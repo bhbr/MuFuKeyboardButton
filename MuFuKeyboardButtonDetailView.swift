@@ -40,7 +40,6 @@ class MuFuKeyboardButtonDetailView: UIView {
     var highlightedInputIndex: NSInteger
     
     weak var button: MuFuKeyboardButton?
-    var expandedPosition: MuFuKeyboardButtonPosition
     var inputOptionsRects: Array<CGRect>?
     
     var displayLabel = UILabel()
@@ -92,12 +91,12 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         
         if (newButton.position != .Inner) {
-            expandedPosition = newButton.position
+            button!.position = newButton.position
         } else {
             // Determine the position
             let leftPadding = newButton.frame.minX
             let rightPadding = (newButton.superview?.frame.maxX)! - newButton.frame.maxX
-            expandedPosition = (leftPadding > rightPadding ? .Left : .Right)
+            button!.position = (leftPadding > rightPadding ? .Left : .Right)
         }
         
         super.init(frame: frame)
@@ -524,7 +523,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         var offsetX: CGFloat = 0.0
         var offsetY: CGFloat = 0.0
         
-        switch expandedPosition {
+        switch button!.position {
         case .Right:
             switch (button?.style)! {
             case .Phone:
@@ -671,7 +670,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             inputOptionsRects.append(optionRect)
             
             // Offset the option rect
-            switch expandedPosition {
+            switch button!.position {
             case .Right:
                 optionRect = optionRect.offsetBy(dx: offset + spacing, dy: 0.0)
                 break

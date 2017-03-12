@@ -26,21 +26,25 @@
 
 import UIKit
 
-let IPHONE_BUTTON_WIDTH: CGFloat = 26.0 //30
-let IPHONE_BUTTON_HEIGHT: CGFloat = 39.0 //45
+let IPHONE_BUTTON_WIDTH: CGFloat = 26.0
+let IPHONE_BUTTON_HEIGHT: CGFloat = 39.0
 let IPAD_BUTTON_WIDTH: CGFloat = 57.0
 let IPAD_BUTTON_HEIGHT: CGFloat = 55.0
 
 let DEFAULT_BUTTON_BG_COLOR: UIColor = .white
 let SPECIAL_BUTTON_BG_COLOR = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 189.0/255.0, alpha: 1.0)
 
+let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
 
-
-enum MuFuKeyboardButtonPosition { // in keyboard view
+enum MuFuKeyboardButtonOptionsLayout { // which way the option selection fans out
     case Left
     case Inner
     case Right
-    case Count // ???
+}
+
+enum MuFuKeyboardButtonActionStyle {
+    case Character
+    case Function // like shift, switch keyboard, etc.
 }
 
 /**
@@ -65,7 +69,6 @@ extension Notification.Name {
         static let buttonWasPressed = Notification.Name("MuFuKeyboardButtonPressed")
         static let buttonDidShowInputOptions = Notification.Name("MuFuKeyboardButtonDidShowInputOptions")
         static let buttonDidHideInputOptions = Notification.Name("MuFuKeyboardButtonDidHideInputOptions")
-        // ??? static let buttonKeyPressedKey = Notification.Name("MuFuKeyboardButtonKeyPressedKey")
 }
 
 
@@ -98,8 +101,9 @@ protocol MFKBDelegate { // is the KeyboardViewController
 }
 
 
-class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
+@IBDesignable class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
     
+    var position: MuFuKeyboardButtonOptionsLayout
     
     var _font: UIFont? = .systemFont(ofSize: 22.0)
     var font: UIFont? {
@@ -159,7 +163,9 @@ class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
         
     }
     
-    var _displayType: MuFuKeyboardButtonDisplayType
+    @IBInspectable var borderColor: UIColor = .white
+    
+    @IBInspectable var _displayType: MuFuKeyboardButtonDisplayType
     var displayType: MuFuKeyboardButtonDisplayType {
         
         get {
@@ -252,9 +258,9 @@ class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
         }
         
         set(newHighlightedInputOptionsImages) {
-            willChangeValue(forKey: "_higlightedInputOptionsImages")
+            willChangeValue(forKey: "_highlightedInputOptionsImages")
             _highlightedInputOptionsImages = newHighlightedInputOptionsImages
-            didChangeValue(forKey: "_higlightedInputOptionsImages")
+            didChangeValue(forKey: "_highlightedInputOptionsImages")
             if ((inputOptionsImages.count) > 0) {
                 setupInputOptionsConfiguration()
             } else {
@@ -267,12 +273,13 @@ class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
     var buttonMagnifiedView: MuFuKeyboardButtonDetailView? // button and magnifier
     var buttonOptionsView: MuFuKeyboardButtonDetailView? // button options
     
-    lazy var position: MuFuKeyboardButtonPosition = .Inner
+    lazy var optionsViewLayout: MuFuKeyboardButtonOptionsLayout = .Inner
     lazy var optionsViewRecognizer = UILongPressGestureRecognizer()
     lazy var panGestureRecognizer = UIPanGestureRecognizer()
     
     var delegate: MFKBDelegate?
     var showMagnifier: Bool = true
+    var optionsViewDelay: Float = DEFAULT_OPTIONS_VIEW_DELAY
     
     var displayLabel = UILabel()
     var displayImageView = UIImageView()
@@ -283,12 +290,16 @@ class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
     // IMPLEMENTATION //
     ////////////////////
     
-    
+    override func prepareForInterfaceBuilder() {
+        displayLabel.text = "MuFuButton"
+        displayImageView.image = UIImage(named:"sqrt_iPhone")
+    }
     
     init() {
         let frame = CGRect(x:0.0,y:0.0,width:IPHONE_BUTTON_WIDTH,height:IPHONE_BUTTON_HEIGHT)
         _style = .Phone
         _displayType = .Label
+        position = .Inner
         super.init(frame:frame)
         commonInit()
     }
@@ -296,6 +307,7 @@ class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
     override init(frame: CGRect) {
         _style = .Phone
         _displayType = .Label
+        position = .Inner
         super.init(frame: frame)
         commonInit()
     }
@@ -312,6 +324,7 @@ class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
             break
         }
         _displayType = .Label
+        position = .Inner
         super.init(frame: newFrame)
         commonInit()
     }
@@ -319,6 +332,7 @@ class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
     required init?(coder aDecoder: NSCoder) {
         _style = .Phone
         _displayType = .Label
+        position = .Inner
         super.init(coder: aDecoder)
         commonInit()
     }

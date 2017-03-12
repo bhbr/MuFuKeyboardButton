@@ -228,12 +228,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../MuFuKeyboardButton.swift"
-            timestampString = "510588455.53819"
+            timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "511"
-            endingLineNumber = "511"
-            landmarkName = "handleTouchUpInside()"
+            startingLineNumber = "521"
+            endingLineNumber = "521"
+            landmarkName = "setupInputOptionsConfiguration()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -244,27 +244,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../MuFuKeyboardButton.swift"
-            timestampString = "510588455.53819"
+            timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "432"
-            endingLineNumber = "432"
-            landmarkName = "hideMagnifiedInputView()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../MuFuKeyboardButton.swift"
-            timestampString = "510588455.53819"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "412"
-            endingLineNumber = "412"
+            startingLineNumber = "442"
+            endingLineNumber = "442"
             landmarkName = "showInputOptionsView(recognizer:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -275,12 +259,28 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../MuFuKeyboardButtonDetailView.swift"
-            timestampString = "510587202.125495"
+            filePath = "../MuFuKeyboardButton.swift"
+            timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
+            startingLineNumber = "422"
+            endingLineNumber = "422"
+            landmarkName = "MuFuKeyboardButton"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../MuFuKeyboardButtonDetailView.swift"
+            timestampString = "511019922.007666"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "95"
+            endingLineNumber = "95"
             landmarkName = "init(keyboardButton:newType:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -292,11 +292,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../MuFuKeyboardButton.swift"
-            timestampString = "510588455.53819"
+            timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "232"
-            endingLineNumber = "232"
+            startingLineNumber = "235"
+            endingLineNumber = "235"
             landmarkName = "MuFuKeyboardButton"
             landmarkType = "3">
          </BreakpointContent>
@@ -308,11 +308,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../MuFuKeyboardButton.swift"
-            timestampString = "510588455.53819"
+            timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "237"
-            endingLineNumber = "237"
+            startingLineNumber = "240"
+            endingLineNumber = "240"
             landmarkName = "MuFuKeyboardButton"
             landmarkType = "3">
          </BreakpointContent>
