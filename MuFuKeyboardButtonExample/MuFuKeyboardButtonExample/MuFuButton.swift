@@ -9,6 +9,16 @@
 import UIKit
 
 
+let IPHONE_BUTTON_WIDTH: CGFloat = 26.0
+let IPHONE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPAD_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_BUTTON_HEIGHT: CGFloat = 55.0
+
+let DEFAULT_BUTTON_BG_COLOR: UIColor = .white
+let SPECIAL_BUTTON_BG_COLOR = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 189.0/255.0, alpha: 1.0)
+
+let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
+
 
 @IBDesignable class MuFuButton: UIButton {
 
@@ -28,13 +38,9 @@ import UIKit
     
     var shadowLayer = CAShapeLayer()
     
-
-    
-    
-    @IBInspectable var shadowRadius: CGFloat = 1.0 {
+    @IBInspectable var shadowOpacity: Float = 1.0 {
         didSet {
-            shadowLayer.shadowRadius = shadowRadius
-            shadowLayer.shadowOpacity = 1.0
+            shadowLayer.opacity = shadowOpacity
         }
     }
     
@@ -44,7 +50,7 @@ import UIKit
         }
     }
     
-    @IBInspectable var shadowOffset: CGSize = CGSize(width: 0, height: 0) {
+    @IBInspectable var shadowOffset: CGSize = CGSize(width: 0, height: 1) {
         didSet {
             shadowLayer.frame = frame
             shadowLayer.frame.origin.x += shadowOffset.width
@@ -59,40 +65,37 @@ import UIKit
             switch customType {
             case "Character":
                 backgroundColor = .white
+                shadowColor = UIColor.lightGray
+                setTitleColor(.black, for: .normal)
+                cornerRadius = 4.0
+                
             case "Function":
                 backgroundColor = UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0)
                 shadowColor = UIColor.lightGray
                 setTitleColor(.black, for: .normal)
                 cornerRadius = 4.0
+            case "Custom":
+                break
             default:
-                backgroundColor = .white
+                break
             }
             
         }
     }
     
-    @IBInspectable var title: String = "Hi" {
-        didSet {
-            setTitle(title, for: .normal)
-            image = nil
-        }
-    }
+//    @IBInspectable var title: String = "Button" {
+//        didSet {
+//            setTitle(title, for: .normal)
+//            image = nil
+//        }
+//    }
+//    
+//    @IBInspectable var image: UIImage? = nil {
+//        didSet {
+//            setImage(image, for: .normal)
+//        }
+//    }
     
-    @IBInspectable var image: UIImage? = nil {
-        didSet {
-            setImage(image, for: .normal)
-        }
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        //layer.shadowColor = UIColor.black.cgColor
-        //layer.shadowOffset = CGSize(width: 0, height: 1)
-        //layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
-        //layer.shadowOpacity = 1.0
-        
-
-    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -100,23 +103,27 @@ import UIKit
     
     
     override func prepareForInterfaceBuilder() {
-        //layer.shadowOpacity = 1.0
+        setTitle("Button", for: .normal)
         layer.masksToBounds = false
         clipsToBounds = true
+        imageView?.contentMode = .scaleAspectFit
     }
     
     
     override func draw(_ rect: CGRect) {
         
+        imageView?.contentMode = .scaleAspectFit
+        
         let context = UIGraphicsGetCurrentContext()
-        let color: UIColor? = backgroundColor
-        //if isHighlighted {
-            //color = highlightColor
-        //}
+        var color: UIColor? = backgroundColor
+        
+        if isHighlighted {
+            color = highlightColor
+        }
         
         let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height), cornerRadius: cornerRadius)
         context?.saveGState()
-        context?.setShadow(offset: shadowOffset, blur: shadowRadius, color: shadowColor.cgColor)
+        context?.setShadow(offset: shadowOffset, blur: 0, color: shadowColor.cgColor)
         color?.setFill()
         roundedRectanglePath.fill()
         context?.restoreGState()
@@ -124,14 +131,8 @@ import UIKit
         shadowLayer = CAShapeLayer()
         shadowLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
         shadowLayer.fillColor = shadowColor.cgColor
+        shadowLayer.opacity = shadowOpacity
         
-        //shadowLayer.shadowColor = UIColor.clear.cgColor
-        //shadowLayer.shadowPath = shadowLayer.path
-        //shadowLayer.shadowOffset = shadowOffset
-        //shadowLayer.shadowOpacity = 0.8
-        //shadowLayer.shadowRadius = 0
-        
-        //layer.insertSublayer(shadowLayer, at: 0)
         shadowLayer.frame = layer.frame
         shadowLayer.frame.origin.x += shadowOffset.width
         shadowLayer.frame.origin.y += shadowOffset.height
@@ -142,16 +143,10 @@ import UIKit
 
     }
     
-//    init() {
-//        var frame = CGRect.zero
-//        frame.size.width = 30.0
-//        frame.size.height = 45.0
-//        super.init(frame: frame)
-//        titleLabel?.text = "MuFuButton"
-//        imageView?.image = UIImage(named:"sqrt_iPhone")
-//        cornerRadius =  5.0
-//    }
-//    
-//
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+
     
 }

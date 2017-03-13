@@ -26,15 +26,6 @@
 
 import UIKit
 
-let IPHONE_BUTTON_WIDTH: CGFloat = 26.0
-let IPHONE_BUTTON_HEIGHT: CGFloat = 39.0
-let IPAD_BUTTON_WIDTH: CGFloat = 57.0
-let IPAD_BUTTON_HEIGHT: CGFloat = 55.0
-
-let DEFAULT_BUTTON_BG_COLOR: UIColor = .white
-let SPECIAL_BUTTON_BG_COLOR = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 189.0/255.0, alpha: 1.0)
-
-let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
 
 enum MuFuKeyboardButtonOptionsLayout { // which way the option selection fans out
     case Left

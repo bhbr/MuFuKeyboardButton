@@ -64,20 +64,5 @@ class ViewController: UIViewController, MFKBDelegate {
     }
     
     
-    @IBAction func muFuButtonTouchDown(sender: MuFuButton) {
-        sender.image = UIImage(named: "sqrt_iPhone")
-        NSLog(sender.layer.shadowOpacity.debugDescription)
-        NSLog(sender.layer.shadowRadius.description)
-        NSLog(sender.layer.shadowColor.debugDescription)
-        NSLog(sender.layer.shadowOffset.debugDescription)
-        NSLog(sender.layer.shadowPath.debugDescription)
-        NSLog(sender.layer.masksToBounds.description)
-        NSLog(sender.clipsToBounds.description)
-    }
-    
-    @IBAction func muFuButtonTouchUp(sender: MuFuButton) {
-        sender.title = "Hello"
-    }
-
 }
 
