@@ -12,7 +12,7 @@
 		B59EC8FA1E6B0A4000C2E78E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B59EC8F81E6B0A4000C2E78E /* Main.storyboard */; };
 		B59EC8FC1E6B0A4000C2E78E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B59EC8FB1E6B0A4000C2E78E /* Assets.xcassets */; };
 		B59EC8FF1E6B0A4100C2E78E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B59EC8FD1E6B0A4100C2E78E /* LaunchScreen.storyboard */; };
-		B5CF11661E759ADA00015F19 /* MuFuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CF11651E759ADA00015F19 /* MuFuButton.swift */; };
+		B5AABFBF1E75EBAC00D83BB6 /* MuFuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5AABFBE1E75EBAC00D83BB6 /* MuFuButton.swift */; };
 		B5CF16DA1E6DC1490063D1A9 /* MuFuKeyboardButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CF16D81E6DC1490063D1A9 /* MuFuKeyboardButton.swift */; };
 		B5CF16DB1E6DC1490063D1A9 /* MuFuKeyboardButtonDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CF16D91E6DC1490063D1A9 /* MuFuKeyboardButtonDetailView.swift */; };
 		B5D2963A1E7181EA00AFEF9B /* TurtleBezierPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D296391E7181EA00AFEF9B /* TurtleBezierPath.swift */; };
@@ -26,7 +26,7 @@
 		B59EC8FB1E6B0A4000C2E78E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B59EC8FE1E6B0A4100C2E78E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B59EC9001E6B0A4100C2E78E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B5CF11651E759ADA00015F19 /* MuFuButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MuFuButton.swift; sourceTree = "<group>"; };
+		B5AABFBE1E75EBAC00D83BB6 /* MuFuButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MuFuButton.swift; sourceTree = "<group>"; };
 		B5CF16D81E6DC1490063D1A9 /* MuFuKeyboardButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MuFuKeyboardButton.swift; path = ../../MuFuKeyboardButton.swift; sourceTree = "<group>"; };
 		B5CF16D91E6DC1490063D1A9 /* MuFuKeyboardButtonDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MuFuKeyboardButtonDetailView.swift; path = ../../MuFuKeyboardButtonDetailView.swift; sourceTree = "<group>"; };
 		B5D296391E7181EA00AFEF9B /* TurtleBezierPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TurtleBezierPath.swift; sourceTree = "<group>"; };
@@ -77,7 +77,7 @@
 		B59EC90A1E6B0A6800C2E78E /* MuFuKeyboardButton */ = {
 			isa = PBXGroup;
 			children = (
-				B5CF11651E759ADA00015F19 /* MuFuButton.swift */,
+				B5AABFBE1E75EBAC00D83BB6 /* MuFuButton.swift */,
 				B5CF16D81E6DC1490063D1A9 /* MuFuKeyboardButton.swift */,
 				B5CF16D91E6DC1490063D1A9 /* MuFuKeyboardButtonDetailView.swift */,
 			);
@@ -162,7 +162,7 @@
 				B59EC8F71E6B0A4000C2E78E /* ViewController.swift in Sources */,
 				B5CF16DA1E6DC1490063D1A9 /* MuFuKeyboardButton.swift in Sources */,
 				B5D2963A1E7181EA00AFEF9B /* TurtleBezierPath.swift in Sources */,
-				B5CF11661E759ADA00015F19 /* MuFuButton.swift in Sources */,
+				B5AABFBF1E75EBAC00D83BB6 /* MuFuButton.swift in Sources */,
 				B59EC8F51E6B0A4000C2E78E /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

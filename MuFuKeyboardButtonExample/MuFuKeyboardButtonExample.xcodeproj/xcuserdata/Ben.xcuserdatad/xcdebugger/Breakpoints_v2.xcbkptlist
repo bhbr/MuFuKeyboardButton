@@ -231,8 +231,13 @@
             timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
+<<<<<<< Updated upstream
             startingLineNumber = "521"
             endingLineNumber = "521"
+=======
+            startingLineNumber = "511"
+            endingLineNumber = "511"
+>>>>>>> Stashed changes
             landmarkName = "setupInputOptionsConfiguration()"
             landmarkType = "7">
          </BreakpointContent>
@@ -247,8 +252,13 @@
             timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
+<<<<<<< Updated upstream
             startingLineNumber = "442"
             endingLineNumber = "442"
+=======
+            startingLineNumber = "432"
+            endingLineNumber = "432"
+>>>>>>> Stashed changes
             landmarkName = "showInputOptionsView(recognizer:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -263,10 +273,17 @@
             timestampString = "511020774.438569"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
+<<<<<<< Updated upstream
             startingLineNumber = "422"
             endingLineNumber = "422"
             landmarkName = "MuFuKeyboardButton"
             landmarkType = "3">
+=======
+            startingLineNumber = "412"
+            endingLineNumber = "412"
+            landmarkName = "showMagnifiedInputView()"
+            landmarkType = "7">
+>>>>>>> Stashed changes
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
