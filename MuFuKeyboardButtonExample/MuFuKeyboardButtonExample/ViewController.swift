@@ -64,5 +64,19 @@ class ViewController: UIViewController, MFKBDelegate {
     }
     
     
+    @IBAction func functionButtonTouchDown(_ sender: MuFuButton) {
+        NSLog("function button touch down")
+    }
+    
+    @IBAction func buttonQPressed(_ sender: MuFuButton!) {
+        NSLog(sender.currentTitle!)
+    }
+    
+    @IBOutlet var muFuButton: MuFuButton?
+    
+    @IBAction func interrupt() {
+        
+    }
+    
 }
 

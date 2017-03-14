@@ -26,6 +26,11 @@
 
 import UIKit
 
+let IPHONE_BUTTON_WIDTH: CGFloat = 26.0
+let IPHONE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPAD_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_BUTTON_HEIGHT: CGFloat = 55.0
+
 
 enum MuFuKeyboardButtonOptionsLayout { // which way the option selection fans out
     case Left
@@ -65,21 +70,6 @@ extension Notification.Name {
 
 
 
-extension UIImage {
-    
-    func inverted() -> UIImage? {
-        guard let cgImage = self.cgImage else { return nil }
-        let ciImage = CoreImage.CIImage(cgImage: cgImage)
-        guard let filter = CIFilter(name: "CIColorInvert") else { return nil }
-        filter.setDefaults()
-        filter.setValue(ciImage, forKey: kCIInputImageKey)
-        let context = CIContext(options: nil)
-        guard let outputImage = filter.outputImage else { return nil }
-        guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
-        return UIImage(cgImage: outputImageCopy)
-    }
-    
-}
 
 
 

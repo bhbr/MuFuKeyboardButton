@@ -6,23 +6,143 @@
 //  Copyright © 2017 Ben Hambrecht. All rights reserved.
 //
 
+
 import UIKit
 
 
-let IPHONE_BUTTON_WIDTH: CGFloat = 26.0
-let IPHONE_BUTTON_HEIGHT: CGFloat = 39.0
-let IPAD_BUTTON_WIDTH: CGFloat = 57.0
-let IPAD_BUTTON_HEIGHT: CGFloat = 55.0
+extension UIImage {
+    
+    func inverted() -> UIImage? {
+        guard let cgImage = self.cgImage else { return nil }
+        let ciImage = CoreImage.CIImage(cgImage: cgImage)
+        guard let filter = CIFilter(name: "CIColorInvert") else { return nil }
+        filter.setDefaults()
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+        let context = CIContext(options: nil)
+        guard let outputImage = filter.outputImage else { return nil }
+        guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
+        return UIImage(cgImage: outputImageCopy)
+    }
+    
+    func tintedImage(color: UIColor) -> UIImage? {
+        // colors the whole image in the same color (preserves alpha)
+        guard let cgImage = self.cgImage else { return nil }
+        let ciImage = CoreImage.CIImage(cgImage: cgImage)
+        guard let filter = CIFilter(name: "CIColorPolynomial") else { return nil }
+        filter.setDefaults()
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+        
+        let ciColor = CIColor(color: color)
+        let redVector = CIVector(x: ciColor.red, y: 0, z: 0, w: 0)
+        let greenVector = CIVector(x: ciColor.green, y: 0, z: 0, w: 0)
+        let blueVector = CIVector(x: ciColor.blue, y: 0, z: 0, w: 0)
+        let alphaVector = CIVector(x: 0, y: 1, z: 0, w: 0)
+        
+        filter.setValue(redVector, forKey: "inputRedCoefficients")
+        filter.setValue(greenVector, forKey: "inputGreenCoefficients")
+        filter.setValue(blueVector, forKey: "inputBlueCoefficients")
+        filter.setValue(alphaVector, forKey: "inputAlphaCoefficients")
+        
+        let context = CIContext(options: nil)
+        guard let outputImage = filter.outputImage else { return nil }
+        guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
+        return UIImage(cgImage: outputImageCopy)
+        
+    }
+}
 
-let DEFAULT_BUTTON_BG_COLOR: UIColor = .white
-let SPECIAL_BUTTON_BG_COLOR = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 189.0/255.0, alpha: 1.0)
+
+// Constants
+
+let CHARACTER_BUTTON_BG_COLOR: UIColor = .white
+let CHARACTER_BUTTON_TEXT_COLOR: UIColor = .black
+let CHARACTER_BUTTON_HIGHLIGHT_BG_COLOR: UIColor = .white
+let CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR: UIColor = .white
+
+let FUNCTION_BUTTON_BG_COLOR = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 189.0/255.0, alpha: 1.0)
+let FUNCTION_BUTTON_TEXT_COLOR: UIColor = .black
+let FUNCTION_BUTTON_HIGHLIGHT_BG_COLOR: UIColor = .white
+let FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR: UIColor = .black
+
+
+let BUTTON_SHADOW_COLOR = UIColor(red: 137.0/255.0, green: 139.0/255.0, blue: 143.0/255.0, alpha: 1.0)
 
 let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
 
 
-@IBDesignable class MuFuButton: UIButton {
 
-    @IBInspectable var highlightColor: UIColor = .blue
+
+@IBDesignable class MuFuButton: UIButton {
+    
+    var _normalColor: UIColor = .white
+    @IBInspectable var normalColor: UIColor {
+        get {
+            return _normalColor
+        }
+        set {
+            switch customType {
+            case "Character":
+                _normalColor = CHARACTER_BUTTON_BG_COLOR
+            case "Function":
+                _normalColor = FUNCTION_BUTTON_BG_COLOR
+            default:
+                _normalColor = newValue
+            }
+        }
+    }
+    
+    var _normalTextColor: UIColor = .black
+    @IBInspectable var normalTextColor: UIColor {
+        get {
+                return _normalTextColor
+        }
+        set {
+            switch customType {
+            case "Character":
+                _normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
+            case "Function":
+                _normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
+            default:
+                _normalTextColor = newValue
+            }
+        }
+    }
+
+    
+    var _highlightColor: UIColor = .blue
+    @IBInspectable var highlightColor: UIColor {
+        get {
+            return _highlightColor
+        }
+        set {
+            switch customType {
+            case "Character":
+                _highlightColor = CHARACTER_BUTTON_HIGHLIGHT_BG_COLOR
+            case "Function":
+                _highlightColor = FUNCTION_BUTTON_HIGHLIGHT_BG_COLOR
+            default:
+                _highlightColor = newValue
+            }
+        }
+    }
+    
+    var _highlightTextColor: UIColor = .white
+    @IBInspectable var highlightTextColor: UIColor {
+        get {
+            return _highlightTextColor
+        }
+        set {
+            switch customType {
+            case "Character":
+                _highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
+            case "Function":
+                _highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
+            default:
+                _highlightTextColor = newValue
+            }
+        }
+    }
+
     
     @IBInspectable var cornerRadius: CGFloat {
         get {
@@ -31,10 +151,11 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         set {
             layer.cornerRadius = newValue
             layer.masksToBounds = newValue > 0
-
         }
     }
     
+    // CALayer's shadow is not rendered live in Storyboard
+    // So we build our own shadow
     
     var shadowLayer = CAShapeLayer()
     
@@ -58,22 +179,32 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         }
     }
     
+    @IBInspectable var customImage: UIImage? {
+        didSet {
+            imageView?.image = customImage
+            highlightedImage = customImage?.tintedImage(color: highlightTextColor)
+        }
+    }
     
+    var highlightedImage: UIImage?
     
-    @IBInspectable var customType: String = "Character" {
+    // Button Type: "Character" is the white kind
+    // "Function" are they gray buttons such as Shift, return etc.
+    
+    // They override the IBInspectable properties, so setting them has no effect
+    // as long as the button type is either Character or Function.
+    
+    // Set it to Custom or anything else to customize the button with
+    // the IBDesignable properties.
+    
+    @IBInspectable var customType: String = "" {
         didSet {
             switch customType {
             case "Character":
-                backgroundColor = .white
-                shadowColor = UIColor.lightGray
-                setTitleColor(.black, for: .normal)
-                cornerRadius = 4.0
-                
+                setupAsCharacterButton()
             case "Function":
-                backgroundColor = UIColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1.0)
-                shadowColor = UIColor.lightGray
-                setTitleColor(.black, for: .normal)
-                cornerRadius = 4.0
+                NSLog("customType set to 'Function'")
+                setupAsFunctionButton()
             case "Custom":
                 break
             default:
@@ -83,56 +214,145 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         }
     }
     
-//    @IBInspectable var title: String = "Button" {
-//        didSet {
-//            setTitle(title, for: .normal)
-//            image = nil
-//        }
-//    }
-//    
-//    @IBInspectable var image: UIImage? = nil {
-//        didSet {
-//            setImage(image, for: .normal)
-//        }
-//    }
+    func setupAsCharacterButton() {
+        NSLog("setupAsCharacterButton")
+        normalColor = CHARACTER_BUTTON_BG_COLOR
+        normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
+        highlightColor = CHARACTER_BUTTON_HIGHLIGHT_BG_COLOR
+        highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
+        
+        backgroundColor = normalColor
+        
+        shadowColor = BUTTON_SHADOW_COLOR
+        shadowOffset = CGSize(width: 0, height: 1)
+        
+        cornerRadius = 4.0
+        
+        // character buttons use font size 22
+        titleLabel?.font = .systemFont(ofSize: 22)
+        
+    }
     
+    func setupAsFunctionButton() {
+        NSLog("setupAsFunctionButton")
+
+        normalColor = FUNCTION_BUTTON_BG_COLOR
+        normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
+        highlightColor = FUNCTION_BUTTON_HIGHLIGHT_BG_COLOR
+        highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
+        
+        backgroundColor = normalColor
+        
+        shadowColor = BUTTON_SHADOW_COLOR
+        shadowOffset = CGSize(width: 0, height: 1)
+        
+        cornerRadius = 4.0
+        
+        // function buttons may use another font size
+        
+    }
+    
+    // actions common to all initializers
+    func commonInit() {
+        NSLog("commonInit")
+        addTarget(self, action: #selector(highlight), for: .touchDown)
+        addTarget(self, action: #selector(unhighlight), for: .touchUpInside)
+        // Text color can be associated with control state using
+        // a built-in function:
+        setTitleColor(normalTextColor, for: .normal)
+        setTitleColor(highlightTextColor, for: .highlighted)
+        // Background color is first set to normalColor (not highlighted)
+        backgroundColor = normalColor
+        
+    }
+    
+    override init(frame: CGRect) {
+        NSLog("init(frame:)")
+        super.init(frame: frame)
+        commonInit()
+    }
     
     required init?(coder aDecoder: NSCoder) {
+        NSLog("init(coder:)")
         super.init(coder: aDecoder)
+        commonInit()
     }
     
     
     override func prepareForInterfaceBuilder() {
-        setTitle("Button", for: .normal)
+        NSLog("prepareForInterfaceBuilder")
         layer.masksToBounds = false
         clipsToBounds = true
         imageView?.contentMode = .scaleAspectFit
+        setNeedsLayout()
     }
+    
+    
+    
+    
+    // Background color should be able to change with UIControlState
+    // so we store two colors as properties and change it using
+    // helper functions:
+    
+    func highlight() {
+        backgroundColor = highlightColor
+    }
+    
+    func unhighlight() {
+        backgroundColor = normalColor
+    }
+    
     
     
     override func draw(_ rect: CGRect) {
         
-        imageView?.contentMode = .scaleAspectFit
-        
-        let context = UIGraphicsGetCurrentContext()
-        var color: UIColor? = backgroundColor
-        
-        if isHighlighted {
-            color = highlightColor
+        // fit image (if there is one)
+        if imageView?.image != nil {
+            imageView?.contentMode = .scaleAspectFit
         }
+        
+        if highlightedImage == nil {
+            // save highlighted version of image
+            highlightedImage = imageView?.image?.tintedImage(color: highlightTextColor)
+        }
+        
+        // and associate with control states
+        setImage(customImage, for: .normal)
+        setImage(highlightedImage, for: .highlighted)
+        let titleText = titleLabel?.text
+        setTitle("test", for: .highlighted)
+        
+        NSLog("draw")
+        // update colors (for live storyboard rendering)
+        if isHighlighted {
+            backgroundColor = highlightColor
+            titleLabel?.textColor = highlightTextColor
+            tintColor = highlightTextColor
+            
+        } else {
+            backgroundColor = normalColor
+            titleLabel?.textColor = normalTextColor
+            tintColor = normalTextColor
+        }
+        
+        
+        // draw shadow: first recreate the button shape
+        let context = UIGraphicsGetCurrentContext()
         
         let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height), cornerRadius: cornerRadius)
         context?.saveGState()
         context?.setShadow(offset: shadowOffset, blur: 0, color: shadowColor.cgColor)
-        color?.setFill()
+        backgroundColor?.setFill()
         roundedRectanglePath.fill()
         context?.restoreGState()
         
+        // now draw this shape in the shadow layer
         shadowLayer = CAShapeLayer()
         shadowLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
         shadowLayer.fillColor = shadowColor.cgColor
         shadowLayer.opacity = shadowOpacity
         
+        // and position
         shadowLayer.frame = layer.frame
         shadowLayer.frame.origin.x += shadowOffset.width
         shadowLayer.frame.origin.y += shadowOffset.height
@@ -141,10 +361,6 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         layer.masksToBounds = false
         clipsToBounds = true
 
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
     }
     
 
