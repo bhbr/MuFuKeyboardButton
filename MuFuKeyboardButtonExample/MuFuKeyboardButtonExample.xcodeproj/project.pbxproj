@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B57CD67F1E798F1B0067948E /* MFBMagnifierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57CD67E1E798F1B0067948E /* MFBMagnifierView.swift */; };
 		B59EC8F51E6B0A4000C2E78E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59EC8F41E6B0A4000C2E78E /* AppDelegate.swift */; };
 		B59EC8F71E6B0A4000C2E78E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59EC8F61E6B0A4000C2E78E /* ViewController.swift */; };
 		B59EC8FA1E6B0A4000C2E78E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B59EC8F81E6B0A4000C2E78E /* Main.storyboard */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B57CD67E1E798F1B0067948E /* MFBMagnifierView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MFBMagnifierView.swift; sourceTree = "<group>"; };
 		B59EC8F11E6B0A4000C2E78E /* MuFuKeyboardButtonExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MuFuKeyboardButtonExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B59EC8F41E6B0A4000C2E78E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B59EC8F61E6B0A4000C2E78E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				B5AABFBE1E75EBAC00D83BB6 /* MuFuButton.swift */,
+				B57CD67E1E798F1B0067948E /* MFBMagnifierView.swift */,
 				B5CF16D81E6DC1490063D1A9 /* MuFuKeyboardButton.swift */,
 				B5CF16D91E6DC1490063D1A9 /* MuFuKeyboardButtonDetailView.swift */,
 			);
@@ -159,6 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B5CF16DB1E6DC1490063D1A9 /* MuFuKeyboardButtonDetailView.swift in Sources */,
+				B57CD67F1E798F1B0067948E /* MFBMagnifierView.swift in Sources */,
 				B59EC8F71E6B0A4000C2E78E /* ViewController.swift in Sources */,
 				B5CF16DA1E6DC1490063D1A9 /* MuFuKeyboardButton.swift in Sources */,
 				B5D2963A1E7181EA00AFEF9B /* TurtleBezierPath.swift in Sources */,

@@ -105,9 +105,18 @@ let BUTTON_SHADOW_COLOR = UIColor(red: 137.0/255.0, green: 139.0/255.0, blue: 14
 let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
 
 
+enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans out
+    case Left
+    case Inner
+    case Right
+}
 
 
 @IBDesignable class MuFuButton: UIButton {
+    
+    var popoverDirection: MuFuKeyboardButtonPopoverDirection = .Inner
+    
+    var magnifierView = MFBMagnifierView(frame: CGRect.zero)
     
     var _normalColor: UIColor = .white
     @IBInspectable var normalColor: UIColor {
@@ -141,12 +150,16 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
     
     func highlight() {
         backgroundColor = highlightColor
+        superview?.addSubview(magnifierView)
+        //layer.insertSublayer(magnifierView.layer, below: nil)
+        magnifierView.setNeedsDisplay()
     }
     
     func unhighlight() {
         backgroundColor = normalColor
+        //magnifierView.removeFromSuperview()
     }
-//
+
 //    var _normalTextColor: UIColor = .black
 //    @IBInspectable var normalTextColor: UIColor {
 //        get {
@@ -211,13 +224,14 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         }
         set {
             layer.cornerRadius = newValue
-            layer.masksToBounds = newValue > 0
+            layer.masksToBounds = false // newValue > 0
         }
     }
     
     // CALayer's shadow is not rendered live in Storyboard
     // So we build our own shadow
     
+    var buttonLayer = CAShapeLayer()
     var shadowLayer = CAShapeLayer()
     
     @IBInspectable var shadowOpacity: Float = 1.0 {
@@ -332,6 +346,9 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         //setTitleColor(highlightTextColor, for: .highlighted)
         // Background color is first set to normalColor (not highlighted)
         backgroundColor = normalColor
+        var magnifiedFrame = frame
+        
+        magnifierView = MFBMagnifierView(frame: magnifiedFrame)
         
     }
     
@@ -417,23 +434,32 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         roundedRectanglePath.fill()
         context?.restoreGState()
         
+        buttonLayer = CAShapeLayer()
+        buttonLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
+        buttonLayer.fillColor = backgroundColor?.cgColor
+        buttonLayer.frame = layer.frame
+        
+        
         // now draw this shape in the shadow layer
         shadowLayer = CAShapeLayer()
         shadowLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
         shadowLayer.fillColor = shadowColor.cgColor
         shadowLayer.opacity = shadowOpacity
+        superview?.layer.insertSublayer(buttonLayer, below: layer)
         
         // and position
         shadowLayer.frame = layer.frame
         shadowLayer.frame.origin.x += shadowOffset.width
         shadowLayer.frame.origin.y += shadowOffset.height
-        superview?.layer.insertSublayer(shadowLayer, below: layer)
+        superview?.layer.insertSublayer(shadowLayer, below: buttonLayer)
 
         layer.masksToBounds = false
         clipsToBounds = true
+        
 
     }
     
+
 
     
 }
