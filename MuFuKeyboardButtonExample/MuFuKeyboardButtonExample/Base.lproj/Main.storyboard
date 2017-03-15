@@ -22,21 +22,24 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleAspectFit" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oW2-tt-lbf" customClass="MuFuButton" customModule="MuFuKeyboardButtonExample" customModuleProvider="target">
-                                <rect key="frame" x="16" y="20" width="185" height="47"/>
+                                <rect key="frame" x="117" y="104" width="54" height="33"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.088490091260000001" green="0.25170588490000001" blue="0.5296390057" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" none="YES"/>
+                                </accessibility>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <state key="normal" title="123" image="sqrt_iPhone">
-                                    <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Tap" image="sqrt_iPhone">
+                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                </state>
+                                <state key="highlighted" title="High">
+                                    <color key="titleColor" red="1" green="0.94901960780000005" blue="0.043137254899999998" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="title" value="Button"/>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                         <real key="value" value="8"/>
-                                    </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
-                                        <color key="value" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
                                         <size key="value" width="0.0" height="1"/>
@@ -51,15 +54,16 @@
                                         <color key="value" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="highlightColor">
-                                        <color key="value" red="0.088490091260000001" green="0.25170588490000001" blue="0.5296390057" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="value" red="0.75759208300000003" green="0.44019794639999998" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="highlightTextColor">
                                         <color key="value" red="0.75759208300000003" green="0.44019794639999998" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="customType" value="Custom"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="customType" value="Character"/>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="customImage" value="sqrt_iPhone"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="functionButtonTouchDown:" destination="BYZ-38-t0r" eventType="touchDown" id="Xe8-9U-ukf"/>
+                                    <action selector="functionButtonTouchDown:" destination="BYZ-38-t0r" eventType="touchUpInside" id="yU0-jf-cxO"/>
                                 </connections>
                             </button>
                         </subviews>

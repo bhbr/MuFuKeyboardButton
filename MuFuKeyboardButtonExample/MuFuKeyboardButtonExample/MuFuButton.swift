@@ -9,8 +9,25 @@
 
 import UIKit
 
+extension UIColor {
+    
+    func getRGBAComponents() -> (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)?
+    {
+        var (red, green, blue, alpha) = (CGFloat(0.0), CGFloat(0.0), CGFloat(0.0), CGFloat(0.0))
+        if self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        {
+            return (red, green, blue, alpha)
+        }
+        else
+        {
+            return nil
+        }
+    }
+    
+}
 
 extension UIImage {
+    
     
     func inverted() -> UIImage? {
         guard let cgImage = self.cgImage else { return nil }
@@ -33,9 +50,16 @@ extension UIImage {
         filter.setValue(ciImage, forKey: kCIInputImageKey)
         
         let ciColor = CIColor(color: color)
-        let redVector = CIVector(x: ciColor.red, y: 0, z: 0, w: 0)
-        let greenVector = CIVector(x: ciColor.green, y: 0, z: 0, w: 0)
-        let blueVector = CIVector(x: ciColor.blue, y: 0, z: 0, w: 0)
+        //var red = ciColor.red > 0 ? ciColor.red : 0 - ciColor.red
+        
+        let (red, green, blue, alpha) = color.getRGBAComponents()!
+        
+        //var green = ciColor.green > 0 ? ciColor.green : 0 - ciColor.green
+        //var blue = ciColor.blue > 0 ? ciColor.blue : 0 - ciColor.blue
+        
+        let redVector = CIVector(x: red, y: 0, z: 0, w: 0)
+        let greenVector = CIVector(x: green, y: 0, z: 0, w: 0)
+        let blueVector = CIVector(x: blue, y: 0, z: 0, w: 0)
         let alphaVector = CIVector(x: 0, y: 1, z: 0, w: 0)
         
         filter.setValue(redVector, forKey: "inputRedCoefficients")
@@ -45,8 +69,19 @@ extension UIImage {
         
         let context = CIContext(options: nil)
         guard let outputImage = filter.outputImage else { return nil }
-        guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
-        return UIImage(cgImage: outputImageCopy)
+        
+        let scale: CGFloat = self.size.width / outputImage.extent.size.width
+        NSLog(self.size.width.description)
+        NSLog(outputImage.debugDescription)
+        
+        let scalingTransform = CGAffineTransform(scaleX: scale, y: scale)
+        
+        guard let outputImageCopy = context.createCGImage(outputImage.applying(scalingTransform), from: outputImage.extent) else { return nil }
+        let cropRect = CGRect(x: 0, y: (1 - scale) * outputImage.extent.height, width: scale * outputImage.extent.width, height: scale * outputImage.extent.height)
+        guard let croppedOutputImage = outputImageCopy.cropping(to: cropRect) else { return nil }
+        let scaledOutputImage = UIImage(cgImage: croppedOutputImage)
+        
+        return scaledOutputImage
         
     }
 }
@@ -88,27 +123,48 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
             default:
                 _normalColor = newValue
             }
+            
+            checkHighlightColor()
         }
     }
     
-    var _normalTextColor: UIColor = .black
-    @IBInspectable var normalTextColor: UIColor {
-        get {
-                return _normalTextColor
-        }
-        set {
-            switch customType {
-            case "Character":
-                _normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
-            case "Function":
-                _normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
-            default:
-                _normalTextColor = newValue
-            }
+    
+    
+    func checkHighlightColor() {
+        if isHighlighted {
+            backgroundColor = highlightColor
+        } else {
+            backgroundColor = normalColor
         }
     }
-
     
+    
+    func highlight() {
+        backgroundColor = highlightColor
+    }
+    
+    func unhighlight() {
+        backgroundColor = normalColor
+    }
+//
+//    var _normalTextColor: UIColor = .black
+//    @IBInspectable var normalTextColor: UIColor {
+//        get {
+//                return _normalTextColor
+//        }
+//        set {
+//            switch customType {
+//            case "Character":
+//                _normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
+//            case "Function":
+//                _normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
+//            default:
+//                _normalTextColor = newValue
+//            }
+//        }
+//    }
+//
+//    
     var _highlightColor: UIColor = .blue
     @IBInspectable var highlightColor: UIColor {
         get {
@@ -123,25 +179,30 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
             default:
                 _highlightColor = newValue
             }
+            
+            checkHighlightColor()
         }
     }
     
-    var _highlightTextColor: UIColor = .white
-    @IBInspectable var highlightTextColor: UIColor {
-        get {
-            return _highlightTextColor
-        }
-        set {
-            switch customType {
-            case "Character":
-                _highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
-            case "Function":
-                _highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
-            default:
-                _highlightTextColor = newValue
-            }
-        }
-    }
+    
+    
+//
+//    var _highlightTextColor: UIColor = .white
+//    @IBInspectable var highlightTextColor: UIColor {
+//        get {
+//            return _highlightTextColor
+//        }
+//        set {
+//            switch customType {
+//            case "Character":
+//                _highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
+//            case "Function":
+//                _highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
+//            default:
+//                _highlightTextColor = newValue
+//            }
+//        }
+//    }
 
     
     @IBInspectable var cornerRadius: CGFloat {
@@ -179,14 +240,14 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         }
     }
     
-    @IBInspectable var customImage: UIImage? {
-        didSet {
-            imageView?.image = customImage
-            highlightedImage = customImage?.tintedImage(color: highlightTextColor)
-        }
-    }
-    
-    var highlightedImage: UIImage?
+//    @IBInspectable var customImage: UIImage? {
+//        didSet {
+//            imageView?.image = customImage
+//            highlightedImage = customImage?.tintedImage(color: highlightTextColor)
+//        }
+//    }
+//
+//    var highlightedImage: UIImage?
     
     // Button Type: "Character" is the white kind
     // "Function" are they gray buttons such as Shift, return etc.
@@ -217,9 +278,12 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
     func setupAsCharacterButton() {
         NSLog("setupAsCharacterButton")
         normalColor = CHARACTER_BUTTON_BG_COLOR
-        normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
+//        normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
         highlightColor = CHARACTER_BUTTON_HIGHLIGHT_BG_COLOR
-        highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
+//        highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
+        setTitleColor(CHARACTER_BUTTON_TEXT_COLOR, for: .normal)
+        setTitleColor(CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR, for: .highlighted)
+        
         
         backgroundColor = normalColor
         
@@ -231,15 +295,20 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         // character buttons use font size 22
         titleLabel?.font = .systemFont(ofSize: 22)
         
+        imageView?.contentMode = .scaleAspectFit
+        
     }
     
     func setupAsFunctionButton() {
         NSLog("setupAsFunctionButton")
 
         normalColor = FUNCTION_BUTTON_BG_COLOR
-        normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
+//        normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
         highlightColor = FUNCTION_BUTTON_HIGHLIGHT_BG_COLOR
-        highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
+        //        highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
+        //        highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
+        setTitleColor(FUNCTION_BUTTON_TEXT_COLOR, for: .normal)
+        setTitleColor(FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR, for: .highlighted)
         
         backgroundColor = normalColor
         
@@ -259,8 +328,8 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
         addTarget(self, action: #selector(unhighlight), for: .touchUpInside)
         // Text color can be associated with control state using
         // a built-in function:
-        setTitleColor(normalTextColor, for: .normal)
-        setTitleColor(highlightTextColor, for: .highlighted)
+        //setTitleColor(normalTextColor, for: .normal)
+        //setTitleColor(highlightTextColor, for: .highlighted)
         // Background color is first set to normalColor (not highlighted)
         backgroundColor = normalColor
         
@@ -294,13 +363,13 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
     // so we store two colors as properties and change it using
     // helper functions:
     
-    func highlight() {
-        backgroundColor = highlightColor
-    }
-    
-    func unhighlight() {
-        backgroundColor = normalColor
-    }
+//    func highlight() {
+//        backgroundColor = highlightColor
+//    }
+//    
+//    func unhighlight() {
+//        backgroundColor = normalColor
+//    }
     
     
     
@@ -311,29 +380,31 @@ let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
             imageView?.contentMode = .scaleAspectFit
         }
         
-        if highlightedImage == nil {
+        if image(for: .highlighted) == image(for: .normal) {
             // save highlighted version of image
-            highlightedImage = imageView?.image?.tintedImage(color: highlightTextColor)
-        }
+            if let highlightTextColor = titleColor(for: .highlighted) {
+                let highlightedImage = imageView?.image?.tintedImage(color: highlightTextColor)
         
-        // and associate with control states
-        setImage(customImage, for: .normal)
-        setImage(highlightedImage, for: .highlighted)
-        let titleText = titleLabel?.text
-        setTitle("test", for: .highlighted)
+        
+            // and associate with control states
+            //setImage(customImage, for: .normal)
+                setImage(highlightedImage, for: .highlighted)
+            //setTitle("test", for: .highlighted)
+            }
+        }
         
         NSLog("draw")
         // update colors (for live storyboard rendering)
-        if isHighlighted {
-            backgroundColor = highlightColor
-            titleLabel?.textColor = highlightTextColor
-            tintColor = highlightTextColor
-            
-        } else {
-            backgroundColor = normalColor
-            titleLabel?.textColor = normalTextColor
-            tintColor = normalTextColor
-        }
+//        if isHighlighted {
+//            backgroundColor = highlightColor
+//            titleLabel?.textColor = highlightTextColor
+//            tintColor = highlightTextColor
+//            
+//        } else {
+//            backgroundColor = normalColor
+//            titleLabel?.textColor = normalTextColor
+//            tintColor = normalTextColor
+//        }
         
         
         // draw shadow: first recreate the button shape
