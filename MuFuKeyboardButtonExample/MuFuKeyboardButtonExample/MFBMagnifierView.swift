@@ -8,28 +8,92 @@
 
 import UIKit
 
+protocol MuFuMagnifierDelegate {
+    var frame: CGRect { get }
+    var titleLabel: UILabel? { get }
+    
+    var imageView: UIImageView? { get }
+    
+    func titleColor(for: UIControlState) -> UIColor?
+    func setTitleColor(_: UIColor?, for: UIControlState)
+}
+
+extension UIButton: MuFuMagnifierDelegate {
+    
+}
+
 class MFBMagnifierView: UIView {
     
     var popoverDirection: MuFuKeyboardButtonPopoverDirection = .Inner
+    var rootButton: MuFuMagnifierDelegate {
+        didSet {
+            generateOverlay()
+        }
+    }
 
     var bezierPath = UIBezierPath()
     
+    var bezierPath2: UIBezierPath {
+        get {
+            return UIBezierPath(cgPath: bezierPath.cgPath)
+        }
+    }
+    
+    var fillColor = UIColor.white
+    
+    var magnifiedButton = UIButton()
+    var magnification: CGFloat = 1.5 {
+        didSet {
+            setupMagnificationButton()
+        }
+    }
+    
+    func setupMagnificationButton() {
+        
+        let magnifiedFrame = CGRect(x: 0, y: 0, width: magnification * rootButton.frame.size.width, height: magnification * rootButton.frame.size.height)
+        
+        magnifiedButton = UIButton(frame: magnifiedFrame)
+        
+        magnifiedButton.setTitle(rootButton.titleLabel?.text, for: .normal)
+        magnifiedButton.titleLabel?.font = rootButton.titleLabel?.font.withSize(magnification * (rootButton.titleLabel?.font.pointSize)!)
+        magnifiedButton.setTitleColor(rootButton.titleColor(for: .highlighted), for: .normal)
+        magnifiedButton.setImage(rootButton.imageView?.image?.tintedImage(color: rootButton.titleColor(for: .highlighted)!), for: .normal)
+        magnifiedButton.imageView?.bounds = CGRect(x: (magnifiedButton.imageView?.bounds.origin.x)!,
+                                                   y: (magnifiedButton.imageView?.bounds.origin.y)!,
+                                                   width: magnification * (magnifiedButton.imageView?.bounds.size.width)!,
+                                                   height: magnification * (magnifiedButton.imageView?.bounds
+                                                    .size.height)!)
+        
+        
+        self.addSubview(magnifiedButton)
+        
+    }
+
     override init(frame: CGRect) {
+        self.rootButton = UIButton()
         super.init(frame: frame)
         clipsToBounds = false
         
         backgroundColor = .clear
+        fillColor = .yellow
         
+        generateOverlay()
+        
+    }
+    
+    func generateOverlay() {
         // Generate the overlay
         bezierPath = magnifierViewPath()
         // expand the frame
         
         let padding: CGFloat = 10
         
-        let x0 = frame.origin.x
-        let y0 = frame.origin.y
-        let w0 = frame.size.width
-        let h0 = frame.size.height
+        let rootFrame = rootButton.frame
+        
+        let x0 = rootButton.frame.origin.x
+        let y0 = rootButton.frame.origin.y
+        let w0 = rootButton.frame.size.width
+        let h0 = rootButton.frame.size.height
         
         let w = bezierPath.bounds.width
         let h = bezierPath.bounds.height
@@ -50,7 +114,7 @@ class MFBMagnifierView: UIView {
                                 y: y0 - (h - h0) - padding,
                                 width: w + 2 * padding,
                                 height: h + 2 * padding)
-
+            
         }
         
         bezierPath.apply(CGAffineTransform(translationX: padding, y: padding))
@@ -61,12 +125,6 @@ class MFBMagnifierView: UIView {
     }
     
     override func draw(_ rect: CGRect) {
-        
-        
-        
-        
-        // Position the overlay
-        let keyRect = bounds
         
         //        magnifierView.bounds = bezierPath.bounds
         //        magnifierView.frame.origin.x = frame.midX - magnifierView.bounds.width / 2.0
@@ -80,19 +138,18 @@ class MFBMagnifierView: UIView {
         
         let context = UIGraphicsGetCurrentContext()
         
-        let highlightColor = UIColor.yellow
         // Overlay path & shadow
         
         //// Shadow Declarations
         let shadow = UIColor.gray
         
-        var shadowOffset = CGSize(width: 0, height: 0.5)
-        var shadowBlurRadius = 2.0
+        let shadowOffset = CGSize(width: 0, height: 0.5)
+        let shadowBlurRadius = 2.0
         
         //// Rounded Rectangle Drawing
         context?.saveGState()
         context?.setShadow(offset: shadowOffset, blur: CGFloat(shadowBlurRadius), color: shadow.cgColor)
-        highlightColor.setFill()
+        fillColor.setFill()
         bezierPath.fill()
         context!.restoreGState()
         
@@ -118,10 +175,10 @@ class MFBMagnifierView: UIView {
     
     func magnifierViewPath() -> UIBezierPath {
         
-        let keyRect = bounds
+        let keyRect = rootButton.frame
         let insets = UIEdgeInsets(top: 7.0, left: 13.0, bottom: 7.0, right: 13.0)
-        let upperWidth = frame.width + insets.left + insets.right
-        let lowerWidth = frame.width
+        let upperWidth = keyRect.width + insets.left + insets.right
+        let lowerWidth = keyRect.width
         let majorRadius: CGFloat = 10.0
         let minorRadius: CGFloat = 4.0
         

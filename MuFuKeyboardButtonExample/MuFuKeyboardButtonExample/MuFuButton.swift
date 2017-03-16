@@ -116,7 +116,12 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
     
     var popoverDirection: MuFuKeyboardButtonPopoverDirection = .Inner
     
-    var magnifierView = MFBMagnifierView(frame: CGRect.zero)
+    lazy var magnifierView = UIView() as! MFBMagnifierView
+    @IBInspectable var magnification: CGFloat = 1.0 {
+        didSet {
+            magnifierView.magnification = magnification
+        }
+    }
     
     var _normalColor: UIColor = .white
     @IBInspectable var normalColor: UIColor {
@@ -145,7 +150,12 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
         } else {
             backgroundColor = normalColor
         }
+        magnifierView.fillColor = highlightColor
     }
+    
+    // Background color should be able to change with UIControlState
+    // so we store two colors as properties and change it using
+    // helper functions:
     
     
     func highlight() {
@@ -198,25 +208,6 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
     }
     
     
-    
-//
-//    var _highlightTextColor: UIColor = .white
-//    @IBInspectable var highlightTextColor: UIColor {
-//        get {
-//            return _highlightTextColor
-//        }
-//        set {
-//            switch customType {
-//            case "Character":
-//                _highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
-//            case "Function":
-//                _highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
-//            default:
-//                _highlightTextColor = newValue
-//            }
-//        }
-//    }
-
     
     @IBInspectable var cornerRadius: CGFloat {
         get {
@@ -333,6 +324,8 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
         
         // function buttons may use another font size
         
+        magnification = 1.5
+        
     }
     
     // actions common to all initializers
@@ -346,10 +339,11 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
         //setTitleColor(highlightTextColor, for: .highlighted)
         // Background color is first set to normalColor (not highlighted)
         backgroundColor = normalColor
-        var magnifiedFrame = frame
-        
+        let magnifiedFrame = frame
         magnifierView = MFBMagnifierView(frame: magnifiedFrame)
-        
+        magnifierView.fillColor = highlightColor
+        magnifierView.rootButton = self
+        magnification = 1.5
     }
     
     override init(frame: CGRect) {
@@ -374,19 +368,6 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
     }
     
     
-    
-    
-    // Background color should be able to change with UIControlState
-    // so we store two colors as properties and change it using
-    // helper functions:
-    
-//    func highlight() {
-//        backgroundColor = highlightColor
-//    }
-//    
-//    func unhighlight() {
-//        backgroundColor = normalColor
-//    }
     
     
     
