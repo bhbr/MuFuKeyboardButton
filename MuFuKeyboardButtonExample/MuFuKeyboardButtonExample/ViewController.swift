@@ -20,6 +20,7 @@ class ViewController: UIViewController, MFKBDelegate {
         myButton.displayLabel.text = "x"
         myButton.inputOptionsIDs = ["a", "b", "c"]
         myButton.delegate = self
+        myButton.frame = CGRect(x: 100.0, y: 150.0, width: myButton.frame.size.width, height: myButton.frame.size.height)
         
         self.view.addSubview(myButton)
         

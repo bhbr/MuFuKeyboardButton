@@ -160,7 +160,7 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
     
     func highlight() {
         backgroundColor = highlightColor
-        superview?.addSubview(magnifierView)
+        self.addSubview(magnifierView)
         //layer.insertSublayer(magnifierView.layer, below: nil)
         magnifierView.setNeedsDisplay()
     }
@@ -302,6 +302,8 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
         
         imageView?.contentMode = .scaleAspectFit
         
+        setupMagnifiedView()
+        
     }
     
     func setupAsFunctionButton() {
@@ -326,6 +328,8 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
         
         magnification = 1.5
         
+        setupMagnifiedView()
+        
     }
     
     // actions common to all initializers
@@ -339,11 +343,28 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
         //setTitleColor(highlightTextColor, for: .highlighted)
         // Background color is first set to normalColor (not highlighted)
         backgroundColor = normalColor
-        let magnifiedFrame = frame
+        imageView?.sizeToFit()
+        setupMagnifiedView()
+        
+    }
+    
+    func setupMagnifiedView() {
+        
+        let magnifiedFrame = bounds//frame
         magnifierView = MFBMagnifierView(frame: magnifiedFrame)
         magnifierView.fillColor = highlightColor
+        magnifierView.magnifiedButton.imageView?.image = imageView?.image?.tintedImage(color: .green)// titleColor(for: .normal)!)
+        magnifierView.magnifiedButton.setTitleColor(.red, for: .normal) // titleColor(for: .normal), for: .normal)
         magnifierView.rootButton = self
-        magnification = 1.5
+        magnification = 1.2
+        
+        
+        // position
+        magnifierView.frame = magnifierView.frame.applying(CGAffineTransform(translationX: self.bounds.midX - magnifierView.frame.midX, y: self.bounds.maxY - magnifierView.frame.maxY + magnifierView.padding))
+        
+        layer.insertSublayer(magnifierView.layer, below: imageView?.layer)
+        
+        
     }
     
     override init(frame: CGRect) {

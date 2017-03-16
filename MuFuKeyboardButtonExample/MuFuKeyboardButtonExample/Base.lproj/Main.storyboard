@@ -21,8 +21,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleAspectFit" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oW2-tt-lbf" customClass="MuFuButton" customModule="MuFuKeyboardButtonExample" customModuleProvider="target">
-                                <rect key="frame" x="16" y="101" width="191" height="33"/>
+                            <button opaque="NO" contentMode="scaleAspectFit" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oW2-tt-lbf" customClass="MuFuButton" customModule="MuFuKeyboardButtonExample" customModuleProvider="target">
+                                <rect key="frame" x="82" y="288" width="212" height="191"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.088490091260000001" green="0.25170588490000001" blue="0.5296390057" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <accessibility key="accessibilityConfiguration">
@@ -30,11 +30,11 @@
                                 </accessibility>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <state key="normal" title="Tap" image="sqrt_iPhone">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Tappity Tap" image="sqrt_iPhone">
+                                    <color key="titleColor" red="0.0" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 </state>
-                                <state key="highlighted" title="High">
-                                    <color key="titleColor" red="1" green="0.94901960780000005" blue="0.043137254899999998" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="highlighted">
+                                    <color key="titleColor" red="0.0" green="0.50196081400000003" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="title" value="Button"/>
@@ -59,7 +59,7 @@
                                     <userDefinedRuntimeAttribute type="color" keyPath="highlightTextColor">
                                         <color key="value" red="0.75759208300000003" green="0.44019794639999998" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="customType" value="Character"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="customType" value="Custom"/>
                                     <userDefinedRuntimeAttribute type="image" keyPath="customImage" value="sqrt_iPhone"/>
                                 </userDefinedRuntimeAttributes>
                                 <connections>

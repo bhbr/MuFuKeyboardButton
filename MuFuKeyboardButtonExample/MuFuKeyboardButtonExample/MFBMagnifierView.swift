@@ -14,6 +14,7 @@ protocol MuFuMagnifierDelegate {
     
     var imageView: UIImageView? { get }
     
+    
     func titleColor(for: UIControlState) -> UIColor?
     func setTitleColor(_: UIColor?, for: UIControlState)
 }
@@ -27,6 +28,7 @@ class MFBMagnifierView: UIView {
     var popoverDirection: MuFuKeyboardButtonPopoverDirection = .Inner
     var rootButton: MuFuMagnifierDelegate {
         didSet {
+            setupMagnificationButton()
             generateOverlay()
         }
     }
@@ -40,8 +42,13 @@ class MFBMagnifierView: UIView {
     }
     
     var fillColor = UIColor.white
+    var padding: CGFloat = 10
     
-    var magnifiedButton = UIButton()
+    lazy var magnifiedButton: UIButton  = {
+        [unowned self] in
+            return UIButton(frame: CGRect.zero)
+    }()
+    
     var magnification: CGFloat = 1.5 {
         didSet {
             setupMagnificationButton()
@@ -50,20 +57,30 @@ class MFBMagnifierView: UIView {
     
     func setupMagnificationButton() {
         
-        let magnifiedFrame = CGRect(x: 0, y: 0, width: magnification * rootButton.frame.size.width, height: magnification * rootButton.frame.size.height)
+        let magnifiedFrame = CGRect(x: padding, y: padding, width: rootButton.frame.size.width + 46, height: magnification * rootButton.frame.size.height)
         
-        magnifiedButton = UIButton(frame: magnifiedFrame)
+        magnifiedButton.frame = magnifiedFrame
         
         magnifiedButton.setTitle(rootButton.titleLabel?.text, for: .normal)
         magnifiedButton.titleLabel?.font = rootButton.titleLabel?.font.withSize(magnification * (rootButton.titleLabel?.font.pointSize)!)
-        magnifiedButton.setTitleColor(rootButton.titleColor(for: .highlighted), for: .normal)
-        magnifiedButton.setImage(rootButton.imageView?.image?.tintedImage(color: rootButton.titleColor(for: .highlighted)!), for: .normal)
+        magnifiedButton.setTitleColor(rootButton.titleColor(for: .normal), for: .normal)
+        magnifiedButton.setImage(rootButton.imageView?.image?.tintedImage(color: rootButton.titleColor(for: .normal)!), for: .normal)
+        
+        
+        let imageAspectRatio = (rootButton.imageView?.image?.size.width)! / (rootButton.imageView?.image?.size.height)!
+        
         magnifiedButton.imageView?.bounds = CGRect(x: (magnifiedButton.imageView?.bounds.origin.x)!,
                                                    y: (magnifiedButton.imageView?.bounds.origin.y)!,
-                                                   width: magnification * (magnifiedButton.imageView?.bounds.size.width)!,
-                                                   height: magnification * (magnifiedButton.imageView?.bounds
-                                                    .size.height)!)
+                                                   width: imageAspectRatio * magnifiedButton.bounds
+                                                    .size.height,
+                                                   height: magnifiedButton.bounds
+                                                    .size.height)
         
+        magnifiedButton.contentHorizontalAlignment = .center
+        magnifiedButton.contentVerticalAlignment = .center
+        magnifiedButton.imageView?.contentMode = .scaleAspectFit
+        
+        magnifiedButton.backgroundColor = UIColor(red:1, green:0, blue:0, alpha:0.5)
         
         self.addSubview(magnifiedButton)
         
@@ -73,10 +90,7 @@ class MFBMagnifierView: UIView {
         self.rootButton = UIButton()
         super.init(frame: frame)
         clipsToBounds = false
-        
         backgroundColor = .clear
-        fillColor = .yellow
-        
         generateOverlay()
         
     }
@@ -85,8 +99,8 @@ class MFBMagnifierView: UIView {
         // Generate the overlay
         bezierPath = magnifierViewPath()
         // expand the frame
+        let myPath = bezierPath2
         
-        let padding: CGFloat = 10
         
         let rootFrame = rootButton.frame
         
@@ -175,12 +189,27 @@ class MFBMagnifierView: UIView {
     
     func magnifierViewPath() -> UIBezierPath {
         
+        let upperFrame = magnifiedButton.frame
+        let upperWidth = upperFrame.size.width
+        let upperHeight = upperFrame.size.height
+        
+        let lowerFrame = rootButton.frame
+        let lowerWidth = lowerFrame.size.width
+        let lowerHeight = lowerFrame.size.height
+        
+        
+// to be deleted
         let keyRect = rootButton.frame
         let insets = UIEdgeInsets(top: 7.0, left: 13.0, bottom: 7.0, right: 13.0)
-        let upperWidth = keyRect.width + insets.left + insets.right
-        let lowerWidth = keyRect.width
+//        let upperWidth =  keyRect.width + insets.left + insets.right
+//        let lowerWidth = keyRect.width
         let majorRadius: CGFloat = 10.0
         let minorRadius: CGFloat = 4.0
+        
+        let radAngle = 48 / 180 * M_PI
+        let a = (upperWidth - lowerWidth)/2
+        let b = majorRadius * CGFloat(1 - cos(radAngle))
+        let fanLength = CGFloat(a - 2 * b) / CGFloat(sin(radAngle))
         
         let path = TurtleBezierPath()
         path.home()
@@ -191,20 +220,20 @@ class MFBMagnifierView: UIView {
             
         case .Inner:
             
-            path.rightArc(majorRadius, turn: 90.0) // #1
-            path.forward(upperWidth - 2.0 * majorRadius) // #2 top
-            path.rightArc(majorRadius, turn: 90.0) // #3
-            path.forward(keyRect.height -  2.0 * majorRadius + insets.top + insets.bottom) // #4 right big
-            path.rightArc(majorRadius, turn: 48.0) // #5
-            path.forward(8.5)
-            path.leftArc(majorRadius, turn: 48.0) // #6
-            path.forward(keyRect.height - 8.5 + 1.0)
+            path.rightArc(majorRadius, turn: 90.0)
+            path.forward(upperWidth - 2.0 * majorRadius)
+            path.rightArc(majorRadius, turn: 90.0)
+            path.forward(upperHeight -  2.0 * majorRadius)
+            path.rightArc(majorRadius, turn: 48.0)
+            path.forward(fanLength)//8.5) // to be changed
+            path.leftArc(majorRadius, turn: 48.0)
+            path.forward(lowerHeight - 2 * minorRadius)
             path.rightArc(minorRadius, turn: 90.0)
             path.forward(lowerWidth - 2.0 * minorRadius) // lowerWidth - 2.0 * minorRadius + 0.5
             path.rightArc(minorRadius, turn: 90.0)
-            path.forward(keyRect.height - 2 * minorRadius)
+            path.forward(lowerHeight - 2 * minorRadius)
             path.leftArc(majorRadius, turn: 48.0)
-            path.forward(8.5)
+            path.forward(fanLength)//8.5) // to be changed
             path.rightArc(majorRadius, turn: 48.0)
             path.close()
             
@@ -216,6 +245,8 @@ class MFBMagnifierView: UIView {
             //offsetY = keyRect.maxY - pathBoundingBox.maxY
             
             path.apply(CGAffineTransform(translationX: offsetX, y: offsetY))
+            
+            let path2 = UIBezierPath(cgPath:path.cgPath)
             
             break
             
