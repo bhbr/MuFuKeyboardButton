@@ -14,9 +14,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "379"
-            endingLineNumber = "379"
-            landmarkName = "init(coder:)"
-            landmarkType = "7">
+            endingLineNumber = "379">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -30,9 +28,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "310"
-            endingLineNumber = "310"
-            landmarkName = "setupAsFunctionButton()"
-            landmarkType = "7">
+            endingLineNumber = "310">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -46,9 +42,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "337"
-            endingLineNumber = "337"
-            landmarkName = "commonInit()"
-            landmarkType = "7">
+            endingLineNumber = "337">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -62,9 +56,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "415"
-            endingLineNumber = "415"
-            landmarkName = "draw(_:)"
-            landmarkType = "7">
+            endingLineNumber = "415">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -78,9 +70,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "179"
-            endingLineNumber = "179"
-            landmarkName = "MuFuButton"
-            landmarkType = "3">
+            endingLineNumber = "179">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -94,9 +84,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "371"
-            endingLineNumber = "371"
-            landmarkName = "init(frame:)"
-            landmarkType = "7">
+            endingLineNumber = "371">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -110,9 +98,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "268"
-            endingLineNumber = "268"
-            landmarkName = "MuFuButton"
-            landmarkType = "3">
+            endingLineNumber = "268">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -142,9 +128,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "396"
-            endingLineNumber = "396"
-            landmarkName = "draw(_:)"
-            landmarkType = "7">
+            endingLineNumber = "396">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -190,9 +174,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "411"
-            endingLineNumber = "411"
-            landmarkName = "draw(_:)"
-            landmarkType = "7">
+            endingLineNumber = "411">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -206,9 +188,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "420"
-            endingLineNumber = "420"
-            landmarkName = "draw(_:)"
-            landmarkType = "7">
+            endingLineNumber = "420">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -222,9 +202,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "460"
-            endingLineNumber = "460"
-            landmarkName = "draw(_:)"
-            landmarkType = "7">
+            endingLineNumber = "460">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -238,9 +216,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "166"
-            endingLineNumber = "166"
-            landmarkName = "highlight()"
-            landmarkType = "7">
+            endingLineNumber = "166">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -254,9 +230,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "169"
-            endingLineNumber = "169"
-            landmarkName = "unhighlight()"
-            landmarkType = "7">
+            endingLineNumber = "169">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -270,9 +244,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "403"
-            endingLineNumber = "403"
-            landmarkName = "draw(_:)"
-            landmarkType = "7">
+            endingLineNumber = "403">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -430,9 +402,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "284"
-            endingLineNumber = "284"
-            landmarkName = "setupAsCharacterButton()"
-            landmarkType = "7">
+            endingLineNumber = "284">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -446,9 +416,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "367"
-            endingLineNumber = "367"
-            landmarkName = "setupMagnifiedView()"
-            landmarkType = "7">
+            endingLineNumber = "367">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

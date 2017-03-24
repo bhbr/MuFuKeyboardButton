@@ -87,20 +87,31 @@ extension UIImage {
 }
 
 
+protocol MuFuKeyDelegate { // is the KeyboardViewController
+    func handleKeyboardEvent(_ id: String)
+}
+
 // Constants
 
-let CHARACTER_BUTTON_BG_COLOR: UIColor = .white
-let CHARACTER_BUTTON_TEXT_COLOR: UIColor = .black
-let CHARACTER_BUTTON_HIGHLIGHT_BG_COLOR: UIColor = .white
-let CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR: UIColor = .white
+let CHARACTER_KEY_BG_COLOR: UIColor = .white
+let CHARACTER_KEY_TEXT_COLOR: UIColor = .black
+let CHARACTER_KEY_HIGHLIGHT_BG_COLOR: UIColor = .white
+let CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR: UIColor = .white
 
-let FUNCTION_BUTTON_BG_COLOR = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 189.0/255.0, alpha: 1.0)
-let FUNCTION_BUTTON_TEXT_COLOR: UIColor = .black
-let FUNCTION_BUTTON_HIGHLIGHT_BG_COLOR: UIColor = .white
-let FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR: UIColor = .black
+let CHARACTER_KEY_FONT: UIFont = UIFont.systemFont(ofSize: 22.0)
 
+let FUNCTION_KEY_BG_COLOR = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 189.0/255.0, alpha: 1.0)
+let FUNCTION_KEY_TEXT_COLOR: UIColor = .black
+let FUNCTION_KEY_HIGHLIGHT_BG_COLOR: UIColor = .white
+let FUNCTION_KEY_HIGHLIGHT_TEXT_COLOR: UIColor = .black
+
+let FUNCTION_KEY_FONT: UIFont = UIFont.systemFont(ofSize: 22.0)
 
 let BUTTON_SHADOW_COLOR = UIColor(red: 137.0/255.0, green: 139.0/255.0, blue: 143.0/255.0, alpha: 1.0)
+
+let IPHONE_CORNER_RADIUS: CGFloat = 4.0
+let IPAD_CORNER_RADIUS: CGFloat = 4.0
+
 
 let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
 
@@ -111,357 +122,563 @@ enum MuFuKeyboardButtonPopoverDirection { // which way the option selection fans
     case Right
 }
 
+enum MuFuKeySymbolType {
+    case Text
+    case Image
+}
 
-@IBDesignable class MuFuButton: UIButton {
+
+@IBDesignable class MuFuKey: UIControl {
     
-    var popoverDirection: MuFuKeyboardButtonPopoverDirection = .Inner
-    
-    lazy var magnifierView = UIView() as! MFBMagnifierView
-    @IBInspectable var magnification: CGFloat = 1.0 {
+    var style: String? = "Character" {
         didSet {
-            magnifierView.magnification = magnification
+            switch style? {
+            case "Character":
+                setupAsCharacterKey()
+            case "Function":
+                setupAdFunctionKey()
+            default:
+                break
+            }
         }
     }
     
-    var _normalColor: UIColor = .white
-    @IBInspectable var normalColor: UIColor {
-        get {
-            return _normalColor
+    // Colors
+    var normalColor: UIColor? = CHARACTER_KEY_BG_COLOR
+    var highlightColor: UIColor? = CHARACTER_KEY_HIGHLIGHT_BG_COLOR
+    
+    var normalTextColor: UIColor? = CHARACTER_KEY_TEXT_COLOR
+    var highlightTextColor: UIColor? = CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR
+
+    
+    override var state: UIControlState {
+        didSet {
+            if state == .highlighted {
+                symbolView.isHidden = true
+                highlightedSymbolView.isHidden = false
+            } else if state == .normal {
+                symbolView.isHidden = false
+                highlightedSymbolView = true
+            }
         }
-        set {
-            switch customType {
-            case "Character":
-                _normalColor = CHARACTER_BUTTON_BG_COLOR
-            case "Function":
-                _normalColor = FUNCTION_BUTTON_BG_COLOR
-            default:
-                _normalColor = newValue
+    }
+    
+    
+    // Symbol
+    var symbolView: UIView
+    var symbolType: MuFuKeySymbolType? {
+        if symbolView is UILabel {
+            return .Text
+        }
+        else if symbolView is UIImageView {
+            return .Image
+        } else {
+            return nil
+        }
+    }
+    
+    
+    var symbolImage: UIImage? {
+        didSet {
+            if let imageView = symbolView as? UIImageView {
+                imageView.image = symbolImage
+            } else {
+                symbolView = UIImageView(frame: symbolView.frame)
+                if symbolView.frame == CGRect.zero {
+                    symbolView.frame = frame
+                }
+                (symbolView as! UIImageView).image = symbolImage
+                symbolView.backgroundColor = .clear
+                symbolView.contentMode = .scaleAspectFit
+            }
+            updateHighlightedSymbolView()
+        }
+    }
+    
+    var symbolFont: UIFont? = CHARACTER_KEY_FONT
+    
+    var symbolText: String? {
+        didSet {
+            if let label = symbolView as? UILabel {
+                label.text = symbolText
+            } else {
+                symbolView = UILabel(frame: symbolView.frame)
+                if symbolView.frame == CGRect.zero {
+                    symbolView.frame = frame
+                }
+                (symbolView as! UILabel).text = symbolText
+                (symbolView as! UILabel).font = symbolFont
+            }
+            updateHighlightedSymbolView()
+        }
+    }
+
+    var highlightedSymbolView: UIView // precomputed in init
+
+    var cornerRadius: CGFloat = IPHONE_BUTTON_CORNER_RADIUS // check properly in init
+    
+    var inputID: String = "no ID set"
+    
+    var delegate: MuFuKeyDelegate
+    
+    func updateHighlightedSymbolView() {
+        
+        if symbolType == .Text {
+            
+            if let newHighlightedSymbolView = highlightedSymbolView as? UILabel {
+                newHighlightedSymbolView.text = symbolText
+            } else {
+                highlightedSymbolView = UILabel(frame: highlightedSymbolView.frame)
+                if highlightedSymbolView.frame = CGRect.zero {
+                    highlightedSymbolView.frame = frame
+                }
+                (highlightedSymbolView as! UILabel).text = symbolText
+                (highlightedSymbolView as! UILabel).backgroundColor = highlightColor
+                (highlightedSymbolView as! UILabel).textColor = highlightTextColor
+                (highlightedSymbolView as! UILabel).font = symbolFont
             }
             
-            checkHighlightColor()
+        } else if symbolType = .Image {
+            
+            if let newHighlightedSymbolView = highlightedSymbolView as? UIImageView {
+                newHighlightedSymbolView.image = symbolImage
+            } else {
+                highlightedSymbolView = UIImage(frame: highlightedSymbolView.frame)
+                if highlightedSymbolView.frame = CGRect.zero {
+                    highlightedSymbolView.frame = frame
+                }
+                (highlightedSymbolView as! UILabel).image = symbolImage
+                (highlightedSymbolView as! UILabel).backgroundColor = .clear
+                (highlightedSymbolView as! UILabel).contentMode = .scaleAspectFit
+            }
+            
+            
         }
+        
     }
     
     
-    
-    func checkHighlightColor() {
-        if isHighlighted {
-            backgroundColor = highlightColor
-        } else {
-            backgroundColor = normalColor
+    func commonInit() {
+        
+        // corner radius
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            cornerRadius = IPHONE_CORNER_RADIUS
+        } else if UIDevice.current.userInterfaceIdiom == .pad {
+            cornerRadius = IPAD_CORNER_RADIUS
         }
-        magnifierView.fillColor = highlightColor
+        
+        // wiring
+        addTarget(self, action: #selector(highlight), for: .touchDown)
+        addTarget(self, action: #selector(unhighlight), for: .touchUpInside)
+        
     }
-    
-    // Background color should be able to change with UIControlState
-    // so we store two colors as properties and change it using
-    // helper functions:
-    
     
     func highlight() {
-        backgroundColor = highlightColor
-        self.addSubview(magnifierView)
-        //layer.insertSublayer(magnifierView.layer, below: nil)
-        magnifierView.setNeedsDisplay()
-    }
-    
-    func unhighlight() {
-        backgroundColor = normalColor
-        //magnifierView.removeFromSuperview()
+        state = .highlighted
     }
 
-//    var _normalTextColor: UIColor = .black
-//    @IBInspectable var normalTextColor: UIColor {
+    func unhighlight() {
+        state = .normal
+    }
+
+    override init(frame: CGRect) {
+        commonInit()
+        super.init(frame: frame)
+    }
+    
+    func setupAsCharacterKey() {
+        
+        normalColor = CHARACTER_KEY_BG_COLOR
+        highlightColor = CHARACTER_KEY_HIGHLIGHT_BG_COLOR
+        normalTextColor = CHARACTER_KEY_TEXT_COLOR
+        highlightTextColor = CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR
+        
+        symbolFont = CHARACTER_KEY_FONT
+        
+        updateHighlightedSymbolView()
+        
+    }
+    
+    func setupAsFunctionKey() {
+        
+        normalColor = FUNCTION_KEY_BG_COLOR
+        highlightColor = FUNCTION_KEY_HIGHLIGHT_BG_COLOR
+        normalTextColor = FUNCTION_KEY_TEXT_COLOR
+        highlightTextColor = FUNCTION_KEY_HIGHLIGHT_TEXT_COLOR
+        
+        symbolFont = FUNCTION_KEY_FONT
+        
+        updateHighlightedSymbolView()
+        
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+        
+    override func prepareForInterfaceBuilder() {
+        layer.masksToBounds = false
+        clipsToBounds = true
+        symbolView?.contentMode = .scaleAspectFit
+        setNeedsLayout()
+    }
+    
+}
+
+
+
+
+//@IBDesignable class MuFuButton: UIButton {
+//
+//    var popoverDirection: MuFuKeyboardButtonPopoverDirection = .Inner
+//    
+//    lazy var magnifierView = UIView() as! MFBMagnifierView
+//    @IBInspectable var magnification: CGFloat = 1.0 {
+//        didSet {
+//            magnifierView.magnification = magnification
+//        }
+//    }
+//    
+//    var _normalColor: UIColor = .white
+//    @IBInspectable var normalColor: UIColor {
 //        get {
-//                return _normalTextColor
+//            return _normalColor
 //        }
 //        set {
 //            switch customType {
 //            case "Character":
-//                _normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
+//                _normalColor = CHARACTER_KEY_BG_COLOR
 //            case "Function":
-//                _normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
+//                _normalColor = FUNCTION_KEY_BG_COLOR
 //            default:
-//                _normalTextColor = newValue
+//                _normalColor = newValue
 //            }
+//            
+//            checkHighlightColor()
 //        }
 //    }
-//
 //    
-    var _highlightColor: UIColor = .blue
-    @IBInspectable var highlightColor: UIColor {
-        get {
-            return _highlightColor
-        }
-        set {
-            switch customType {
-            case "Character":
-                _highlightColor = CHARACTER_BUTTON_HIGHLIGHT_BG_COLOR
-            case "Function":
-                _highlightColor = FUNCTION_BUTTON_HIGHLIGHT_BG_COLOR
-            default:
-                _highlightColor = newValue
-            }
-            
-            checkHighlightColor()
-        }
-    }
-    
-    
-    
-    @IBInspectable var cornerRadius: CGFloat {
-        get {
-            return layer.cornerRadius
-        }
-        set {
-            layer.cornerRadius = newValue
-            layer.masksToBounds = false // newValue > 0
-        }
-    }
-    
-    // CALayer's shadow is not rendered live in Storyboard
-    // So we build our own shadow
-    
-    var buttonLayer = CAShapeLayer()
-    var shadowLayer = CAShapeLayer()
-    
-    @IBInspectable var shadowOpacity: Float = 1.0 {
-        didSet {
-            shadowLayer.opacity = shadowOpacity
-        }
-    }
-    
-    @IBInspectable var shadowColor: UIColor = .lightGray {
-        didSet {
-            shadowLayer.fillColor = shadowColor.cgColor
-        }
-    }
-    
-    @IBInspectable var shadowOffset: CGSize = CGSize(width: 0, height: 1) {
-        didSet {
-            shadowLayer.frame = frame
-            shadowLayer.frame.origin.x += shadowOffset.width
-            shadowLayer.frame.origin.y += shadowOffset.height
-        }
-    }
-    
-//    @IBInspectable var customImage: UIImage? {
-//        didSet {
-//            imageView?.image = customImage
-//            highlightedImage = customImage?.tintedImage(color: highlightTextColor)
-//        }
-//    }
-//
-//    var highlightedImage: UIImage?
-    
-    // Button Type: "Character" is the white kind
-    // "Function" are they gray buttons such as Shift, return etc.
-    
-    // They override the IBInspectable properties, so setting them has no effect
-    // as long as the button type is either Character or Function.
-    
-    // Set it to Custom or anything else to customize the button with
-    // the IBDesignable properties.
-    
-    @IBInspectable var customType: String = "" {
-        didSet {
-            switch customType {
-            case "Character":
-                setupAsCharacterButton()
-            case "Function":
-                NSLog("customType set to 'Function'")
-                setupAsFunctionButton()
-            case "Custom":
-                break
-            default:
-                break
-            }
-            
-        }
-    }
-    
-    func setupAsCharacterButton() {
-        NSLog("setupAsCharacterButton")
-        normalColor = CHARACTER_BUTTON_BG_COLOR
-//        normalTextColor = CHARACTER_BUTTON_TEXT_COLOR
-        highlightColor = CHARACTER_BUTTON_HIGHLIGHT_BG_COLOR
-//        highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
-        setTitleColor(CHARACTER_BUTTON_TEXT_COLOR, for: .normal)
-        setTitleColor(CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR, for: .highlighted)
-        
-        
-        backgroundColor = normalColor
-        
-        shadowColor = BUTTON_SHADOW_COLOR
-        shadowOffset = CGSize(width: 0, height: 1)
-        
-        cornerRadius = 4.0
-        
-        // character buttons use font size 22
-        titleLabel?.font = .systemFont(ofSize: 22)
-        
-        imageView?.contentMode = .scaleAspectFit
-        
-        setupMagnifiedView()
-        
-    }
-    
-    func setupAsFunctionButton() {
-        NSLog("setupAsFunctionButton")
-
-        normalColor = FUNCTION_BUTTON_BG_COLOR
-//        normalTextColor = FUNCTION_BUTTON_TEXT_COLOR
-        highlightColor = FUNCTION_BUTTON_HIGHLIGHT_BG_COLOR
-        //        highlightTextColor = FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR
-        //        highlightTextColor = CHARACTER_BUTTON_HIGHLIGHT_TEXT_COLOR
-        setTitleColor(FUNCTION_BUTTON_TEXT_COLOR, for: .normal)
-        setTitleColor(FUNCTION_BUTTON_HIGHLIGHT_TEXT_COLOR, for: .highlighted)
-        
-        backgroundColor = normalColor
-        
-        shadowColor = BUTTON_SHADOW_COLOR
-        shadowOffset = CGSize(width: 0, height: 1)
-        
-        cornerRadius = 4.0
-        
-        // function buttons may use another font size
-        
-        magnification = 1.5
-        
-        setupMagnifiedView()
-        
-    }
-    
-    // actions common to all initializers
-    func commonInit() {
-        NSLog("commonInit")
-        addTarget(self, action: #selector(highlight), for: .touchDown)
-        addTarget(self, action: #selector(unhighlight), for: .touchUpInside)
-        // Text color can be associated with control state using
-        // a built-in function:
-        //setTitleColor(normalTextColor, for: .normal)
-        //setTitleColor(highlightTextColor, for: .highlighted)
-        // Background color is first set to normalColor (not highlighted)
-        backgroundColor = normalColor
-        imageView?.sizeToFit()
-        setupMagnifiedView()
-        
-    }
-    
-    func setupMagnifiedView() {
-        
-        let magnifiedFrame = bounds//frame
-        magnifierView = MFBMagnifierView(frame: magnifiedFrame)
-        magnifierView.fillColor = highlightColor
-        magnifierView.magnifiedButton.imageView?.image = imageView?.image?.tintedImage(color: .green)// titleColor(for: .normal)!)
-        magnifierView.magnifiedButton.setTitleColor(.red, for: .normal) // titleColor(for: .normal), for: .normal)
-        magnifierView.rootButton = self
-        magnification = 1.2
-        
-        
-        // position
-        magnifierView.frame = magnifierView.frame.applying(CGAffineTransform(translationX: self.bounds.midX - magnifierView.frame.midX, y: self.bounds.maxY - magnifierView.frame.maxY + magnifierView.padding))
-        
-        layer.insertSublayer(magnifierView.layer, below: imageView?.layer)
-        
-        
-    }
-    
-    override init(frame: CGRect) {
-        NSLog("init(frame:)")
-        super.init(frame: frame)
-        commonInit()
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        NSLog("init(coder:)")
-        super.init(coder: aDecoder)
-        commonInit()
-    }
-    
-    
-    override func prepareForInterfaceBuilder() {
-        NSLog("prepareForInterfaceBuilder")
-        layer.masksToBounds = false
-        clipsToBounds = true
-        imageView?.contentMode = .scaleAspectFit
-        setNeedsLayout()
-    }
-    
-    
-    
-    
-    
-    override func draw(_ rect: CGRect) {
-        
-        // fit image (if there is one)
-        if imageView?.image != nil {
-            imageView?.contentMode = .scaleAspectFit
-        }
-        
-        if image(for: .highlighted) == image(for: .normal) {
-            // save highlighted version of image
-            if let highlightTextColor = titleColor(for: .highlighted) {
-                let highlightedImage = imageView?.image?.tintedImage(color: highlightTextColor)
-        
-        
-            // and associate with control states
-            //setImage(customImage, for: .normal)
-                setImage(highlightedImage, for: .highlighted)
-            //setTitle("test", for: .highlighted)
-            }
-        }
-        
-        NSLog("draw")
-        // update colors (for live storyboard rendering)
+//    
+//    
+//    func checkHighlightColor() {
 //        if isHighlighted {
 //            backgroundColor = highlightColor
-//            titleLabel?.textColor = highlightTextColor
-//            tintColor = highlightTextColor
-//            
 //        } else {
 //            backgroundColor = normalColor
-//            titleLabel?.textColor = normalTextColor
-//            tintColor = normalTextColor
 //        }
-        
-        
-        // draw shadow: first recreate the button shape
-        let context = UIGraphicsGetCurrentContext()
-        
-        let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height), cornerRadius: cornerRadius)
-        context?.saveGState()
-        context?.setShadow(offset: shadowOffset, blur: 0, color: shadowColor.cgColor)
-        backgroundColor?.setFill()
-        roundedRectanglePath.fill()
-        context?.restoreGState()
-        
-        buttonLayer = CAShapeLayer()
-        buttonLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
-        buttonLayer.fillColor = backgroundColor?.cgColor
-        buttonLayer.frame = layer.frame
-        
-        
-        // now draw this shape in the shadow layer
-        shadowLayer = CAShapeLayer()
-        shadowLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
-        shadowLayer.fillColor = shadowColor.cgColor
-        shadowLayer.opacity = shadowOpacity
-        superview?.layer.insertSublayer(buttonLayer, below: layer)
-        
-        // and position
-        shadowLayer.frame = layer.frame
-        shadowLayer.frame.origin.x += shadowOffset.width
-        shadowLayer.frame.origin.y += shadowOffset.height
-        superview?.layer.insertSublayer(shadowLayer, below: buttonLayer)
-
-        layer.masksToBounds = false
-        clipsToBounds = true
-        
-
-    }
-    
-
-
-    
-}
+//        magnifierView.fillColor = highlightColor
+//    }
+//    
+//    // Background color should be able to change with UIControlState
+//    // so we store two colors as properties and change it using
+//    // helper functions:
+//    
+//    
+//    func highlight() {
+//        backgroundColor = highlightColor
+//        self.addSubview(magnifierView)
+//        //layer.insertSublayer(magnifierView.layer, below: nil)
+//        magnifierView.setNeedsDisplay()
+//    }
+//    
+//    func unhighlight() {
+//        backgroundColor = normalColor
+//        //magnifierView.removeFromSuperview()
+//    }
+//
+////    var _normalTextColor: UIColor = .black
+////    @IBInspectable var normalTextColor: UIColor {
+////        get {
+////                return _normalTextColor
+////        }
+////        set {
+////            switch customType {
+////            case "Character":
+////                _normalTextColor = CHARACTER_KEY_TEXT_COLOR
+////            case "Function":
+////                _normalTextColor = FUNCTION_KEY_TEXT_COLOR
+////            default:
+////                _normalTextColor = newValue
+////            }
+////        }
+////    }
+////
+////    
+//    var _highlightColor: UIColor = .blue
+//    @IBInspectable var highlightColor: UIColor {
+//        get {
+//            return _highlightColor
+//        }
+//        set {
+//            switch customType {
+//            case "Character":
+//                _highlightColor = CHARACTER_KEY_HIGHLIGHT_BG_COLOR
+//            case "Function":
+//                _highlightColor = FUNCTION_KEY_HIGHLIGHT_BG_COLOR
+//            default:
+//                _highlightColor = newValue
+//            }
+//            
+//            checkHighlightColor()
+//        }
+//    }
+//    
+//    
+//    
+//    @IBInspectable var cornerRadius: CGFloat {
+//        get {
+//            return layer.cornerRadius
+//        }
+//        set {
+//            layer.cornerRadius = newValue
+//            layer.masksToBounds = false // newValue > 0
+//        }
+//    }
+//    
+//    // CALayer's shadow is not rendered live in Storyboard
+//    // So we build our own shadow
+//    
+//    var buttonLayer = CAShapeLayer()
+//    var shadowLayer = CAShapeLayer()
+//    
+//    @IBInspectable var shadowOpacity: Float = 1.0 {
+//        didSet {
+//            shadowLayer.opacity = shadowOpacity
+//        }
+//    }
+//    
+//    @IBInspectable var shadowColor: UIColor = .lightGray {
+//        didSet {
+//            shadowLayer.fillColor = shadowColor.cgColor
+//        }
+//    }
+//    
+//    @IBInspectable var shadowOffset: CGSize = CGSize(width: 0, height: 1) {
+//        didSet {
+//            shadowLayer.frame = frame
+//            shadowLayer.frame.origin.x += shadowOffset.width
+//            shadowLayer.frame.origin.y += shadowOffset.height
+//        }
+//    }
+//    
+////    @IBInspectable var customImage: UIImage? {
+////        didSet {
+////            imageView?.image = customImage
+////            highlightedImage = customImage?.tintedImage(color: highlightTextColor)
+////        }
+////    }
+////
+////    var highlightedImage: UIImage?
+//    
+//    // Button Type: "Character" is the white kind
+//    // "Function" are they gray buttons such as Shift, return etc.
+//    
+//    // They override the IBInspectable properties, so setting them has no effect
+//    // as long as the button type is either Character or Function.
+//    
+//    // Set it to Custom or anything else to customize the button with
+//    // the IBDesignable properties.
+//    
+//    @IBInspectable var customType: String = "" {
+//        didSet {
+//            switch customType {
+//            case "Character":
+//                setupAsCharacterButton()
+//            case "Function":
+//                NSLog("customType set to 'Function'")
+//                setupAsFunctionButton()
+//            case "Custom":
+//                break
+//            default:
+//                break
+//            }
+//            
+//        }
+//    }
+//    
+//    func setupAsCharacterButton() {
+//        NSLog("setupAsCharacterButton")
+//        normalColor = CHARACTER_KEY_BG_COLOR
+////        normalTextColor = CHARACTER_KEY_TEXT_COLOR
+//        highlightColor = CHARACTER_KEY_HIGHLIGHT_BG_COLOR
+////        highlightTextColor = CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR
+//        setTitleColor(CHARACTER_KEY_TEXT_COLOR, for: .normal)
+//        setTitleColor(CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR, for: .highlighted)
+//        
+//        
+//        backgroundColor = normalColor
+//        
+//        shadowColor = BUTTON_SHADOW_COLOR
+//        shadowOffset = CGSize(width: 0, height: 1)
+//        
+//        cornerRadius = 4.0
+//        
+//        // character buttons use font size 22
+//        titleLabel?.font = .systemFont(ofSize: 22)
+//        
+//        imageView?.contentMode = .scaleAspectFit
+//        
+//        setupMagnifiedView()
+//        
+//    }
+//    
+//    func setupAsFunctionButton() {
+//        NSLog("setupAsFunctionButton")
+//
+//        normalColor = FUNCTION_KEY_BG_COLOR
+////        normalTextColor = FUNCTION_KEY_TEXT_COLOR
+//        highlightColor = FUNCTION_KEY_HIGHLIGHT_BG_COLOR
+//        //        highlightTextColor = FUNCTION_KEY_HIGHLIGHT_TEXT_COLOR
+//        //        highlightTextColor = CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR
+//        setTitleColor(FUNCTION_KEY_TEXT_COLOR, for: .normal)
+//        setTitleColor(FUNCTION_KEY_HIGHLIGHT_TEXT_COLOR, for: .highlighted)
+//        
+//        backgroundColor = normalColor
+//        
+//        shadowColor = BUTTON_SHADOW_COLOR
+//        shadowOffset = CGSize(width: 0, height: 1)
+//        
+//        cornerRadius = 4.0
+//        
+//        // function buttons may use another font size
+//        
+//        magnification = 1.5
+//        
+//        setupMagnifiedView()
+//        
+//    }
+//    
+//    // actions common to all initializers
+//    func commonInit() {
+//        NSLog("commonInit")
+//        addTarget(self, action: #selector(highlight), for: .touchDown)
+//        addTarget(self, action: #selector(unhighlight), for: .touchUpInside)
+//        // Text color can be associated with control state using
+//        // a built-in function:
+//        //setTitleColor(normalTextColor, for: .normal)
+//        //setTitleColor(highlightTextColor, for: .highlighted)
+//        // Background color is first set to normalColor (not highlighted)
+//        backgroundColor = normalColor
+//        imageView?.sizeToFit()
+//        setupMagnifiedView()
+//        
+//    }
+//    
+//    func setupMagnifiedView() {
+//        
+//        let magnifiedFrame = bounds//frame
+//        magnifierView = MFBMagnifierView(frame: magnifiedFrame)
+//        magnifierView.fillColor = highlightColor
+//        magnifierView.magnifiedButton.imageView?.image = imageView?.image?.tintedImage(color: .green)// titleColor(for: .normal)!)
+//        magnifierView.magnifiedButton.setTitleColor(.red, for: .normal) // titleColor(for: .normal), for: .normal)
+//        magnifierView.rootButton = self
+//        magnification = 1.2
+//        
+//        
+//        // position
+//        magnifierView.frame = magnifierView.frame.applying(CGAffineTransform(translationX: self.bounds.midX - magnifierView.frame.midX, y: self.bounds.maxY - magnifierView.frame.maxY + magnifierView.padding))
+//        
+//        layer.insertSublayer(magnifierView.layer, below: imageView?.layer)
+//        
+//        
+//    }
+//    
+//    override init(frame: CGRect) {
+//        NSLog("init(frame:)")
+//        super.init(frame: frame)
+//        commonInit()
+//    }
+//    
+//    required init?(coder aDecoder: NSCoder) {
+//        NSLog("init(coder:)")
+//        super.init(coder: aDecoder)
+//        commonInit()
+//    }
+//    
+//    
+//    override func prepareForInterfaceBuilder() {
+//        NSLog("prepareForInterfaceBuilder")
+//        layer.masksToBounds = false
+//        clipsToBounds = true
+//        imageView?.contentMode = .scaleAspectFit
+//        setNeedsLayout()
+//    }
+//    
+//    
+//    
+//    
+//    
+//    override func draw(_ rect: CGRect) {
+//        
+//        // fit image (if there is one)
+//        if imageView?.image != nil {
+//            imageView?.contentMode = .scaleAspectFit
+//        }
+//        
+//        if image(for: .highlighted) == image(for: .normal) {
+//            // save highlighted version of image
+//            if let highlightTextColor = titleColor(for: .highlighted) {
+//                let highlightedImage = imageView?.image?.tintedImage(color: highlightTextColor)
+//        
+//        
+//            // and associate with control states
+//            //setImage(customImage, for: .normal)
+//                setImage(highlightedImage, for: .highlighted)
+//            //setTitle("test", for: .highlighted)
+//            }
+//        }
+//        
+//        NSLog("draw")
+//        // update colors (for live storyboard rendering)
+////        if isHighlighted {
+////            backgroundColor = highlightColor
+////            titleLabel?.textColor = highlightTextColor
+////            tintColor = highlightTextColor
+////            
+////        } else {
+////            backgroundColor = normalColor
+////            titleLabel?.textColor = normalTextColor
+////            tintColor = normalTextColor
+////        }
+//        
+//        
+//        // draw shadow: first recreate the button shape
+//        let context = UIGraphicsGetCurrentContext()
+//        
+//        let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height), cornerRadius: cornerRadius)
+//        context?.saveGState()
+//        context?.setShadow(offset: shadowOffset, blur: 0, color: shadowColor.cgColor)
+//        backgroundColor?.setFill()
+//        roundedRectanglePath.fill()
+//        context?.restoreGState()
+//        
+//        buttonLayer = CAShapeLayer()
+//        buttonLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
+//        buttonLayer.fillColor = backgroundColor?.cgColor
+//        buttonLayer.frame = layer.frame
+//        
+//        
+//        // now draw this shape in the shadow layer
+//        shadowLayer = CAShapeLayer()
+//        shadowLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
+//        shadowLayer.fillColor = shadowColor.cgColor
+//        shadowLayer.opacity = shadowOpacity
+//        superview?.layer.insertSublayer(buttonLayer, below: layer)
+//        
+//        // and position
+//        shadowLayer.frame = layer.frame
+//        shadowLayer.frame.origin.x += shadowOffset.width
+//        shadowLayer.frame.origin.y += shadowOffset.height
+//        superview?.layer.insertSublayer(shadowLayer, below: buttonLayer)
+//
+//        layer.masksToBounds = false
+//        clipsToBounds = true
+//        
+//
+//    }
+//    
+//
+//
+//    
+//}

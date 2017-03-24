@@ -74,12 +74,12 @@ extension Notification.Name {
 
 
 
-
-protocol MFKBDelegate { // is the KeyboardViewController
-    
-    func handleKeyboardEvent(_ id: String)
-
-}
+//
+//protocol MFKBDelegate { // is the KeyboardViewController
+//    
+//    func handleKeyboardEvent(_ id: String)
+//
+//}
 
 
 @IBDesignable class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
