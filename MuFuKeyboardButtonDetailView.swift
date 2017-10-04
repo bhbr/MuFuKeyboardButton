@@ -44,6 +44,7 @@ class MuFuKeyboardButtonDetailView: UIView {
     
     var displayLabel = UILabel()
     var displayImageView = UIImageView()
+    var displayLabelFont: UIFont = .systemFont(ofSize: 44.0) // default: magnifier
     
     var _displayType: MuFuKeyboardButtonDisplayType = .Label
     var displayType: MuFuKeyboardButtonDisplayType {
@@ -70,10 +71,10 @@ class MuFuKeyboardButtonDetailView: UIView {
                 if (type == .Options) {
                     displayLabel.isHidden = true
                 }
-
+            
             }
         }
-        
+    
     }
     
     init(keyboardButton newButton: MuFuKeyboardButton, newType: MuFuKeyboardButtonDetailViewType) {
@@ -87,7 +88,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         button = newButton
         type = newType
-        highlightedInputIndex = 0
+        highlightedInputIndex = NSNotFound
         
         
         if (newButton.position != .Inner) {
@@ -108,7 +109,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         // Label
         displayLabel.frame = magnifiedInputViewPath().bounds
         displayLabel.text = button?.displayLabel.text ?? button?.inputID!
-        displayLabel.font = UIFont.init(name: "HelveticaNeue-Light", size: 44) ?? UIFont.systemFont(ofSize: 44)
+        displayLabel.font = button?.magnifiedDisplayLabelFont //  displayLabelFont // button?.displayLabel.font //.withSize(44.0)
         displayLabel.textColor = button?.keyTextColor
         displayLabel.backgroundColor = .clear
         displayLabel.textAlignment = .center
@@ -117,7 +118,6 @@ class MuFuKeyboardButtonDetailView: UIView {
             displayLabel.frame.origin.x += 20.0
         } else if button!.position == .Right {
             displayLabel.frame.origin.x -= 20.0
-            
         }
         
         self.addSubview(displayLabel)
@@ -133,6 +133,8 @@ class MuFuKeyboardButtonDetailView: UIView {
             displayImageView.frame.origin.x += 20.0
         } else if button!.position == .Right {
             displayImageView.frame.origin.x -= 20.0
+        } else if button!.position == .Inner {
+            // no adjustment necessary (?)
         }
         
         self.addSubview(displayImageView)
@@ -162,11 +164,32 @@ class MuFuKeyboardButtonDetailView: UIView {
     
     public func updateHighlightedInputIndex(forPoint point: CGPoint) -> () {
         
+        //var highlightedInputRow: NSInteger = NSNotFound
         var highlightedInputIndex: NSInteger = NSNotFound
         let testRect = CGRect(x: point.x, y: point.y, width: 0, height: 0)
         let location = convert(testRect, from: button?.superview).origin
         
-        for keyRect: CGRect in inputOptionsRects! {
+        var nbKeysBefore: Int = 0
+        
+        if ((button?.optionsRowLengths.count)! > 1) {
+        
+            // Find the row
+            let firstRect = (inputOptionsRects?.first)!
+            var row = Int(location.y/firstRect.height) - 1
+            if row < 0 { row = 0 }
+            if row > (button?.optionsRowLengths.count)! { row = (button?.optionsRowLengths.count)! }
+            //NSLog(row.description)
+            
+            // Extract keys of that row
+            for nbKeys in (button?.optionsRowLengths[0..<row])! {
+                nbKeysBefore += nbKeys
+            }
+            //NSLog(nbKeysBefore.description)
+        }
+        
+        // Find the key
+        
+        for keyRect: CGRect in inputOptionsRects!.dropFirst(nbKeysBefore) {
             var infiniteKeyRect = CGRect(x: keyRect.minX, y: 0.0, width: keyRect.width, height: CGFloat.infinity)
             infiniteKeyRect = infiniteKeyRect.insetBy(dx: -3, dy: 0)
             
@@ -215,9 +238,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             displayLabel.frame.origin.x -= 10.0
         } else if button!.position == .Right {
             displayLabel.frame.origin.x += 10.0
-            
         }
-        
     }
     
     override func draw(_ rect: CGRect) {
@@ -234,7 +255,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         // Generate the overlay
         let bezierPath = magnifiedInputViewPath()
-        let inputID = button?.inputID
+        //let inputID = button?.inputID
         
         // Position the overlay
         let keyRect = convert((button?.frame)!, from: button?.superview)
@@ -354,10 +375,9 @@ class MuFuKeyboardButtonDetailView: UIView {
         context?.setShadow(offset: CGSize.zero, blur: 0, color: UIColor.clear.cgColor)
         context?.saveGState()
         
-        let inputOptionsIDs = button?.inputOptionsIDs
-        for optionID: String in inputOptionsIDs! {
+        for optionID: String in (button?.inputOptionsIDs)! {
             
-            let idx: NSInteger = (inputOptionsIDs?.index(of: optionID))!
+            let idx: NSInteger = (button?.inputOptionsIDs?.index(of: optionID))!
             let optionRect: CGRect = (inputOptionsRects?[idx])!
             let highlighted = (idx == highlightedInputIndex)
             
@@ -370,13 +390,15 @@ class MuFuKeyboardButtonDetailView: UIView {
             
             if (displayType == .Label) {
             
+                let optionGlyph: String? = button?.inputOptionsGlyphs?[idx]
+                
                 // Draw the text
                 let stringColor = (highlighted ? UIColor.white : button?.keyTextColor)
-                let stringSize = optionID.size(attributes: [NSFontAttributeName: (button?.inputOptionsFont)!])
+                let stringSize = optionGlyph!.size(withAttributes: [NSAttributedStringKey.font: (button?.inputOptionsFont)!])
                 let stringRect = CGRect(x: optionRect.midX - stringSize.width * 0.5, y: optionRect.midY - stringSize.height * 0.5, width: stringSize.width, height: stringSize.height)
                 let p = NSMutableParagraphStyle()
                 p.alignment = NSTextAlignment.center
-                let attributedString = NSAttributedString.init(string: optionID, attributes: [NSFontAttributeName: (button?.inputOptionsFont)!, NSForegroundColorAttributeName: stringColor!, NSParagraphStyleAttributeName: p])
+                let attributedString = NSAttributedString.init(string: optionGlyph!, attributes: [NSAttributedStringKey.font: (button?.inputOptionsFont)!, NSAttributedStringKey.foregroundColor: stringColor!, NSAttributedStringKey.paragraphStyle: p])
                 attributedString.draw(in: stringRect)
             
             } else if (displayType == .Image) {
@@ -425,6 +447,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             path.forward(keyRect.height -  2.0 * majorRadius + insets.top + insets.bottom) // #4 right big
             path.rightArc(majorRadius, turn: 48.0) // #5
             path.forward(8.5)
+            //path.forward(upperWidth - majorRadius - lowerWidth/2.0)
             path.leftArc(majorRadius, turn: 48.0) // #6
             path.forward(keyRect.height - 8.5 + 1.0)
             path.rightArc(minorRadius, turn: 90.0)
@@ -433,6 +456,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             path.forward(keyRect.height - 2 * minorRadius)
             path.leftArc(majorRadius, turn: 48.0)
             path.forward(8.5)
+            //path.forward(upperWidth - majorRadius - lowerWidth/2.0)
             path.rightArc(majorRadius, turn: 48.0)
             
             var offsetX: CGFloat = 0.0
@@ -498,9 +522,9 @@ class MuFuKeyboardButtonDetailView: UIView {
                 
             break
             
-        default:
+      //  default:
             
-            break
+      //      break
             
         }
         
@@ -514,8 +538,17 @@ class MuFuKeyboardButtonDetailView: UIView {
         let keyRect = convert((button?.frame)!, from: button?.superview)
         let insets = UIEdgeInsets(top: 7.0, left: 13.0, bottom: 7.0, right: 13.0)
         let margin: CGFloat = 7.0
-        let nbKeys = CGFloat((button?.inputOptionsIDs?.count)!)
-        let upperWidth = insets.left + insets.right + nbKeys * keyRect.width + margin * (nbKeys - 1) - margin * 0.5
+        
+        let nbKeys = button?.optionsRowLengths.max()
+        let nbRows = button?.optionsRowLengths.count
+//        NSLog("nbKeys:")
+//        NSLog((nbKeys?.description)!)
+//        NSLog("nbRows:")
+//        NSLog((nbRows?.description)!)
+        
+        
+        var upperWidth = insets.left + insets.right + CGFloat(nbKeys!) * keyRect.width
+        upperWidth += CGFloat(margin) * (CGFloat(nbKeys!) - 1.0) - margin * 0.5
         let lowerWidth = (button?.frame.width)!
         let majorRadius: CGFloat = 10.0
         let minorRadius: CGFloat = 4.0
@@ -525,6 +558,9 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         switch button!.position {
         case .Right:
+            
+            //NSLog(".Right")
+            
             switch (button?.style)! {
             case .Phone:
                 
@@ -536,7 +572,7 @@ class MuFuKeyboardButtonDetailView: UIView {
                 path.rightArc(majorRadius, turn: 90.0) // #1
                 path.forward(upperWidth - 2.0 * majorRadius) // #2 top
                 path.rightArc(majorRadius, turn: 90.0) // #3
-                path.forward(keyRect.height - 2.0 * majorRadius + insets.top + insets.bottom - 3.0) // #4 right big
+                path.forward(CGFloat(nbRows!) * keyRect.height - 2.0 * majorRadius + insets.top + insets.bottom - 3.0 + 10.0) // #4 right big
                 path.rightArc(majorRadius, turn: 90.0) // #5
                 path.forward(path.currentPoint.x - (keyRect.width + 2.0 * majorRadius + 3.0))
                 path.leftArc(majorRadius, turn: 90.0) // #6
@@ -575,8 +611,11 @@ class MuFuKeyboardButtonDetailView: UIView {
             
         case .Left:
             
+            //NSLog(".Left")
+            
             switch (button?.style)! {
             case .Phone:
+                
                 
                 let path = TurtleBezierPath()
                 path.home()
@@ -587,7 +626,7 @@ class MuFuKeyboardButtonDetailView: UIView {
                 path.rightArc(majorRadius, turn: 90.0) // #1
                 path.forward(upperWidth - 2.0 * majorRadius) // #2 top
                 path.rightArc(majorRadius, turn: 90.0) // #3
-                path.forward(keyRect.height - 2.0 * majorRadius + insets.top + insets.bottom - 3.0) // #4 right big
+                path.forward(CGFloat(nbRows!) * keyRect.height - 2.0 * majorRadius + insets.top + insets.bottom - 3.0 + 10.0) // #4 right big
                 path.rightArc(majorRadius, turn: 48.0)
                 path.forward(8.5)
                 path.leftArc(majorRadius, turn: 48.0)
@@ -623,11 +662,63 @@ class MuFuKeyboardButtonDetailView: UIView {
                 return path
             }
             
-            break
             
-            
+//        case .Inner:
+//            
+//            //NSLog(".Inner")
+//            
+//            switch (button?.style)! {
+//            case .Phone:
+//                
+//                
+//                let path = TurtleBezierPath()
+//                path.home()
+//                
+//                path.lineWidth = 0.0
+//                path.lineCapStyle = CGLineCap.round
+//                
+//                path.rightArc(majorRadius, turn: 90.0) // #1
+//                path.forward(upperWidth - 2.0 * majorRadius) // #2 top
+//                path.rightArc(majorRadius, turn: 90.0) // #3
+//                path.forward(CGFloat(nbRows!) * keyRect.height - 2.0 * majorRadius + insets.top + insets.bottom - 3.0 + 10.0) // #4 right big
+//                path.rightArc(majorRadius, turn: 48.0)
+//                path.forward(upperWidth/2.0 - majorRadius - minorRadius - lowerWidth)
+//                path.leftArc(majorRadius, turn: 48.0)
+//                path.forward(keyRect.height - minorRadius)
+//                path.rightArc(minorRadius, turn: 90.0)
+//                path.forward(lowerWidth - 2.0 * minorRadius) //  lowerWidth - 2 * minorRadius + 0.5
+//                path.rightArc(minorRadius, turn: 90.0)
+//                path.forward(keyRect.height - 2.0 * minorRadius)
+//                path.leftArc(majorRadius, turn: 90.0) // #5
+//                path.forward(path.currentPoint.x - majorRadius)
+//                path.rightArc(majorRadius, turn: 90.0) // #6
+//                
+//                offsetX = keyRect.maxX - path.bounds.width + insets.left
+//                offsetY = keyRect.maxY - path.bounds.height + 10.0
+//                
+//                path.apply(CGAffineTransform(translationX: offsetX, y: offsetY))
+//                
+//                return path
+//                
+//            case .Tablet:
+//                
+//                let firstRect = inputOptionsRects?[0]
+//                let path = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: (firstRect?.width)! * CGFloat((button?.inputOptionsIDs?.count)!) + 12.0, height: firstRect!.height + 12.0), cornerRadius: 6.0)
+//                
+//                path.lineWidth = 0.0
+//                path.lineCapStyle = CGLineCap.round
+//                
+//                offsetX = keyRect.maxX - path.bounds.width
+//                offsetY = (firstRect?.minY)! - 6.0
+//                
+//                path.apply(CGAffineTransform(translationX: offsetX, y: offsetY))
+//                
+//                return path
+//            }
+//
         default:
             break
+            
         }
         
         return UIBezierPath()
@@ -639,35 +730,46 @@ class MuFuKeyboardButtonDetailView: UIView {
     
     func determineInputOptionsGeometries() {
         
-        let keyRect = convert((button?.frame)!, from: button?.superview)
-        var inputOptionsRects = Array<CGRect>()
-        inputOptionsRects.reserveCapacity((button?.inputOptionsIDs?.count)!)
+        var keyRect = convert((button?.frame)!, from: button?.superview)
+        
+        var newInputOptionsRects = Array<CGRect>()
+        newInputOptionsRects.reserveCapacity((button?.inputOptionsIDs?.count)!)
+        
+        //let nbKeys: Int = (button?.optionsRowLengths.max())!
+        let nbRows: Int = (button?.optionsRowLengths.count)!
         
         var offset: CGFloat = 0.0
         var spacing: CGFloat = 0.0
         
         var optionRect = CGRect.zero
+        var rowLeadingOptionRect = CGRect.zero
         
         switch (button?.style)! {
         case .Phone:
             
+            keyRect.size.width = button!.frame.size.width // IPHONE_PORTRAIT_OPTION_WIDTH
             offset = keyRect.width
             spacing = 6.0
-            optionRect = keyRect.insetBy(dx: 0.0, dy: 0.5).offsetBy(dx: 0.0, dy: -(keyRect.height + 15.0))
+            optionRect = keyRect.insetBy(dx: 0.0, dy: 0.5).offsetBy(dx: (button?.optionsRowOffsets.first!)!, dy: -(CGFloat(nbRows) * keyRect.height + 25.0))
+            rowLeadingOptionRect = optionRect
             break
             
         case .Tablet:
+            
+            keyRect.size.width = frame.size.width // IPAD_PORTRAIT_OPTION_WIDTH
             spacing = 0.0
-            optionRect = keyRect.insetBy(dx: 6.0, dy: 6.5).offsetBy(dx: 0.0, dy: -(keyRect.height + 3.0))
-            offset =  optionRect.width
+            optionRect = keyRect.insetBy(dx: 6.0, dy: 6.5).offsetBy(dx: (button?.optionsRowOffsets.first!)!, dy: -(CGFloat(nbRows) * keyRect.height + 3.0))
+            rowLeadingOptionRect = optionRect
+            offset = optionRect.width
             break
         }
 
-        
+        var rowCounter: Int = 0
+        var keyCounter: Int = 0
         
         for _ in (button?.inputOptionsIDs)! {
             
-            inputOptionsRects.append(optionRect)
+            newInputOptionsRects.append(optionRect)
             
             // Offset the option rect
             switch button!.position {
@@ -681,9 +783,22 @@ class MuFuKeyboardButtonDetailView: UIView {
                 break
             }
             
+            keyCounter += 1
+            if keyCounter == button?.optionsRowLengths[rowCounter] {
+                
+                keyCounter = 0
+                rowCounter += 1
+
+                if (rowCounter < nbRows) {
+                    rowLeadingOptionRect = rowLeadingOptionRect.offsetBy(dx: (button?.optionsRowOffsets[rowCounter])!, dy: keyRect.height)// + spacing)
+                    optionRect = rowLeadingOptionRect
+                }
+                
+            }
+            
         }
         
-        self.inputOptionsRects = inputOptionsRects
+        inputOptionsRects = newInputOptionsRects
         
     }
     

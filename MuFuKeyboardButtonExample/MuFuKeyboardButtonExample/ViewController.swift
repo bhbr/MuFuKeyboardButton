@@ -53,37 +53,23 @@ class ViewController: UIViewController, MuFuKeyDelegate {
     }
 
     func handleKeyboardEvent(_ id: String) {
-        if (id == "x") {
-            NSLog("event x detected")
-        } else if (id == "a") {
-            NSLog("event a detected")
-        } else if (id == "b") {
-            NSLog("event b detected")
-        } else if (id == "c") {
-            NSLog("event c detected")
-        } else if (id == "y") {
-            NSLog("event y detected")
-        } else if (id == "A") {
-            NSLog("event A detected")
-        } else if (id == "B") {
-            NSLog("event B detected")
-        } else if (id == "🤡") {
-            NSLog("event 🤡 detected")
+        if (id == "test") {
+            NSLog("test event detected")
         } else {
             NSLog("other event detected")
         }
     }
     
     
-    @IBAction func functionButtonTouchDown(_ sender: MuFuButton) {
+    @IBAction func functionButtonTouchDown(_ sender: MuFuKey) {
         NSLog("function button touch down")
     }
     
-    @IBAction func buttonQPressed(_ sender: MuFuButton!) {
-        NSLog(sender.currentTitle!)
+    @IBAction func buttonQPressed(_ sender: MuFuKey!) {
+        NSLog(sender.inputID)
     }
     
-    @IBOutlet var muFuButton: MuFuButton?
+    @IBOutlet var muFuButton: MuFuKey?
     
     @IBAction func interrupt() {
         

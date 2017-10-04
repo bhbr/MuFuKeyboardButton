@@ -49,13 +49,12 @@ extension UIImage {
         filter.setDefaults()
         filter.setValue(ciImage, forKey: kCIInputImageKey)
         
-        let ciColor = CIColor(color: color)
+        // let ciColor = CIColor(color: color)
         //var red = ciColor.red > 0 ? ciColor.red : 0 - ciColor.red
-        
-        let (red, green, blue, alpha) = color.getRGBAComponents()!
-        
         //var green = ciColor.green > 0 ? ciColor.green : 0 - ciColor.green
         //var blue = ciColor.blue > 0 ? ciColor.blue : 0 - ciColor.blue
+        
+        let (red, green, blue, _) = color.getRGBAComponents()!
         
         let redVector = CIVector(x: red, y: 0, z: 0, w: 0)
         let greenVector = CIVector(x: green, y: 0, z: 0, w: 0)
@@ -109,8 +108,8 @@ let FUNCTION_KEY_FONT: UIFont = UIFont.systemFont(ofSize: 22.0)
 
 let BUTTON_SHADOW_COLOR = UIColor(red: 137.0/255.0, green: 139.0/255.0, blue: 143.0/255.0, alpha: 1.0)
 
-let IPHONE_CORNER_RADIUS: CGFloat = 4.0
-let IPAD_CORNER_RADIUS: CGFloat = 4.0
+let IPHONE_KEY_CORNER_RADIUS: CGFloat = 4.0
+let IPAD_KEY_CORNER_RADIUS: CGFloat = 4.0
 
 
 let DEFAULT_OPTIONS_VIEW_DELAY: Float = 0.3
@@ -130,13 +129,13 @@ enum MuFuKeySymbolType {
 
 @IBDesignable class MuFuKey: UIControl {
     
-    var style: String? = "Character" {
+    @IBInspectable var style: String? = "Character" {
         didSet {
-            switch style? {
+            switch style! {
             case "Character":
                 setupAsCharacterKey()
             case "Function":
-                setupAdFunctionKey()
+                setupAsFunctionKey()
             default:
                 break
             }
@@ -144,28 +143,17 @@ enum MuFuKeySymbolType {
     }
     
     // Colors
-    var normalColor: UIColor? = CHARACTER_KEY_BG_COLOR
-    var highlightColor: UIColor? = CHARACTER_KEY_HIGHLIGHT_BG_COLOR
+    @IBInspectable var normalColor: UIColor? = CHARACTER_KEY_BG_COLOR
+    @IBInspectable var highlightColor: UIColor? = CHARACTER_KEY_HIGHLIGHT_BG_COLOR
     
-    var normalTextColor: UIColor? = CHARACTER_KEY_TEXT_COLOR
-    var highlightTextColor: UIColor? = CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR
+    @IBInspectable var normalTextColor: UIColor? = CHARACTER_KEY_TEXT_COLOR
+    @IBInspectable var highlightTextColor: UIColor? = CHARACTER_KEY_HIGHLIGHT_TEXT_COLOR
 
     
-    override var state: UIControlState {
-        didSet {
-            if state == .highlighted {
-                symbolView.isHidden = true
-                highlightedSymbolView.isHidden = false
-            } else if state == .normal {
-                symbolView.isHidden = false
-                highlightedSymbolView = true
-            }
-        }
-    }
     
     
     // Symbol
-    var symbolView: UIView
+    var symbolView: UIView?
     var symbolType: MuFuKeySymbolType? {
         if symbolView is UILabel {
             return .Text
@@ -178,48 +166,27 @@ enum MuFuKeySymbolType {
     }
     
     
-    var symbolImage: UIImage? {
+    @IBInspectable var symbolImage: UIImage? {
         didSet {
-            if let imageView = symbolView as? UIImageView {
-                imageView.image = symbolImage
-            } else {
-                symbolView = UIImageView(frame: symbolView.frame)
-                if symbolView.frame == CGRect.zero {
-                    symbolView.frame = frame
-                }
-                (symbolView as! UIImageView).image = symbolImage
-                symbolView.backgroundColor = .clear
-                symbolView.contentMode = .scaleAspectFit
-            }
-            updateHighlightedSymbolView()
+            setupSymbolViewAsImage()
         }
     }
     
-    var symbolFont: UIFont? = CHARACTER_KEY_FONT
+    @IBInspectable var symbolFont: UIFont? = CHARACTER_KEY_FONT
     
-    var symbolText: String? {
+    @IBInspectable var symbolText: String? {
         didSet {
-            if let label = symbolView as? UILabel {
-                label.text = symbolText
-            } else {
-                symbolView = UILabel(frame: symbolView.frame)
-                if symbolView.frame == CGRect.zero {
-                    symbolView.frame = frame
-                }
-                (symbolView as! UILabel).text = symbolText
-                (symbolView as! UILabel).font = symbolFont
-            }
-            updateHighlightedSymbolView()
+            setupSymbolViewAsLabel()
         }
     }
 
-    var highlightedSymbolView: UIView // precomputed in init
+    var highlightedSymbolView: UIView? // precomputed in init
 
-    var cornerRadius: CGFloat = IPHONE_BUTTON_CORNER_RADIUS // check properly in init
+    @IBInspectable var cornerRadius: CGFloat = IPHONE_KEY_CORNER_RADIUS // check properly in init
     
-    var inputID: String = "no ID set"
+    @IBInspectable var inputID: String = "no ID set"
     
-    var delegate: MuFuKeyDelegate
+    var delegate: MuFuKeyDelegate?
     
     func updateHighlightedSymbolView() {
         
@@ -228,9 +195,13 @@ enum MuFuKeySymbolType {
             if let newHighlightedSymbolView = highlightedSymbolView as? UILabel {
                 newHighlightedSymbolView.text = symbolText
             } else {
-                highlightedSymbolView = UILabel(frame: highlightedSymbolView.frame)
-                if highlightedSymbolView.frame = CGRect.zero {
-                    highlightedSymbolView.frame = frame
+                if let highlightedSymbolViewFrame = highlightedSymbolView?.frame {
+                    highlightedSymbolView = UILabel(frame: highlightedSymbolViewFrame)
+                } else {
+                    highlightedSymbolView = UILabel(frame: frame)
+                }
+                if highlightedSymbolView?.frame == CGRect.zero {
+                    highlightedSymbolView?.frame = frame
                 }
                 (highlightedSymbolView as! UILabel).text = symbolText
                 (highlightedSymbolView as! UILabel).backgroundColor = highlightColor
@@ -238,18 +209,22 @@ enum MuFuKeySymbolType {
                 (highlightedSymbolView as! UILabel).font = symbolFont
             }
             
-        } else if symbolType = .Image {
+        } else if symbolType == .Image {
             
             if let newHighlightedSymbolView = highlightedSymbolView as? UIImageView {
                 newHighlightedSymbolView.image = symbolImage
             } else {
-                highlightedSymbolView = UIImage(frame: highlightedSymbolView.frame)
-                if highlightedSymbolView.frame = CGRect.zero {
-                    highlightedSymbolView.frame = frame
+                if let highlightedSymbolViewFrame = highlightedSymbolView?.frame {
+                    highlightedSymbolView = UIImageView(frame: highlightedSymbolViewFrame)
+                } else {
+                    highlightedSymbolView = UIImageView(frame: frame)
                 }
-                (highlightedSymbolView as! UILabel).image = symbolImage
-                (highlightedSymbolView as! UILabel).backgroundColor = .clear
-                (highlightedSymbolView as! UILabel).contentMode = .scaleAspectFit
+                if highlightedSymbolView?.frame == CGRect.zero {
+                    highlightedSymbolView?.frame = frame
+                }
+                (highlightedSymbolView as! UIImageView).image = symbolImage
+                (highlightedSymbolView as! UIImageView).backgroundColor = .clear
+                (highlightedSymbolView as! UIImageView).contentMode = .scaleAspectFit
             }
             
             
@@ -257,33 +232,95 @@ enum MuFuKeySymbolType {
         
     }
     
+    func setupSymbolViewAsLabel() {
+        
+        if let label = symbolView as? UILabel {
+            label.text = symbolText
+        } else {
+            if let symbolViewFrame = symbolView?.frame { // does it bring a frame already? then keep it
+                symbolView = UILabel(frame: symbolViewFrame)
+            } else {
+                symbolView = UILabel(frame: frame) // otherwise use the MuFuKey's frame
+            }
+            if symbolView?.frame == CGRect.zero {
+                symbolView?.frame = frame
+            }
+            (symbolView as! UILabel).text = symbolText
+            (symbolView as! UILabel).font = symbolFont
+        }
+        updateHighlightedSymbolView()
+
+    }
+    
+    func setupSymbolViewAsImage() {
+        if let imageView = symbolView as? UIImageView {
+            imageView.image = symbolImage
+        } else {
+            if let symbolViewFrame = symbolView?.frame { // does it bring a frame already? then keep it
+                symbolView = UIImageView(frame: symbolViewFrame)
+            } else {
+                symbolView = UIImageView(frame: frame) // otherwise use the MuFuKey's frame
+            }
+            if symbolView?.frame == CGRect.zero {
+                symbolView?.frame = frame
+            }
+            (symbolView as! UIImageView).image = symbolImage
+            symbolView?.backgroundColor = .clear
+            symbolView?.contentMode = .scaleAspectFit
+        }
+        updateHighlightedSymbolView()
+
+    }
     
     func commonInit() {
         
         // corner radius
         if UIDevice.current.userInterfaceIdiom == .phone {
-            cornerRadius = IPHONE_CORNER_RADIUS
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
         } else if UIDevice.current.userInterfaceIdiom == .pad {
-            cornerRadius = IPAD_CORNER_RADIUS
+            cornerRadius = IPAD_KEY_CORNER_RADIUS
         }
         
         // wiring
         addTarget(self, action: #selector(highlight), for: .touchDown)
         addTarget(self, action: #selector(unhighlight), for: .touchUpInside)
         
+        symbolText = "Title"
+        setupSymbolViewAsLabel()
+        
+        // subview
+        addSubview(symbolView!)
+        addSubview(highlightedSymbolView!)
+        highlightedSymbolView?.isHidden = true
     }
     
+    
     func highlight() {
-        state = .highlighted
+        symbolView?.isHidden = true
+        highlightedSymbolView?.isHidden = false
     }
 
     func unhighlight() {
-        state = .normal
+        symbolView?.isHidden = false
+        highlightedSymbolView?.isHidden = true
     }
 
     override init(frame: CGRect) {
-        commonInit()
+        
         super.init(frame: frame)
+        commonInit()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+    
+    override func prepareForInterfaceBuilder() {
+        layer.masksToBounds = false
+        clipsToBounds = true
+        symbolView?.contentMode = .scaleAspectFit
+        setNeedsLayout()
     }
     
     func setupAsCharacterKey() {
@@ -296,8 +333,8 @@ enum MuFuKeySymbolType {
         symbolFont = CHARACTER_KEY_FONT
         
         updateHighlightedSymbolView()
-        
     }
+    
     
     func setupAsFunctionKey() {
         
@@ -309,19 +346,20 @@ enum MuFuKeySymbolType {
         symbolFont = FUNCTION_KEY_FONT
         
         updateHighlightedSymbolView()
+
+//        let magnifiedFrame = bounds//frame
+//        magnifierView = MFBMagnifierView(frame: magnifiedFrame)
+//
+//        let magnifiedFrame = frame
+//        magnifierView = MFBMagnifierView(rootButton: self)
+//
+//        magnifierView.fillColor = highlightColor
+//        magnifierView.magnifiedButton.imageView?.image = imageView?.image?.tintedImage(color: .green)// titleColor(for: .normal)!)
+//        magnifierView.magnifiedButton.setTitleColor(.red, for: .normal) // titleColor(for: .normal), for: .normal)
+//        magnifierView.rootButton = self
+//        magnification = 1.2
+
         
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        commonInit()
-    }
-        
-    override func prepareForInterfaceBuilder() {
-        layer.masksToBounds = false
-        clipsToBounds = true
-        symbolView?.contentMode = .scaleAspectFit
-        setNeedsLayout()
     }
     
 }
@@ -396,7 +434,7 @@ enum MuFuKeySymbolType {
 ////            switch customType {
 ////            case "Character":
 ////                _normalTextColor = CHARACTER_KEY_TEXT_COLOR
-////            case "Function":
+////           case "Function":
 ////                _normalTextColor = FUNCTION_KEY_TEXT_COLOR
 ////            default:
 ////                _normalTextColor = newValue

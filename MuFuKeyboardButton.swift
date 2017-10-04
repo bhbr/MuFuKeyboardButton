@@ -26,10 +26,94 @@
 
 import UIKit
 
-let IPHONE_BUTTON_WIDTH: CGFloat = 26.0
-let IPHONE_BUTTON_HEIGHT: CGFloat = 39.0
-let IPAD_BUTTON_WIDTH: CGFloat = 57.0
-let IPAD_BUTTON_HEIGHT: CGFloat = 55.0
+let IPHONE5_PORTRAIT_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE5_PORTRAIT_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE5_PORTRAIT_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE5_PORTRAIT_OPTION_HEIGHT: CGFloat = 20.0
+
+let IPHONE5_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE5_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE5_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE5_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+
+let IPHONE6_PORTRAIT_BUTTON_WIDTH: CGFloat = 38.0  //
+let IPHONE6_PORTRAIT_BUTTON_HEIGHT: CGFloat = 43.0  //
+let IPHONE6_PORTRAIT_OPTION_WIDTH: CGFloat = 38.0  //
+let IPHONE6_PORTRAIT_OPTION_HEIGHT: CGFloat = 43.0  //
+
+let IPHONE6_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE6_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE6_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE6_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+
+let IPHONE6P_PORTRAIT_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE6P_PORTRAIT_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE6P_PORTRAIT_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE6P_PORTRAIT_OPTION_HEIGHT: CGFloat = 20.0
+
+let IPHONE6P_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE6P_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE6P_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE6P_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+
+let IPHONEX_PORTRAIT_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONEX_PORTRAIT_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONEX_PORTRAIT_OPTION_WIDTH: CGFloat = 20.0
+let IPHONEX_PORTRAIT_OPTION_HEIGHT: CGFloat = 20.0
+
+let IPHONEX_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONEX_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONEX_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONEX_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+
+
+
+
+let IPAD_PORTRAIT_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_PORTRAIT_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD_PORTRAIT_OPTION_WIDTH: CGFloat = 50.0
+let IPAD_PORTRAIT_OPTION_HEIGHT: CGFloat = 50.0
+
+let IPAD_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD_LANDSCAPE_OPTION_WIDTH: CGFloat = 50.0
+let IPAD_LANDSCAPE_OPTION_HEIGHT: CGFloat = 50.0
+
+let IPAD_PRO10_PORTRAIT_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_PRO10_PORTRAIT_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD_PRO10_PORTRAIT_OPTION_WIDTH: CGFloat = 50.0
+let IPAD_PRO10_PORTRAIT_OPTION_HEIGHT: CGFloat = 50.0
+
+let IPAD_PRO10_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_PRO10_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD_PRO10_LANDSCAPE_OPTION_WIDTH: CGFloat = 50.0
+let IPAD_PRO10_LANDSCAPE_OPTION_HEIGHT: CGFloat = 50.0
+
+let IPAD_PRO12_PORTRAIT_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_PRO12_PORTRAIT_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD_PRO12_PORTRAIT_OPTION_WIDTH: CGFloat = 50.0
+let IPAD_PRO12_PORTRAIT_OPTION_HEIGHT: CGFloat = 50.0
+
+let IPAD_PRO12_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_PRO12_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD_PRO12_LANDSCAPE_OPTION_WIDTH: CGFloat = 50.0
+let IPAD_PRO12_LANDSCAPE_OPTION_HEIGHT: CGFloat = 50.0
+
+
+let DEFAULT_BUTTON_WIDTH: CGFloat = 30.0
+let DEFAULT_BUTTON_HEIGHT: CGFloat = 45.0
+let DEFAULT_OPTION_WIDTH: CGFloat = 30.0
+let DEFAULT_OPTION_HEIGHT: CGFloat = 45.0
+
+let IPHONE_KEY_CORNER_RADIUS: CGFloat = 4.0
+let IPAD_KEY_CORNER_RADIUS: CGFloat = 6.0
+
+let DEFAULT_OPTIONS_VIEW_DELAY = 0.3
+
+
+
+
+
 
 
 enum MuFuKeyboardButtonOptionsLayout { // which way the option selection fans out
@@ -74,12 +158,12 @@ extension Notification.Name {
 
 
 
-//
-//protocol MFKBDelegate { // is the KeyboardViewController
-//    
-//    func handleKeyboardEvent(_ id: String)
-//
-//}
+
+protocol MFKBDelegate { // is the KeyboardViewController
+    
+    func handleKeyboardEvent(_ id: String)
+
+}
 
 
 @IBDesignable class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
@@ -139,14 +223,14 @@ extension Notification.Name {
             willChangeValue(forKey: "_style")
             _style = newStyle
             didChangeValue(forKey: "_style")
-            updateDisplayStyle()
+            //updateDisplayStyle()
         }
         
     }
     
     @IBInspectable var borderColor: UIColor = .white
     
-    @IBInspectable var _displayType: MuFuKeyboardButtonDisplayType
+    var _displayType: MuFuKeyboardButtonDisplayType
     var displayType: MuFuKeyboardButtonDisplayType {
         
         get {
@@ -196,6 +280,8 @@ extension Notification.Name {
             _inputOptionsIDs = newInputOptionsIDs
             didChangeValue(forKey: "_inputOptionsIDs")
             
+            optionsRowLengths = [inputOptionsIDs!.count]
+            
             if ((inputOptionsIDs?.count)! > 0) {
                 setupInputOptionsConfiguration()
             } else {
@@ -203,6 +289,8 @@ extension Notification.Name {
             }
         }
     }
+    
+    var inputOptionsGlyphs: Array<String>? = []
     
     var _inputOptionsImages: Array<UIImage> = []
     var inputOptionsImages: Array<UIImage> {
@@ -212,7 +300,7 @@ extension Notification.Name {
         }
         
         set(newInputOptionsImages) {
-            willChangeValue(forKey: "_inputOptionsImagess")
+            willChangeValue(forKey: "_inputOptionsImages")
             _inputOptionsImages = newInputOptionsImages
             didChangeValue(forKey: "_inputOptionsImages")
             
@@ -260,11 +348,24 @@ extension Notification.Name {
     
     var delegate: MFKBDelegate?
     var showMagnifier: Bool = true
-    var optionsViewDelay: Float = DEFAULT_OPTIONS_VIEW_DELAY
+    var optionsViewDelay: Float = Float(DEFAULT_OPTIONS_VIEW_DELAY)
+    
+    var optionsRowLengths: [Int] = [0]
+    var optionsRowOffsets: [CGFloat] = [0.0]
+    
+    var labelIsPersistent: Bool = true
     
     var displayLabel = UILabel()
     var displayImageView = UIImageView()
     var magnifiedDisplayImageView = UIImageView()
+    
+    var magnifiedDisplayLabelFont: UIFont = .systemFont(ofSize: 44.0)
+    
+    var optionWidth: CGFloat = DEFAULT_OPTION_WIDTH
+    var optionHeight: CGFloat = DEFAULT_OPTION_HEIGHT
+
+    
+    
     
     
     ////////////////////
@@ -272,12 +373,14 @@ extension Notification.Name {
     ////////////////////
     
     override func prepareForInterfaceBuilder() {
+        // dummy values
         displayLabel.text = "MuFuButton"
-        displayImageView.image = UIImage(named:"sqrt_iPhone")
+        displayImageView.image = UIImage(named:"sqrt")
+        displayImageView.contentMode = .center
     }
     
     init() {
-        let frame = CGRect(x:0.0,y:0.0,width:IPHONE_BUTTON_WIDTH,height:IPHONE_BUTTON_HEIGHT)
+        let frame = CGRect(x:0.0,y:0.0,width:DEFAULT_BUTTON_WIDTH,height:DEFAULT_BUTTON_HEIGHT)
         _style = .Phone
         _displayType = .Label
         position = .Inner
@@ -295,15 +398,7 @@ extension Notification.Name {
     
     init(x: CGFloat, y: CGFloat, style: MuFuKeyboardButtonStyle) {
         _style = style
-        var newFrame = CGRect.zero
-        switch style {
-        case .Phone:
-            newFrame = CGRect(x: x, y: y, width: IPHONE_BUTTON_WIDTH, height: IPHONE_BUTTON_HEIGHT)
-        case .Tablet:
-            newFrame = CGRect(x: x, y: y, width: IPAD_BUTTON_WIDTH, height: IPAD_BUTTON_HEIGHT)
-        default:
-            break
-        }
+        let newFrame = CGRect(x: x, y: y, width: DEFAULT_BUTTON_WIDTH, height: DEFAULT_BUTTON_HEIGHT)
         _displayType = .Label
         position = .Inner
         super.init(frame: newFrame)
@@ -320,20 +415,7 @@ extension Notification.Name {
     
     func commonInit() {
         
-        switch UIDevice.current.userInterfaceIdiom {
-        case .phone:
-            style = .Phone
-            self.frame.size.width = IPHONE_BUTTON_WIDTH
-            self.frame.size.height = IPHONE_BUTTON_HEIGHT
-            break
-        case .pad:
-            style = .Tablet
-            self.frame.size.width = IPAD_BUTTON_WIDTH
-            self.frame.size.height = IPAD_BUTTON_HEIGHT
-            break
-        default:
-            break
-        }
+        updateDisplayStyle()
         
         // Default appearance
         font = .systemFont(ofSize: 22.0)
@@ -352,6 +434,7 @@ extension Notification.Name {
         // State handling
         addTarget(self, action: #selector(MuFuKeyboardButton.handleTouchDown), for: .touchDown)
         addTarget(self, action: #selector(MuFuKeyboardButton.handleTouchUpInside), for: .touchUpInside)
+        addTarget(self, action: #selector(MuFuKeyboardButton.handleTouchUpOutside), for: .touchUpOutside)
         
         
         // Add label or image
@@ -369,14 +452,18 @@ extension Notification.Name {
         self.addSubview(newDisplayLabel)
         
         let newDisplayImageView = UIImageView(frame: CGRect(x: 0.0, y: 0.0, width: frame.width, height: frame.height))
-        newDisplayImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        //newDisplayImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        //newDisplayImageView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
         newDisplayImageView.backgroundColor = .clear
         newDisplayImageView.isUserInteractionEnabled = false
         
         self.displayImageView = newDisplayImageView
         self.addSubview(newDisplayImageView)
         
-        updateDisplayStyle()
+        optionsRowLengths = [(inputOptionsIDs?.count)!] // unless specified from outside
+        
+        inputOptionsGlyphs = inputOptionsIDs
+        
     }
     
     
@@ -414,7 +501,7 @@ extension Notification.Name {
         
     }
     
-    func showInputOptionsView(recognizer: UILongPressGestureRecognizer) {
+    @objc func showInputOptionsView(recognizer: UILongPressGestureRecognizer) {
         
         if (recognizer.state == .began) {
             
@@ -457,16 +544,131 @@ extension Notification.Name {
     
     func updateDisplayStyle() {
         
-        switch style {
-        case .Phone:
-            keyCornerRadius = 4.0
-            frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: IPHONE_BUTTON_WIDTH, height: IPHONE_BUTTON_HEIGHT)
+        let screenSize = max(UIScreen.main.bounds.width,UIScreen.main.bounds.height)
+        
+        let myTrue: Bool = true
+        
+        switch (UIDevice.current.userInterfaceIdiom, screenSize, myTrue) { //UIDevice.current.orientation.isPortrait) {
+            
+        case (.phone, 568.0,true): // iPhone 5,5C,5S,SE Portrait
+            style = .Phone
+            self.frame.size.width = IPHONE5_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONE5_PORTRAIT_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
-        case .Tablet:
-            keyCornerRadius = 6.0
-            frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: IPAD_BUTTON_WIDTH, height: IPAD_BUTTON_HEIGHT)
+            
+        case (.phone, 568.0,false): // iPhone 5,5C,5S,SE Landscape
+            style = .Phone
+            self.frame.size.width = IPHONE5_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONE5_LANDSCAPE_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone, 667.0, true): // iPhone 6,6S,7,8 Portrait
+            style = .Phone
+            self.frame.size.width = IPHONE6_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONE6_PORTRAIT_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone, 667.0, false): // iPhone 6,6S,7,8 Landscape
+            style = .Phone
+            self.frame.size.width = IPHONE6_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONE6_LANDSCAPE_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone, 736.0,true): // iPhone 6+,6S+,7+,8+ Portrait
+            style = .Phone
+            self.frame.size.width = IPHONE6P_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONE6P_PORTRAIT_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,736.0,false): // iPhone 6+,6S+,7+,8+ Landscape
+            style = .Phone
+            self.frame.size.width = IPHONE6P_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONE6P_LANDSCAPE_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,812.0,true): // iPhone X Portrait
+            style = .Phone
+            self.frame.size.width = IPHONEX_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONEX_PORTRAIT_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,812.0,false): // iPhone X Landscape
+            style = .Phone
+            self.frame.size.width = IPHONEX_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONEX_LANDSCAPE_BUTTON_HEIGHT
+            keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+            
+            
+            
+        case (.pad,1024.0,true): // iPad Air/Mini Portrait
+            style = .Tablet
+            self.frame.size.width = IPAD_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPAD_PORTRAIT_BUTTON_HEIGHT
+            keyCornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1024.0,false): // iPad Air/Mini Landscape
+            style = .Tablet
+            self.frame.size.width = IPAD_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPAD_LANDSCAPE_BUTTON_HEIGHT
+            keyCornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1112.0,true): // iPad Pro 10" Portrait
+            style = .Tablet
+            self.frame.size.width = IPAD_PRO10_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPAD_PRO10_PORTRAIT_BUTTON_HEIGHT
+            keyCornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1112.0,false): // iPad Pro 10" Landscape
+            style = .Tablet
+            self.frame.size.width = IPAD_PRO10_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPAD_PRO10_LANDSCAPE_BUTTON_HEIGHT
+            keyCornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1366.0,true): // iPad Pro 12" Portrait
+            style = .Tablet
+            self.frame.size.width = IPAD_PRO12_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPAD_PRO12_PORTRAIT_BUTTON_HEIGHT
+            keyCornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1366.0,false): // iPad Pro 12" Landscape
+            style = .Tablet
+            self.frame.size.width = IPAD_PRO12_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPAD_PRO12_LANDSCAPE_BUTTON_HEIGHT
+            keyCornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+            
+        default:
+            NSLog("screen size and orientation undetected!")
             break
         }
+        
+        
+        
+//        switch style {
+//        case .Phone:
+//            keyCornerRadius = 4.0
+//            frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: IPHONE_BUTTON_WIDTH, height: IPHONE_BUTTON_HEIGHT)
+//            break
+//        case .Tablet:
+//            keyCornerRadius = 6.0
+//            frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: IPAD_BUTTON_WIDTH, height: IPAD_BUTTON_HEIGHT)
+//            break
+//        }
     
         setNeedsDisplay()
         
@@ -495,12 +697,12 @@ extension Notification.Name {
         if ((inputOptionsIDs?.count)! > 0) {
             
             let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(showInputOptionsView(recognizer:)))
-            longPressGestureRecognizer.minimumPressDuration = 0.3
+            longPressGestureRecognizer.minimumPressDuration = CFTimeInterval(optionsViewDelay)
             longPressGestureRecognizer.delegate = self
             addGestureRecognizer(longPressGestureRecognizer)
             optionsViewRecognizer = longPressGestureRecognizer
             
-            let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(_handlePanning(recognizer:)))
+            let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanning(recognizer:)))
             panGestureRecognizer.delegate = self
             addGestureRecognizer(panGestureRecognizer)
             self.panGestureRecognizer = panGestureRecognizer
@@ -513,14 +715,14 @@ extension Notification.Name {
         removeGestureRecognizer(panGestureRecognizer)
     }
     
-    func handleTouchDown() {
+    @objc func handleTouchDown() {
         UIDevice.current.playInputClick()
         if showMagnifier {
             showMagnifiedInputView()
         }
     }
     
-    func handleTouchUpInside() {
+    @objc func handleTouchUpInside() {
         delegate?.handleKeyboardEvent(inputID!)
         if showMagnifier {
             hideMagnifiedInputView()
@@ -528,7 +730,15 @@ extension Notification.Name {
         hideInputOptionsView()
     }
     
-    func _handlePanning(recognizer: UIPanGestureRecognizer) {
+    @objc func handleTouchUpOutside() {
+        delegate?.handleKeyboardEvent(inputID!)
+        if showMagnifier {
+            hideMagnifiedInputView()
+        }
+        hideInputOptionsView()
+    }
+    
+    @objc func handlePanning(recognizer: UIPanGestureRecognizer) {
         
         if (recognizer.state == .ended || recognizer.state == .cancelled) {
             if let idx = buttonOptionsView?.highlightedInputIndex {
