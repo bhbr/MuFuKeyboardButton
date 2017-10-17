@@ -100,8 +100,6 @@ let IPAD_PRO12_LANDSCAPE_OPTION_WIDTH: CGFloat = 50.0
 let IPAD_PRO12_LANDSCAPE_OPTION_HEIGHT: CGFloat = 50.0
 
 
-let DEFAULT_BUTTON_WIDTH: CGFloat = 30.0
-let DEFAULT_BUTTON_HEIGHT: CGFloat = 45.0
 let DEFAULT_OPTION_WIDTH: CGFloat = 30.0
 let DEFAULT_OPTION_HEIGHT: CGFloat = 45.0
 
@@ -114,24 +112,17 @@ let DEFAULT_OPTIONS_VIEW_DELAY = 0.3
 
 
 
-
-
-enum MuFuKeyboardButtonOptionsLayout { // which way the option selection fans out
+enum MuFuKeyboardButtonOptionsFanoutDirection { // which way the option selection fans out
     case Left
-    case Inner
+    case Auto // will choose Left or Right depending on which screen edge the button is closer to
     case Right
-}
-
-enum MuFuKeyboardButtonActionStyle {
-    case Character
-    case Function // like shift, switch keyboard, etc.
 }
 
 /**
  The style of the keyboard button. You use these constants to set the value of the keyboard button style.
  */
 
-enum MuFuKeyboardButtonStyle {
+enum MuFuKeyboardButtonSizeClass {
     case Phone
     case Tablet
 }
@@ -152,56 +143,35 @@ extension Notification.Name {
 }
 
 
-
-
-
-
-
-
-
 protocol MFKBDelegate { // is the KeyboardViewController
-    
     func handleKeyboardEvent(_ id: String)
-
 }
 
 
 @IBDesignable class MuFuKeyboardButton: UIControl, UIGestureRecognizerDelegate {
     
-    var position: MuFuKeyboardButtonOptionsLayout
+    var optionsFanoutDirection: MuFuKeyboardButtonOptionsFanoutDirection
     
     var _font: UIFont? = .systemFont(ofSize: 22.0)
     var font: UIFont? {
-        
-        get {
-            return _font
-        }
-        
+        get { return _font }
         set(newFont) {
-
-            if (_font != newFont) {
-                willChangeValue(forKey: "_font")
-                _font = newFont
-                didChangeValue(forKey: "_font")
-                displayLabel.font = newFont
-                }
+            willChangeValue(forKey: "_font")
+            _font = newFont
+            didChangeValue(forKey: "_font")
+            displayLabel.font = newFont
         }
-        
     }
     
     var inputOptionsFont: UIFont?
-    var keyColor: UIColor?
+    var color: UIColor?
     
-    var _keyTextColor: UIColor? = .clear
-    var keyTextColor: UIColor? {
-        
-        get {
-            return _keyTextColor
-        }
-        
+    var _textColor: UIColor? = .clear
+    var textColor: UIColor? {
+        get { return _textColor }
         set(newKeyTextColor) {
             willChangeValue(forKey: "_keyTextColor")
-            _keyTextColor = newKeyTextColor
+            _textColor = newKeyTextColor
             didChangeValue(forKey: "_keyTextColor")
             displayLabel.textColor = newKeyTextColor
         }
@@ -212,31 +182,22 @@ protocol MFKBDelegate { // is the KeyboardViewController
     var keyHighlightedColor: UIColor?
     lazy var keyCornerRadius: CGFloat = 0.0
     
-    var _style: MuFuKeyboardButtonStyle
-    var style: MuFuKeyboardButtonStyle {
-        
-        get {
-            return _style
-        }
-        
-        set(newStyle) {
-            willChangeValue(forKey: "_style")
-            _style = newStyle
-            didChangeValue(forKey: "_style")
+    var _sizeClass: MuFuKeyboardButtonSizeClass
+    var sizeClass: MuFuKeyboardButtonSizeClass {
+        get { return _sizeClass }
+        set(newSizeClass) {
+            willChangeValue(forKey: "_sizeClass")
+            _sizeClass = newSizeClass
+            didChangeValue(forKey: "_sizeClass")
             //updateDisplayStyle()
         }
-        
     }
     
     @IBInspectable var borderColor: UIColor = .white
     
     var _displayType: MuFuKeyboardButtonDisplayType
     var displayType: MuFuKeyboardButtonDisplayType {
-        
-        get {
-            return _displayType
-        }
-        
+        get { return _displayType}
         set(newDisplayType) {
             willChangeValue(forKey: "displayType")
             _displayType = newDisplayType
@@ -249,18 +210,13 @@ protocol MFKBDelegate { // is the KeyboardViewController
                 displayLabel.isHidden = true
                 displayImageView.isHidden = false
             }
-            
         }
     }
 
     
     var _inputID: String? = "" // passed to delegate if pressed
     var inputID: String? {
-        
-        get {
-            return _inputID
-        }
-        
+        get { return _inputID }
         set(newInputID) {
             willChangeValue(forKey: "_inputID")
             _inputID = newInputID
@@ -268,13 +224,9 @@ protocol MFKBDelegate { // is the KeyboardViewController
         }
     }
     
-    var _inputOptionsIDs: Array<String>? = []// one of these strings passed to the delegate when selected
+    var _inputOptionsIDs: Array<String>? = [] // one of these strings passed to the delegate when selected
     var inputOptionsIDs: Array<String>? {
-        
-        get {
-            return _inputOptionsIDs
-        }
-        
+        get { return _inputOptionsIDs }
         set(newInputOptionsIDs) {
             willChangeValue(forKey: "_inputOptionsIDs")
             _inputOptionsIDs = newInputOptionsIDs
@@ -294,11 +246,7 @@ protocol MFKBDelegate { // is the KeyboardViewController
     
     var _inputOptionsImages: Array<UIImage> = []
     var inputOptionsImages: Array<UIImage> {
-        
-        get {
-            return _inputOptionsImages
-        }
-        
+        get { return _inputOptionsImages }
         set(newInputOptionsImages) {
             willChangeValue(forKey: "_inputOptionsImages")
             _inputOptionsImages = newInputOptionsImages
@@ -310,7 +258,6 @@ protocol MFKBDelegate { // is the KeyboardViewController
                 highlightedInputOptionsImages.append(inputOptionImage.inverted()!)
             }
 
-            
             if ((inputOptionsImages.count) > 0) {
                 setupInputOptionsConfiguration()
             } else {
@@ -321,11 +268,7 @@ protocol MFKBDelegate { // is the KeyboardViewController
     
     var _highlightedInputOptionsImages: Array<UIImage> = []
     var highlightedInputOptionsImages: Array<UIImage> {
-        
-        get {
-            return _highlightedInputOptionsImages
-        }
-        
+        get { return _highlightedInputOptionsImages }
         set(newHighlightedInputOptionsImages) {
             willChangeValue(forKey: "_highlightedInputOptionsImages")
             _highlightedInputOptionsImages = newHighlightedInputOptionsImages
@@ -342,7 +285,7 @@ protocol MFKBDelegate { // is the KeyboardViewController
     var buttonMagnifiedView: MuFuKeyboardButtonDetailView? // button and magnifier
     var buttonOptionsView: MuFuKeyboardButtonDetailView? // button options
     
-    lazy var optionsViewLayout: MuFuKeyboardButtonOptionsLayout = .Inner
+    lazy var optionsViewLayout: MuFuKeyboardButtonOptionsFanoutDirection = .Auto
     lazy var optionsViewRecognizer = UILongPressGestureRecognizer()
     lazy var panGestureRecognizer = UIPanGestureRecognizer()
     
@@ -381,34 +324,34 @@ protocol MFKBDelegate { // is the KeyboardViewController
     
     init() {
         let frame = CGRect(x:0.0,y:0.0,width:DEFAULT_BUTTON_WIDTH,height:DEFAULT_BUTTON_HEIGHT)
-        _style = .Phone
+        _sizeClass = .Phone
         _displayType = .Label
-        position = .Inner
+        optionsFanoutDirection = .Auto
         super.init(frame:frame)
         commonInit()
     }
     
     override init(frame: CGRect) {
-        _style = .Phone
+        _sizeClass = .Phone
         _displayType = .Label
-        position = .Inner
+        optionsFanoutDirection = .Auto
         super.init(frame: frame)
         commonInit()
     }
     
-    init(x: CGFloat, y: CGFloat, style: MuFuKeyboardButtonStyle) {
-        _style = style
+    init(x: CGFloat, y: CGFloat, style: MuFuKeyboardButtonSizeClass) {
+        _sizeClass = style
         let newFrame = CGRect(x: x, y: y, width: DEFAULT_BUTTON_WIDTH, height: DEFAULT_BUTTON_HEIGHT)
         _displayType = .Label
-        position = .Inner
+        optionsFanoutDirection = .Auto
         super.init(frame: newFrame)
         commonInit()
     }
     
     required init?(coder aDecoder: NSCoder) {
-        _style = .Phone
+        _sizeClass = .Phone
         _displayType = .Label
-        position = .Inner
+        optionsFanoutDirection = .Auto
         super.init(coder: aDecoder)
         commonInit()
     }
@@ -420,8 +363,8 @@ protocol MFKBDelegate { // is the KeyboardViewController
         // Default appearance
         font = .systemFont(ofSize: 22.0)
         inputOptionsFont = .systemFont(ofSize: 24.0)
-        keyColor = .white
-        keyTextColor = .black
+        color = .white
+        textColor = .black
         keyShadowColor = UIColor(red: 136.0/255.0, green: 138.0/255.0, blue: 142.0/255.0, alpha: 1.0)
         keyHighlightedColor = UIColor(red: 213.0/255.0, green: 214.0/255.0, blue: 216.0/255.0, alpha: 1.0)
         
@@ -444,7 +387,7 @@ protocol MFKBDelegate { // is the KeyboardViewController
         newDisplayLabel.textAlignment = .center
         newDisplayLabel.backgroundColor = .clear
         newDisplayLabel.isUserInteractionEnabled = false
-        newDisplayLabel.textColor = keyTextColor
+        newDisplayLabel.textColor = textColor
         newDisplayLabel.font = font
         newDisplayLabel.text = inputID!
         
@@ -490,7 +433,7 @@ protocol MFKBDelegate { // is the KeyboardViewController
     
     func showMagnifiedInputView() {
         
-        if (style == .Phone) {
+        if (sizeClass == .Phone) {
             hideMagnifiedInputView()
             buttonMagnifiedView = MuFuKeyboardButtonDetailView(keyboardButton: self, newType: .Magnified)
             buttonMagnifiedView?.displayImageView.image = magnifiedDisplayImageView.image
@@ -551,56 +494,56 @@ protocol MFKBDelegate { // is the KeyboardViewController
         switch (UIDevice.current.userInterfaceIdiom, screenSize, myTrue) { //UIDevice.current.orientation.isPortrait) {
             
         case (.phone, 568.0,true): // iPhone 5,5C,5S,SE Portrait
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONE5_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONE5_PORTRAIT_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
         case (.phone, 568.0,false): // iPhone 5,5C,5S,SE Landscape
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONE5_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONE5_LANDSCAPE_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
         case (.phone, 667.0, true): // iPhone 6,6S,7,8 Portrait
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONE6_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONE6_PORTRAIT_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
         case (.phone, 667.0, false): // iPhone 6,6S,7,8 Landscape
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONE6_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONE6_LANDSCAPE_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
         case (.phone, 736.0,true): // iPhone 6+,6S+,7+,8+ Portrait
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONE6P_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONE6P_PORTRAIT_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
         case (.phone,736.0,false): // iPhone 6+,6S+,7+,8+ Landscape
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONE6P_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONE6P_LANDSCAPE_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
         case (.phone,812.0,true): // iPhone X Portrait
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONEX_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONEX_PORTRAIT_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
         case (.phone,812.0,false): // iPhone X Landscape
-            style = .Phone
+            sizeClass = .Phone
             self.frame.size.width = IPHONEX_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONEX_LANDSCAPE_BUTTON_HEIGHT
             keyCornerRadius = IPHONE_KEY_CORNER_RADIUS
@@ -610,7 +553,7 @@ protocol MFKBDelegate { // is the KeyboardViewController
             
             
         case (.pad,1024.0,true): // iPad Air/Mini Portrait
-            style = .Tablet
+            sizeClass = .Tablet
             self.frame.size.width = IPAD_AIR_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPAD_AIR_PORTRAIT_BUTTON_HEIGHT
             keyCornerRadius = IPAD_KEY_CORNER_RADIUS
@@ -619,35 +562,35 @@ protocol MFKBDelegate { // is the KeyboardViewController
             break
             
         case (.pad,1024.0,false): // iPad Air/Mini Landscape
-            style = .Tablet
+            sizeClass = .Tablet
             self.frame.size.width = IPAD_AIR_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPAD_AIR_LANDSCAPE_BUTTON_HEIGHT
             keyCornerRadius = IPAD_KEY_CORNER_RADIUS
             break
             
         case (.pad,1112.0,true): // iPad Pro 10" Portrait
-            style = .Tablet
+            sizeClass = .Tablet
             self.frame.size.width = IPAD_PRO10_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPAD_PRO10_PORTRAIT_BUTTON_HEIGHT
             keyCornerRadius = IPAD_KEY_CORNER_RADIUS
             break
             
         case (.pad,1112.0,false): // iPad Pro 10" Landscape
-            style = .Tablet
+            sizeClass = .Tablet
             self.frame.size.width = IPAD_PRO10_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPAD_PRO10_LANDSCAPE_BUTTON_HEIGHT
             keyCornerRadius = IPAD_KEY_CORNER_RADIUS
             break
             
         case (.pad,1366.0,true): // iPad Pro 12" Portrait
-            style = .Tablet
+            sizeClass = .Tablet
             self.frame.size.width = IPAD_PRO12_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPAD_PRO12_PORTRAIT_BUTTON_HEIGHT
             keyCornerRadius = IPAD_KEY_CORNER_RADIUS
             break
             
         case (.pad,1366.0,false): // iPad Pro 12" Landscape
-            style = .Tablet
+            sizeClass = .Tablet
             self.frame.size.width = IPAD_PRO12_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPAD_PRO12_LANDSCAPE_BUTTON_HEIGHT
             keyCornerRadius = IPAD_KEY_CORNER_RADIUS
@@ -684,11 +627,11 @@ protocol MFKBDelegate { // is the KeyboardViewController
         let minimumClearance = frame.width * 0.5 + 8.0
         
         if (leftPadding >= minimumClearance && rightPadding >= minimumClearance) {
-            position = .Inner
+            optionsFanoutDirection = .Auto
         } else if (leftPadding > rightPadding) {
-            position = .Left
+            optionsFanoutDirection = .Left
         } else {
-            position = .Right
+            optionsFanoutDirection = .Right
         }
     }
     
@@ -771,8 +714,8 @@ protocol MFKBDelegate { // is the KeyboardViewController
     override func draw(_ rect: CGRect) {
         
         let context = UIGraphicsGetCurrentContext()
-        var color = keyColor
-        if (style == .Tablet && state == .highlighted) {
+        var color = self.color
+        if (sizeClass == .Tablet && state == .highlighted) {
             color = keyHighlightedColor
         }
         let shadow = keyShadowColor

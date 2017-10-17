@@ -91,13 +91,13 @@ class MuFuKeyboardButtonDetailView: UIView {
         highlightedInputIndex = NSNotFound
         
         
-        if (newButton.position != .Inner) {
-            button!.position = newButton.position
+        if (newButton.optionsFanoutDirection != .Auto) {
+            button!.optionsFanoutDirection = newButton.optionsFanoutDirection
         } else {
             // Determine the position
             let leftPadding = newButton.frame.minX
             let rightPadding = (newButton.superview?.frame.maxX)! - newButton.frame.maxX
-            button!.position = (leftPadding > rightPadding ? .Left : .Right)
+            button!.optionsFanoutDirection = (leftPadding > rightPadding ? .Left : .Right)
         }
         
         super.init(frame: frame)
@@ -110,13 +110,13 @@ class MuFuKeyboardButtonDetailView: UIView {
         displayLabel.frame = magnifiedInputViewPath().bounds
         displayLabel.text = button?.displayLabel.text ?? button?.inputID!
         displayLabel.font = button?.magnifiedDisplayLabelFont //  displayLabelFont // button?.displayLabel.font //.withSize(44.0)
-        displayLabel.textColor = button?.keyTextColor
+        displayLabel.textColor = button?.textColor
         displayLabel.backgroundColor = .clear
         displayLabel.textAlignment = .center
         
-        if button!.position == .Left {
+        if button!.optionsFanoutDirection == .Left {
             displayLabel.frame.origin.x += 20.0
-        } else if button!.position == .Right {
+        } else if button!.optionsFanoutDirection == .Right {
             displayLabel.frame.origin.x -= 20.0
         }
         
@@ -129,11 +129,11 @@ class MuFuKeyboardButtonDetailView: UIView {
         displayImageView.image = UIImage()
         displayImageView.autoresizingMask = []
         
-        if button!.position == .Left {
+        if button!.optionsFanoutDirection == .Left {
             displayImageView.frame.origin.x += 20.0
-        } else if button!.position == .Right {
+        } else if button!.optionsFanoutDirection == .Right {
             displayImageView.frame.origin.x -= 20.0
-        } else if button!.position == .Inner {
+        } else if button!.optionsFanoutDirection == .Auto {
             // no adjustment necessary (?)
         }
         
@@ -222,9 +222,9 @@ class MuFuKeyboardButtonDetailView: UIView {
         displayImageView.frame = CGRect(x: newFrame.origin.x, y: newFrame.origin.y + 5.0, width: button!.frame.width * 1.5, height: newFrame.size.height * 1.5)
         displayImageView.center.x = (button?.center.x)!
         
-        if button!.position == .Left {
+        if button!.optionsFanoutDirection == .Left {
             displayImageView.frame.origin.x -= 10.0
-        } else if button!.position == .Right {
+        } else if button!.optionsFanoutDirection == .Right {
             displayImageView.frame.origin.x += 10.0
         }
         
@@ -234,9 +234,9 @@ class MuFuKeyboardButtonDetailView: UIView {
         displayLabel.frame = CGRect(x: newFrame.origin.x, y: newFrame.origin.y + 5.0, width: button!.frame.width, height: button!.frame.height)
         displayLabel.center.x = (button?.center.x)!
         
-        if button!.position == .Left {
+        if button!.optionsFanoutDirection == .Left {
             displayLabel.frame.origin.x -= 10.0
-        } else if button!.position == .Right {
+        } else if button!.optionsFanoutDirection == .Right {
             displayLabel.frame.origin.x += 10.0
         }
     }
@@ -271,7 +271,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         //// Rounded Rectangle Drawing
         context?.saveGState()
         context?.setShadow(offset: shadowOffset, blur: CGFloat(shadowBlurRadius), color: shadow.cgColor)
-        button?.keyColor?.setFill()
+        button?.color?.setFill()
         bezierPath.fill()
         context!.restoreGState()
         
@@ -279,7 +279,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         // Draw the key shadow sliver
         
         //// Color Declarations
-        let color = button?.keyColor
+        let color = button?.color
         
         //// Shadow Declarations
         shadow = (button?.keyShadowColor)!
@@ -343,14 +343,14 @@ class MuFuKeyboardButtonDetailView: UIView {
         //// Rounded Rectangle Drawing
         context?.saveGState()
         context?.setShadow(offset: shadowOffset, blur: shadowBlurRadius, color: shadow.cgColor)
-        button?.keyColor?.setFill()
+        button?.color?.setFill()
         bezierPath.fill()
         context?.restoreGState()
         
         
         // Draw the key shadow sliver
-        if (button?.style == MuFuKeyboardButtonStyle.Phone) {
-            let color = button?.keyColor
+        if (button?.sizeClass == MuFuKeyboardButtonSizeClass.Phone) {
+            let color = button?.color
             
             //// Shadow Declarations
             let shadow = button?.keyShadowColor
@@ -397,12 +397,12 @@ class MuFuKeyboardButtonDetailView: UIView {
                 let optionGlyph: String? = button?.inputOptionsGlyphs?[idx]
                 
                 // Draw the text
-                let stringColor = (highlighted ? UIColor.white : button?.keyTextColor)
-                let stringSize = optionGlyph!.size(withAttributes: [NSAttributedStringKey.font: (button?.inputOptionsFont)!])
+                let stringColor = (highlighted ? UIColor.white : button?.textColor)
+                let stringSize = optionGlyph!.size(attributes: ["font": (button?.inputOptionsFont)!])
                 let stringRect = CGRect(x: optionRect.midX - stringSize.width * 0.5, y: optionRect.midY - stringSize.height * 0.5, width: stringSize.width, height: stringSize.height)
                 let p = NSMutableParagraphStyle()
                 p.alignment = NSTextAlignment.center
-                let attributedString = NSAttributedString.init(string: optionGlyph!, attributes: [NSAttributedStringKey.font: (button?.inputOptionsFont)!, NSAttributedStringKey.foregroundColor: stringColor!, NSAttributedStringKey.paragraphStyle: p])
+                let attributedString = NSAttributedString.init(string: optionGlyph!, attributes: ["font": (button?.inputOptionsFont)!, "foregroundColor": stringColor!, "paragraphStyle": p])
                 attributedString.draw(in: stringRect)
             
             } else if (displayType == .Image) {
@@ -441,9 +441,9 @@ class MuFuKeyboardButtonDetailView: UIView {
         path.lineWidth = 0.0
         path.lineCapStyle = CGLineCap.round
         
-        switch (button?.position)! {
+        switch (button?.optionsFanoutDirection)! {
             
-        case .Inner:
+        case .Auto:
             
             path.rightArc(majorRadius, turn: 90.0) // #1
             path.forward(upperWidth - 2.0 * majorRadius) // #2 top
@@ -552,11 +552,11 @@ class MuFuKeyboardButtonDetailView: UIView {
         var offsetX: CGFloat = 0.0
         var offsetY: CGFloat = 0.0
         
-        switch button!.position {
+        switch button!.optionsFanoutDirection {
             
         case .Right:
             
-            switch (button?.style)! {
+            switch (button?.sizeClass)! {
             case .Phone:
                 
                 let path = TurtleBezierPath()
@@ -608,7 +608,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             
         case .Left:
             
-            switch (button?.style)! {
+            switch (button?.sizeClass)! {
             case .Phone:
                 
                 
@@ -692,7 +692,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         var optionRect = CGRect.zero
         var rowLeadingOptionRect = CGRect.zero
         
-        switch (button?.style)! {
+        switch (button?.sizeClass)! {
         case .Phone:
             
             //keyRect.size.width = (button?.optionsRectWidth)! //button!.frame.size.width // IPHONE_PORTRAIT_OPTION_WIDTH
@@ -729,7 +729,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             newInputOptionsRects.append(optionRect)
             
             // Offset the option rect
-            switch button!.position {
+            switch button!.optionsFanoutDirection {
             case .Right:
                 optionRect = optionRect.offsetBy(dx: offset + spacing, dy: 0.0)
                 break
