@@ -223,6 +223,10 @@ extension Notification.Name {
 
 protocol MFKBDelegate { // is the KeyboardViewController
     func handleKeyboardEvent(_ id: String)
+    func log(_ string: String)
+    func optionsShown(for: MuFuKeyboardButton)
+    func optionsHidden(for: MuFuKeyboardButton)
+    var isTypingText: Bool { get set }
 }
 
 
@@ -247,7 +251,7 @@ struct ScreenGeometry {
         var returnValue = ScreenGeometry()
         returnValue.interfaceIdiom = UIDevice.current.userInterfaceIdiom
         returnValue.screenSize = max(UIScreen.main.bounds.width,UIScreen.main.bounds.height)
-        returnValue.isPortrait = true //UIDevice.current.orientation.isPortrait)
+        returnValue.isPortrait = UIDevice.current.orientation.isPortrait // was true
         return returnValue
     }
     
@@ -264,6 +268,8 @@ struct ScreenGeometry {
     }
     
     var titleIsPersistent: Bool = true // false means: displayed label/image changes to last selected option
+    
+    var optionsArePersistent: Bool = false // for the roman letter key
     
     // shortcuts for the label's properties
     
@@ -383,7 +389,6 @@ struct ScreenGeometry {
     var optionsViewDelay = Float(DEFAULT_OPTIONS_VIEW_DELAY)
     var optionsRowLengths: [Int] = [0]
     var optionsRowOffsets: [CGFloat] = [0.0]
-
     
     var delegate: MFKBDelegate?
     // handles keyboard events by getting passed an input ID
@@ -403,8 +408,8 @@ struct ScreenGeometry {
     }
     
     init() {
-        //NSLog("MFKB.init()")
-        let frame = CGRect(x:0.0, y:0.0, width:DEFAULT_BUTTON_WIDTH, height:DEFAULT_BUTTON_HEIGHT)
+        delegate?.log("MFKB.init()")
+        let frame = CGRect(x:0.0, y:0.0, width: DEFAULT_BUTTON_WIDTH, height: DEFAULT_BUTTON_HEIGHT)
         sizeClass = .Phone
         titleType = .Label
         position = .Inner
@@ -414,7 +419,7 @@ struct ScreenGeometry {
     }
     
     override init(frame: CGRect) {
-        //NSLog("MFKB.init(frame:)")
+        delegate?.log("MFKB.init(frame:)")
         sizeClass = .Phone
         titleType = .Label
         position = .Inner
@@ -424,7 +429,7 @@ struct ScreenGeometry {
     }
     
     init(x: CGFloat, y: CGFloat, style: MuFuKeyboardButtonSizeClass) {
-        //NSLog("MFKB.init(x:y:style:)")
+        delegate?.log("MFKB.init(x:y:style:)")
         sizeClass = style
         let newFrame = CGRect(x: x, y: y, width: DEFAULT_BUTTON_WIDTH, height: DEFAULT_BUTTON_HEIGHT)
         titleType = .Label
@@ -444,7 +449,7 @@ struct ScreenGeometry {
     }
     
     func setupAppearanceFromDevice() {
-        //NSLog("MuFuKeyboardButton.setupAppearanceFromDevice()")
+        delegate?.log("MuFuKeyboardButton.setupAppearanceFromDevice()")
         switch (screenGeometry.interfaceIdiom, screenGeometry.screenSize, screenGeometry.isPortrait) {
             
         case (.phone, 568.0,true): // iPhone 5,5C,5S,SE Portrait
@@ -550,7 +555,7 @@ struct ScreenGeometry {
             
             
         default:
-            //NSLog("screen size and orientation undetected!")
+            delegate?.log("screen size and orientation undetected!")
             break
         }
         
@@ -572,7 +577,7 @@ struct ScreenGeometry {
     }
     
     func commonInit() {
-        //NSLog("MFKB.commonInit()")
+        delegate?.log("MFKB.commonInit()")
         setupAppearanceFromDevice()
         
         //        // Default appearance
@@ -595,19 +600,6 @@ struct ScreenGeometry {
         addTarget(self, action: #selector(MuFuKeyboardButton.handleTouchUpOutside), for: .touchUpOutside)
         
         
-        // Add label or image
-        
-        //        let newtitleLabel = UILabel(frame: CGRect(x: 0.0, y: 0.0, width: frame.width, height: frame.height))
-        //        newtitleLabel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        //        newtitleLabel.textAlignment = .center
-        //        newtitleLabel.backgroundColor = .clear
-        //        newtitleLabel.isUserInteractionEnabled = false
-        //        newtitleLabel.textColor = titleColor
-        //        newtitleLabel.font = titleFont
-        //        newtitleLabel.text = inputID
-        //
-        //        self.titleLabel = newtitleLabel
-        
         titleLabel.frame = self.bounds
         titleLabel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         titleLabel.textAlignment = .center
@@ -615,18 +607,8 @@ struct ScreenGeometry {
         
         self.addSubview(titleLabel)
         
-        //        let newtitleImageView = UIImageView(frame: CGRect(x: 0.0, y: 0.0, width: frame.width, height: frame.height))
-        //        //newtitleImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        //        //newtitleImageView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
-        //        newtitleImageView.backgroundColor = .clear
-        //        newtitleImageView.isUserInteractionEnabled = false
-        //
-        //        self.titleImageView = newtitleImageView
-        //        self.addSubview(newtitleImageView)
-        
         titleImageView.frame = self.bounds
         
-        //newtitleImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         titleImageView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
         
         
@@ -635,9 +617,6 @@ struct ScreenGeometry {
         titleImageView.contentMode = .scaleAspectFit // .center
         
         self.addSubview(titleImageView)
-        
-        //magnifierTitleImageView.image = titleImageView.image as UIImage?
-
         
         optionsRowLengths = [optionsInputIDs.count] // unless specified from outside
         optionsTitles = optionsInputIDs
@@ -651,10 +630,11 @@ struct ScreenGeometry {
     }
     
     override func layoutSubviews() {
-         //NSLog("MFKB.layoutSubviews")
+         delegate?.log("MFKB.layoutSubviews")
         super.layoutSubviews()
-        setNeedsDisplay()
         updateButtonPosition()
+        //setNeedsDisplay()
+        contentMode = .redraw
     }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -669,7 +649,7 @@ struct ScreenGeometry {
     
     
     func showMagnifier() {
-         //NSLog("MFKB.showMagnifier()")
+         delegate?.log("MFKB.showMagnifier()")
         if (sizeClass == .Phone) {
             //hideMagnifier()
             magnifier = MuFuKeyboardButtonDetailView(keyboardButton: self, newType: .Magnifier)
@@ -685,21 +665,23 @@ struct ScreenGeometry {
     }
     
     @objc func showOptions(recognizer: UILongPressGestureRecognizer) {
-         //NSLog("MFKB.showOptions()")
         
         //hideMagnifier()
         
         if (recognizer.state == .began) {
+            delegate?.log("MFKB.showOptions(), began\n")
             
             if (optionsView == nil) {
                 
                 let newOptionsView = MuFuKeyboardButtonDetailView(keyboardButton: self, newType: .Options)
                 // again, all previous setup is now erased!!!
                 newOptionsView.titleType = titleType
-                
+            
                 window?.addSubview(newOptionsView)
                 optionsView = newOptionsView
                 NotificationCenter.default.post(name: .buttonDidShowInputOptions, object: self)
+                
+                delegate?.optionsShown(for: self)
                 
             }
             
@@ -710,30 +692,33 @@ struct ScreenGeometry {
             }
             
         }
+    
         
     }
     
     func hideMagnifier() {
-         //NSLog("MFKB.hideMagnifier()")
+         delegate?.log("MFKB.hideMagnifier()")
         magnifier?.removeFromSuperview()
         magnifier = nil
         setNeedsDisplay()
     }
     
     func hideOptions() {
-         //NSLog("MFKB.hideOptions()")
+        delegate?.log("MFKB.hideOptions()")
+        delegate?.optionsHidden(for: self)
         if optionsView?.type == .Options {
             NotificationCenter.default.post(name: .buttonDidHideInputOptions, object: self)
         }
         
         optionsView?.removeFromSuperview()
         optionsView = nil
+        setNeedsDisplay()
     }
     
     
     
     func updateButtonPosition() {
-         //NSLog("MFKB.updateButtonPosition()")
+         delegate?.log("MFKB.updateButtonPosition() on button " + inputID)
         // Determine the button's position state based on the superview padding
         let leftPadding = frame.minX
         let rightPadding = (superview?.frame.maxX)! - frame.maxX
@@ -749,11 +734,11 @@ struct ScreenGeometry {
     }
     
     func setupOptionsConfiguration() {
-         //NSLog("MFKB.setupOptionsConfiguration()")
+         delegate?.log("MFKB.setupOptionsConfiguration()")
         tearDownOptionsConfiguration()
         
         if (optionsInputIDs.count > 0) {
-            //NSLog("--- optionsInputIDs.count > 0")
+            delegate?.log("--- optionsInputIDs.count > 0")
             let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(showOptions(recognizer:)))
             longPressGestureRecognizer.minimumPressDuration = CFTimeInterval(optionsViewDelay)
             longPressGestureRecognizer.delegate = self
@@ -769,7 +754,7 @@ struct ScreenGeometry {
     }
     
     func tearDownOptionsConfiguration() {
-        //NSLog("MFKB.tearDownOptionsConfiguration()")
+        delegate?.log("MFKB.tearDownOptionsConfiguration()")
         removeGestureRecognizer(optionsViewRecognizer)
         removeGestureRecognizer(panGestureRecognizer)
     }
@@ -777,22 +762,26 @@ struct ScreenGeometry {
     @objc func handleTouchDown() {
         UIDevice.current.playInputClick()
         if shouldShowMagnifier { showMagnifier() }
+        setNeedsDisplay()
     }
     
     @objc func handleTouchUpInside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
-        hideOptions()
+        setNeedsDisplay()
+        //hideOptions()
     }
     
     @objc func handleTouchUpOutside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
+        setNeedsDisplay()
         hideOptions()
     }
     
     @objc func handlePanning(recognizer: UIPanGestureRecognizer) {
-        //NSLog("MFKB.handlePanning(recognizer:)")
+        delegate?.log("MFKB.handlePanning(recognizer:)")
+        
         if (recognizer.state == .ended || recognizer.state == .cancelled) {
             if let idx = optionsView?.highlightedInputIndex {
                 if idx != NSNotFound {
@@ -807,17 +796,31 @@ struct ScreenGeometry {
                 }
             }
             
-            hideOptions()
+            
+            if !optionsArePersistent {
+                hideOptions()
+            } else { // typing text
+                
+                if !(delegate?.isTypingText)! {
+                    delegate?.isTypingText = true
+                    delegate?.handleKeyboardEvent("mathrm")
+                }
+                
+                optionsView?.highlightedInputIndex = NSNotFound
+                optionsView?.setNeedsDisplay()
+            }
             
         } else {
             let location = recognizer.location(in: superview)
             optionsView?.updateHighlightedInputIndex(forPoint: location)
+            
         }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
         hideMagnifier()
+        hideOptions()
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -826,19 +829,21 @@ struct ScreenGeometry {
     }
     
     override func draw(_ rect: CGRect) { // draw the button alone (without magnifier or options, but maybe highlighted)
-        //NSLog("MFKB.draw(_)")
+        delegate?.log("MFKB.draw(_)")
         let context = UIGraphicsGetCurrentContext()
         var fillColor = self.color
-        if (sizeClass == .Tablet && state == .highlighted) {
+        
+        if (state == .highlighted) {
             fillColor = highlightColor
         }
-        
-        let shadowOffset = CGSize(width: shadowXOffset, height: shadowYOffset)
-        let shadowBlurRadius: CGFloat = 0.0
-        
+
         let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height - shadowYOffset), cornerRadius: cornerRadius)
         context?.saveGState()
-        context?.setShadow(offset: shadowOffset, blur: shadowBlurRadius, color: shadowColor?.cgColor)
+        //context?.setShadow(offset: shadowOffset, blur: shadowBlurRadius, color: shadowColor?.cgColor)
+//        layer.shadowOffset = shadowOffset
+//        layer.shadowOpacity = 1.0 // ?
+//        layer.shadowColor = shadowColor?.cgColor
+//        layer.shadowRadius = 0.0 //shadowBlurRadius
         fillColor?.setFill()
         roundedRectanglePath.fill()
         context?.restoreGState()
