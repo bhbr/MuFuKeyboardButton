@@ -572,7 +572,7 @@ struct ScreenGeometry {
         //            break
         //        }
         
-        setNeedsDisplay()
+        //setNeedsDisplay()
         
     }
     
@@ -633,7 +633,7 @@ struct ScreenGeometry {
          //delegate?.log("MFKB.layoutSubviews")
         super.layoutSubviews()
         updateButtonPosition()
-        //setNeedsDisplay()
+        ////setNeedsDisplay()
         contentMode = .redraw
     }
     
@@ -659,7 +659,7 @@ struct ScreenGeometry {
             //magnifier?.titleImageView.image = magnifierTitleImageView.image
             window?.addSubview(magnifier!)
         } else {
-            setNeedsDisplay()
+            //setNeedsDisplay()
         }
         
     }
@@ -700,7 +700,7 @@ struct ScreenGeometry {
          //delegate?.log("MFKB.hideMagnifier()")
         magnifier?.removeFromSuperview()
         magnifier = nil
-        setNeedsDisplay()
+        //setNeedsDisplay()
     }
     
     func hideOptions() {
@@ -712,7 +712,7 @@ struct ScreenGeometry {
         
         optionsView?.removeFromSuperview()
         optionsView = nil
-        setNeedsDisplay()
+        //setNeedsDisplay()
     }
     
     
@@ -734,7 +734,7 @@ struct ScreenGeometry {
     }
     
     func setupOptionsConfiguration() {
-         //delegate?.log("MFKB.setupOptionsConfiguration()")
+        delegate?.log("MFKB.setupOptionsConfiguration()")
         tearDownOptionsConfiguration()
         
         if (optionsInputIDs.count > 0) {
@@ -762,20 +762,20 @@ struct ScreenGeometry {
     @objc func handleTouchDown() {
         UIDevice.current.playInputClick()
         if shouldShowMagnifier { showMagnifier() }
-        setNeedsDisplay()
+        //setNeedsDisplay()
     }
     
     @objc func handleTouchUpInside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
-        setNeedsDisplay()
+        //setNeedsDisplay()
         //hideOptions()
     }
     
     @objc func handleTouchUpOutside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
-        setNeedsDisplay()
+        //setNeedsDisplay()
         hideOptions()
     }
     
@@ -807,10 +807,11 @@ struct ScreenGeometry {
                 }
                 
                 optionsView?.highlightedInputIndex = NSNotFound
-                optionsView?.setNeedsDisplay()
+                //optionsView?.setNeedsDisplay()
             }
             
         } else {
+            //delegate?.log("yes we're panning")
             let location = recognizer.location(in: superview)
             optionsView?.updateHighlightedInputIndex(forPoint: location)
             

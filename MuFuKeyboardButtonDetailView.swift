@@ -89,6 +89,8 @@ class MuFuKeyboardButtonDetailView: UIView {
     
     var type: MuFuKeyboardButtonDetailViewType
     var highlightedInputIndex: NSInteger
+    var previouslyHighlightedInputIndex: NSInteger = NSNotFound
+    
     
     var rootButton: MuFuKeyboardButton
     var inputOptionsRects: Array<CGRect> = []
@@ -220,13 +222,13 @@ class MuFuKeyboardButtonDetailView: UIView {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let point = touches.first!.location(in: self)
         updateHighlightedInputIndex(forPoint: point)
-        setNeedsDisplay()
+        //setNeedsDisplay()
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         let point = touches.first!.location(in: self)
         updateHighlightedInputIndex(forPoint: point)
-        setNeedsDisplay()
+        //setNeedsDisplay()
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -237,7 +239,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             // tapped outside: dismiss popup
             highlightedInputIndex = NSNotFound
             rootButton.hideOptions()
-            setNeedsDisplay() // necessary?
+            //setNeedsDisplay() // necessary?
             return
         }
         
@@ -247,7 +249,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             if !rootButton.optionsArePersistent {
                 rootButton.hideOptions()
             }
-            setNeedsDisplay() // necessary?
+            //setNeedsDisplay() // necessary?
             return
         }
         
@@ -258,7 +260,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             rootButton.delegate?.handleKeyboardEvent(tappedInputID)
         }
         highlightedInputIndex = NSNotFound
-        setNeedsDisplay()
+        //setNeedsDisplay()
 
     }
     
@@ -288,7 +290,7 @@ class MuFuKeyboardButtonDetailView: UIView {
     }
     
     public func updateHighlightedInputIndex(forPoint point: CGPoint) -> () {
-        //rootButton.//delegate?.log("updateHighlightedInputIndex(forPoint:)\n")
+        //rootButton.delegate?.log("updateHighlightedInputIndex(forPoint:)")
         var highlightedInputIndex: NSInteger = NSNotFound
         
         for optionRect in inputOptionsRects {
@@ -306,9 +308,13 @@ class MuFuKeyboardButtonDetailView: UIView {
         }
         
         if (self.highlightedInputIndex != highlightedInputIndex) {
-            //rootButton.//delegate?.log("Found new index!")
+            rootButton.delegate?.log("old index: " + self.highlightedInputIndex.description)
+            rootButton.delegate?.log("new index: " + highlightedInputIndex.description)
+            self.previouslyHighlightedInputIndex = self.highlightedInputIndex
             self.highlightedInputIndex = highlightedInputIndex
-            setNeedsDisplay()
+            drawInputOptionView(for: self.previouslyHighlightedInputIndex)
+            drawInputOptionView(for: self.highlightedInputIndex)
+            
         }
     }
     
@@ -497,92 +503,129 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         
         for optionInputID: String in rootButton.optionsInputIDs {
-            
             // position rect has already been computed, let's retrieve it
             let idx = rootButton.optionsInputIDs.index(of: optionInputID)!
-
-            let optionRect: CGRect = inputOptionsRects[idx]
-            let highlighted = (idx == highlightedInputIndex)
+            setupLabel(for: idx)
             
-            if (highlighted) {
-                // Draw selection background
-                let roundedRectanglePath = UIBezierPath(roundedRect: optionRect, cornerRadius: cornerRadius)
-                    // cornerRadius was 4.0
-                tintColor.setFill()
-                roundedRectanglePath.fill()
-            }
-            
-            if (titleType == .Label) {
-                
-                if rootButton.optionsTitles.count > 0 {
-            
-                    let optionTitle = rootButton.optionsTitles[idx]
-                
-                    // Draw the text
-                    let stringColor = highlighted ? UIColor.white : rootButton.titleColor
-                    
-                    let p = NSMutableParagraphStyle()
-                    p.alignment = .center
-                    
-                    let stringToRender = NSAttributedString(string: optionTitle, attributes:
-                    [
-                        NSFontAttributeName : rootButton.optionsFont,
-                        NSForegroundColorAttributeName : stringColor ?? .black,
-                        NSParagraphStyleAttributeName : p
-                    ])
-                    
-                    let stringRect = stringToRender.boundingRect(with: optionRect.size, options: .usesFontLeading, context: nil)
-                   // option doesn't mean anything, XCode wouldn't shut up until it got one
-                    
-                    var drawingRect = CGRect(origin: optionRect.origin, size: stringRect.size)
-                    drawingRect.origin.x = optionRect.origin.x + optionRect.size.width * 0.5 - stringRect.size.width * 0.5
-                    drawingRect.origin.y = optionRect.origin.y + optionRect.size.height * 0.5 - stringRect.size.height * 0.5
-                    
-                    
-                    stringToRender.draw(in: drawingRect)
-                    
-                    // using UILabels was apparently a performance hog, led to crashes
-                    
-//                    let newLabel = UILabel(frame: optionRect)
-//                    newLabel.text = optionTitle
-//                    newLabel.textColor = stringColor
-//                    newLabel.font = rootButton.optionsFont
-//                    newLabel.contentMode = .scaleAspectFit
-//                    newLabel.clipsToBounds = false
-//                    //newLabel.sizeToFit()
-//                    newLabel.textAlignment = .center
-//                    newLabel.center = CGPoint(x: optionRect.midX, y: optionRect.midY)
-//                    newLabel.isOpaque = true
-//                    addSubview(newLabel)
-//                    newLabel.adjustsFontSizeToFitWidth = true
-                
-                }
-            
-            } else if (titleType == .Image) {
-                
-                if rootButton.optionsImages.count > 0 {
-                    
-                    // Draw an image
-                    let imageView = UIImageView(frame: optionRect)
-                    if highlighted {
-                        imageView.image = rootButton.highlightedOptionsImages[idx]
-                    } else {
-                        imageView.image = rootButton.optionsImages[idx]
-                    }
-                    imageView.isOpaque = true
-                    imageView.contentMode = .scaleAspectFit
-                    addSubview(imageView)
-                    
-                }
-                
-            } // end of .Label, .Image cases
-            
-        } // end of loop over optionIDs
+        }
         
         context?.restoreGState()
     }
     
+    func setupLabel(for idx: NSInteger) {
+        //rootButton.delegate?.log("one more label")
+        let optionTitle = rootButton.optionsTitles[idx]
+        let optionRect: CGRect = inputOptionsRects[idx]
+        let stringColor = UIColor.black
+        
+        let newLabel = UILabel(frame: optionRect)
+        newLabel.text = optionTitle
+        newLabel.textColor = stringColor
+        newLabel.font = rootButton.optionsFont
+        newLabel.contentMode = .scaleAspectFit
+        newLabel.clipsToBounds = false
+        //newLabel.sizeToFit()
+        newLabel.textAlignment = .center
+        newLabel.center = CGPoint(x: optionRect.midX, y: optionRect.midY)
+        newLabel.isOpaque = true
+        addSubview(newLabel)
+        newLabel.adjustsFontSizeToFitWidth = true
+        newLabel.layer.cornerRadius = 5.0
+        newLabel.layer.masksToBounds = true
+
+    }
     
+    func drawInputOptionView(for idx: NSInteger) {
+        
+        if (idx == nil || idx == NSNotFound || idx >= inputOptionsRects.count) {
+            return
+        }
+        
+        rootButton.delegate?.log("updating labels")
+        let optionTitle = rootButton.optionsTitles[idx]
+        let highlighted = (idx == self.highlightedInputIndex)
+        let previouslyHighlighted = (idx == self.previouslyHighlightedInputIndex)
+        
+        for subview: UIView in subviews {
+            if let label = subview as? UILabel {
+                if label.text == optionTitle {
+                    if highlighted {
+                        label.backgroundColor = .blue
+                        label.textColor = .white
+                    } else if previouslyHighlighted {
+                        label.backgroundColor = .white
+                        label.textColor = .black
+                        
+                    }
+                }
+            }
+        }
+        
+//        rootButton.delegate?.log("drawing input option for index: " + idx.description)
+//        let optionRect: CGRect = inputOptionsRects[idx]
+//        let highlighted = (idx == highlightedInputIndex)
+//
+//        if (highlighted) {
+//            // Draw selection background
+//            let roundedRectanglePath = UIBezierPath(roundedRect: optionRect, cornerRadius: cornerRadius)
+//            // cornerRadius was 4.0
+//            tintColor.setFill()
+//            roundedRectanglePath.fill()
+//        }
+//
+//        if (titleType == .Label) {
+//
+//            if rootButton.optionsTitles.count > 0 {
+//
+//                let optionTitle = rootButton.optionsTitles[idx]
+//
+//                // Draw the text
+//                let stringColor = highlighted ? UIColor.white : rootButton.titleColor
+//
+//                let p = NSMutableParagraphStyle()
+//                p.alignment = .center
+//
+//                let stringToRender = NSAttributedString(string: optionTitle, attributes:
+//                    [
+//                        NSFontAttributeName : rootButton.optionsFont,
+//                        NSForegroundColorAttributeName : stringColor ?? .black,
+//                        NSParagraphStyleAttributeName : p
+//                    ])
+//
+//                let stringRect = stringToRender.boundingRect(with: optionRect.size, options: .usesFontLeading, context: nil)
+//                // option doesn't mean anything, XCode wouldn't shut up until it got one
+//
+//                var drawingRect = CGRect(origin: optionRect.origin, size: stringRect.size)
+//                drawingRect.origin.x = optionRect.origin.x + optionRect.size.width * 0.5 - stringRect.size.width * 0.5
+//                drawingRect.origin.y = optionRect.origin.y + optionRect.size.height * 0.5 - stringRect.size.height * 0.5
+//
+//
+//                stringToRender.draw(in: drawingRect)
+//
+//
+//            }
+//
+//        } else if (titleType == .Image) {
+//
+//            if rootButton.optionsImages.count > 0 {
+//
+//                // Draw an image
+//                let imageView = UIImageView(frame: optionRect)
+//                if highlighted {
+//                    imageView.image = rootButton.highlightedOptionsImages[idx]
+//                } else {
+//                    imageView.image = rootButton.optionsImages[idx]
+//                }
+//                imageView.isOpaque = true
+//                imageView.contentMode = .scaleAspectFit
+//                addSubview(imageView)
+//
+//            }
+//
+//        }
+
+
+    }
     
     
     
