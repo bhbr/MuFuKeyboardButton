@@ -762,20 +762,21 @@ struct ScreenGeometry {
     @objc func handleTouchDown() {
         UIDevice.current.playInputClick()
         if shouldShowMagnifier { showMagnifier() }
-        //setNeedsDisplay()
+        
+        setNeedsDisplay()
     }
     
     @objc func handleTouchUpInside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
-        //setNeedsDisplay()
+        setNeedsDisplay()
         //hideOptions()
     }
     
     @objc func handleTouchUpOutside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
-        //setNeedsDisplay()
+        setNeedsDisplay()
         hideOptions()
     }
     
@@ -793,6 +794,11 @@ struct ScreenGeometry {
                         titleImageView.image? = optionsImages[idx]
                         //magnifierTitleImageView.image? = optionsImages[idx]
                     }
+                    
+                    optionsView?.previouslyHighlightedInputIndex = (optionsView?.highlightedInputIndex)!
+                    optionsView?.highlightedInputIndex = NSNotFound
+                    optionsView?.drawInputOptionView(for: (optionsView?.previouslyHighlightedInputIndex)!)
+                    optionsView?.drawInputOptionView(for: (optionsView?.highlightedInputIndex)!)
                 }
             }
             
@@ -809,6 +815,8 @@ struct ScreenGeometry {
                 optionsView?.highlightedInputIndex = NSNotFound
                 //optionsView?.setNeedsDisplay()
             }
+            
+            setNeedsDisplay()
             
         } else {
             //delegate?.log("yes we're panning")

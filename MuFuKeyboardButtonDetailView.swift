@@ -259,7 +259,20 @@ class MuFuKeyboardButtonDetailView: UIView {
         {
             rootButton.delegate?.handleKeyboardEvent(tappedInputID)
         }
+        
+        
+        for subview in subviews {
+            if let label = subview as? UILabel {
+                label.backgroundColor = rootButton.color
+            } else if let imageView = subview as? UIImageView {
+                imageView.backgroundColor = rootButton.color
+            }
+        }
+        
+        previouslyHighlightedInputIndex = highlightedInputIndex
         highlightedInputIndex = NSNotFound
+        drawInputOptionView(for: previouslyHighlightedInputIndex)
+        drawInputOptionView(for: highlightedInputIndex)
         //setNeedsDisplay()
 
     }
@@ -505,7 +518,11 @@ class MuFuKeyboardButtonDetailView: UIView {
         for optionInputID: String in rootButton.optionsInputIDs {
             // position rect has already been computed, let's retrieve it
             let idx = rootButton.optionsInputIDs.index(of: optionInputID)!
-            setupLabel(for: idx)
+            if rootButton.titleType == .Label {
+                setupLabel(for: idx)
+            } else if titleType == .Image {
+                setupImageView(for: idx)
+            }
             
         }
         
@@ -532,12 +549,30 @@ class MuFuKeyboardButtonDetailView: UIView {
         newLabel.adjustsFontSizeToFitWidth = true
         newLabel.layer.cornerRadius = 5.0
         newLabel.layer.masksToBounds = true
-
+        
+    }
+    
+    func setupImageView(for idx: NSInteger) {
+        //rootButton.delegate?.log("one more label")
+        let optionTitle = rootButton.optionsTitles[idx]
+        let optionRect: CGRect = inputOptionsRects[idx]
+        let stringColor = UIColor.black
+        
+        let newImageView = UIImageView(frame: optionRect)
+        newImageView.image = rootButton.optionsImages[idx]
+        newImageView.contentMode = .scaleAspectFit
+        newImageView.clipsToBounds = false
+        newImageView.center = CGPoint(x: optionRect.midX, y: optionRect.midY)
+        newImageView.isOpaque = true
+        addSubview(newImageView)
+        newImageView.layer.cornerRadius = 5.0
+        newImageView.layer.masksToBounds = true
+        
     }
     
     func drawInputOptionView(for idx: NSInteger) {
         
-        if (idx == nil || idx == NSNotFound || idx >= inputOptionsRects.count) {
+        if (idx == NSNotFound || idx >= inputOptionsRects.count) {
             return
         }
         
@@ -550,15 +585,29 @@ class MuFuKeyboardButtonDetailView: UIView {
             if let label = subview as? UILabel {
                 if label.text == optionTitle {
                     if highlighted {
-                        label.backgroundColor = .blue
+                        label.backgroundColor = rootButton.tintColor
                         label.textColor = .white
                     } else if previouslyHighlighted {
                         label.backgroundColor = .white
                         label.textColor = .black
-                        
                     }
                 }
+            } else if let imageView = subview as? UIImageView {
+                
+                if (imageView.image == rootButton.optionsImages[idx] || imageView.image == rootButton.highlightedOptionsImages[idx]) {
+                
+                    if highlighted {
+                        imageView.backgroundColor = rootButton.highlightColor
+                        imageView.image = rootButton.highlightedOptionsImages[idx]
+                    } else if previouslyHighlighted {
+                        imageView.backgroundColor = rootButton.color
+                        imageView.image = rootButton.optionsImages[idx]
+                    }
+                    
+                }
+    
             }
+            
         }
         
 //        rootButton.delegate?.log("drawing input option for index: " + idx.description)
@@ -605,24 +654,24 @@ class MuFuKeyboardButtonDetailView: UIView {
 //
 //            }
 //
-//        } else if (titleType == .Image) {
-//
-//            if rootButton.optionsImages.count > 0 {
-//
-//                // Draw an image
-//                let imageView = UIImageView(frame: optionRect)
-//                if highlighted {
-//                    imageView.image = rootButton.highlightedOptionsImages[idx]
-//                } else {
-//                    imageView.image = rootButton.optionsImages[idx]
-//                }
-//                imageView.isOpaque = true
-//                imageView.contentMode = .scaleAspectFit
-//                addSubview(imageView)
-//
-//            }
-//
-//        }
+        //        } else if (titleType == .Image) {
+        //
+        //            if rootButton.optionsImages.count > 0 {
+        //
+        //                // Draw an image
+        //                let imageView = UIImageView(frame: optionRect)
+        //                if highlighted {
+        //                    imageView.image = rootButton.highlightedOptionsImages[idx]
+        //                } else {
+        //                    imageView.image = rootButton.optionsImages[idx]
+        //                }
+        //                imageView.isOpaque = true
+        //                imageView.contentMode = .scaleAspectFit
+        //                addSubview(imageView)
+        //
+        //            }
+        //
+        //        }
 
 
     }
