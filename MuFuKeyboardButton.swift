@@ -288,8 +288,15 @@ struct ScreenGeometry {
         set { titleLabel.textColor = newValue }
     }
     
-    var color: UIColor? = DEFAULT_KEY_COLOR // the key's background color
+    var color: UIColor? = DEFAULT_KEY_COLOR { // the key's background color
     //  the existing backgroundColor has to remain clear so we can have round corners
+    // no it doesn't if we use the built-in corner rounding on the layer
+        didSet {
+            backgroundColor = self.color
+        }
+    }
+        
+        
     var borderColor: UIColor = DEFAULT_BORDER_COLOR
     var shadowColor: UIColor? = DEFAULT_SHADOW_COLOR
     var highlightColor: UIColor? = DEFAULT_HIGHLIGHT_COLOR
@@ -623,7 +630,25 @@ struct ScreenGeometry {
         
         optionWidth = frame.width
         
+        
+        backgroundColor = self.color
+        if (state == .highlighted) {
+            backgroundColor = highlightColor
+        }
+        
+        let shadowOffset = CGSize(width: 0.1, height: 1.0)
+        
+        layer.cornerRadius = cornerRadius
+        layer.shadowOffset = shadowOffset
+        layer.shadowOpacity = 1.0 // ?
+        layer.shadowColor = shadowColor?.cgColor
+        layer.shadowRadius = 0.0 //shadowBlurRadius
+        layer.masksToBounds = true
+        
+        isOpaque = true
+        
     }
+    
     
     override func didMoveToSuperview() {
         updateButtonPosition()
@@ -761,6 +786,7 @@ struct ScreenGeometry {
     
     @objc func handleTouchDown() {
         UIDevice.current.playInputClick()
+        backgroundColor = highlightColor
         if shouldShowMagnifier { showMagnifier() }
         
         setNeedsDisplay()
@@ -769,6 +795,7 @@ struct ScreenGeometry {
     @objc func handleTouchUpInside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
+        backgroundColor = self.color
         setNeedsDisplay()
         //hideOptions()
     }
@@ -776,6 +803,7 @@ struct ScreenGeometry {
     @objc func handleTouchUpOutside() {
         delegate?.handleKeyboardEvent(inputID)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
+        backgroundColor = self.color
         setNeedsDisplay()
         hideOptions()
     }
@@ -784,6 +812,7 @@ struct ScreenGeometry {
         //delegate?.log("MFKB.handlePanning(recognizer:)")
         
         if (recognizer.state == .ended || recognizer.state == .cancelled) {
+            backgroundColor = self.color
             if let idx = optionsView?.highlightedInputIndex {
                 if idx != NSNotFound {
                     let inputOptionID = optionsInputIDs[idx]
@@ -839,23 +868,23 @@ struct ScreenGeometry {
     
     override func draw(_ rect: CGRect) { // draw the button alone (without magnifier or options, but maybe highlighted)
         //delegate?.log("MFKB.draw(_)")
-        let context = UIGraphicsGetCurrentContext()
-        var fillColor = self.color
-        
-        if (state == .highlighted) {
-            fillColor = highlightColor
-        }
-
-        let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height - shadowYOffset), cornerRadius: cornerRadius)
-        context?.saveGState()
-        //context?.setShadow(offset: shadowOffset, blur: shadowBlurRadius, color: shadowColor?.cgColor)
-//        layer.shadowOffset = shadowOffset
-//        layer.shadowOpacity = 1.0 // ?
-//        layer.shadowColor = shadowColor?.cgColor
-//        layer.shadowRadius = 0.0 //shadowBlurRadius
-        fillColor?.setFill()
-        roundedRectanglePath.fill()
-        context?.restoreGState()
+//        let context = UIGraphicsGetCurrentContext()
+//        var fillColor = self.color
+//
+//        if (state == .highlighted) {
+//            fillColor = highlightColor
+//        }
+//
+//        let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height - shadowYOffset), cornerRadius: cornerRadius)
+//        context?.saveGState()
+//        //context?.setShadow(offset: shadowOffset, blur: shadowBlurRadius, color: shadowColor?.cgColor)
+////        layer.shadowOffset = shadowOffset
+////        layer.shadowOpacity = 1.0 // ?
+////        layer.shadowColor = shadowColor?.cgColor
+////        layer.shadowRadius = 0.0 //shadowBlurRadius
+//        fillColor?.setFill()
+//        roundedRectanglePath.fill()
+//        context?.restoreGState()
         
     }
     
@@ -928,7 +957,7 @@ extension UIImage {
         print("height: \(height)")
         print("width: \(width)")
         
-        //Filter through data and look for non-transparent pixels.
+        //Filter through data and look for transparent or white pixels.
         for y in (0 ..< heightInt) {
             let y = CGFloat(y)
             for x in (0 ..< widthInt) {
@@ -941,7 +970,7 @@ extension UIImage {
                 let blue =  data[Int(pixelIndex + 3)]
                 
                 if (alpha != 255 && red != 255 && green != 255 && blue != 255) {
-                    print("(\(x),\(y)) -> (\(alpha),\(red),\(green),\(blue))")
+                    //print("(\(x),\(y)) -> (\(alpha),\(red),\(green),\(blue))")
                 }
                 
                 if data[Int(pixelIndex)] == 0  {
@@ -969,12 +998,10 @@ extension UIImage {
             }
         }
         
-        // lowY -= 200
-        // highY += 200
-        print(lowX)
-        print(highX)
-        print(lowY)
-        print(highY)
+//        print(lowX)
+//        print(highX)
+//        print(lowY)
+//        print(highY)
         
         let padding: CGFloat = 5.0
         
