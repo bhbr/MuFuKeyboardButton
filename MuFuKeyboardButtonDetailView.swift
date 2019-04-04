@@ -553,10 +553,9 @@ class MuFuKeyboardButtonDetailView: UIView {
     }
     
     func setupImageView(for idx: NSInteger) {
-        //rootButton.delegate?.log("one more label")
-        let optionTitle = rootButton.optionsTitles[idx]
+        //let optionTitle = rootButton.optionsTitles[idx]
         let optionRect: CGRect = inputOptionsRects[idx]
-        let stringColor = UIColor.black
+        //let stringColor = UIColor.black
         
         let newImageView = UIImageView(frame: optionRect)
         newImageView.image = rootButton.optionsImages[idx]
