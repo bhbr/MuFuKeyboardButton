@@ -179,7 +179,7 @@ let DEFAULT_MAGNIFIER_FONT: UIFont = .systemFont(ofSize: 44.0)
 let DEFAULT_KEY_COLOR: UIColor = .white
 let DEFAULT_SHADOW_COLOR: UIColor = UIColor(red: 136.0/255.0, green: 138.0/255.0, blue: 142.0/255.0, alpha: 1.0)
 let DEFAULT_BORDER_COLOR: UIColor = .clear
-let DEFAULT_HIGHLIGHT_COLOR: UIColor = UIColor(red: 213.0/255.0, green: 214.0/255.0, blue: 216.0/255.0, alpha: 1.0)
+let DEFAULT_HIGHLIGHT_COLOR: UIColor = UIColor(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1.0)
 let DEFAULT_CORNER_RADIUS: CGFloat = 5.0
 
 let DEFAULT_SHADOW_X_OFFSET: CGFloat = 0.1
@@ -354,7 +354,9 @@ struct ScreenGeometry {
             // automatically save inverted images
             highlightedOptionsImages = []
             for inputOptionImage: UIImage in optionsImages {
+                NSLog("adding inverted image...")
                 highlightedOptionsImages.append(inputOptionImage.inverted()!)
+                NSLog("...done.")
             }
         }
     }
@@ -1024,13 +1026,15 @@ extension UIImage {
             return nil
         }
         
-        let context = CGContext (data: bitmapData,
-                                 width: width,
-                                 height: height,
-                                 bitsPerComponent: 8,      // bits per component
+        let context = CGContext(
+            data: bitmapData,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,      // bits per component
             bytesPerRow: bitmapBytesPerRow,
             space: colorSpace,
-            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue)
+            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
+        )
         
         return context
     }
@@ -1040,34 +1044,37 @@ extension UIImage {
         accessibilityIdentifier = imageName
     }
     
-    // http://stackoverflow.com/a/40177870/4488252
-    func imageWithColor(newColor: UIColor?) -> UIImage? {
+    func imageByMakingWhiteBackgroundTransparent() -> UIImage? {
         
-        if let newColor = newColor {
-            UIGraphicsBeginImageContextWithOptions(size, false, scale)
-            
-            let context = UIGraphicsGetCurrentContext()!
-            context.translateBy(x: 0, y: size.height)
-            context.scaleBy(x: 1.0, y: -1.0)
-            context.setBlendMode(.normal)
-            
-            let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-            context.clip(to: rect, mask: cgImage!)
-            
-            newColor.setFill()
-            context.fill(rect)
-            
-            let newImage = UIGraphicsGetImageFromCurrentImageContext()!
-            UIGraphicsEndImageContext()
-            newImage.accessibilityIdentifier = accessibilityIdentifier
-            return newImage
-        }
+        let image = UIImage(data: self.jpegData(compressionQuality: 1.0)!)!
+        let rawImageRef: CGImage = image.cgImage!
         
-        if let accessibilityIdentifier = accessibilityIdentifier {
-            return UIImage(imageName: accessibilityIdentifier)
-        }
+        let colorMasking: [CGFloat] = [222, 255, 222, 255, 222, 255]
+        UIGraphicsBeginImageContext(image.size);
         
-        return self
+        let maskedImageRef = rawImageRef.copy(maskingColorComponents: colorMasking)
+        UIGraphicsGetCurrentContext()?.translateBy(x: 0.0,y: image.size.height)
+        UIGraphicsGetCurrentContext()?.scaleBy(x: 1.0, y: -1.0)
+        UIGraphicsGetCurrentContext()?.draw(maskedImageRef!, in: CGRect.init(x: 0, y: 0, width: image.size.width, height: image.size.height))
+        let result = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        return result
+        
+    }
+    
+    func withBackground(color: UIColor, opaque: Bool = true) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
+        
+        guard let ctx = UIGraphicsGetCurrentContext() else { return self }
+        defer { UIGraphicsEndImageContext() }
+        
+        let rect = CGRect(origin: .zero, size: size)
+        ctx.setFillColor(color.cgColor)
+        ctx.fill(rect)
+        ctx.concatenate(CGAffineTransform(a: 1, b: 0, c: 0, d: -1, tx: 0, ty: size.height))
+        ctx.draw(cgImage!, in: rect)
+        
+        return UIGraphicsGetImageFromCurrentImageContext() ?? self
     }
     
     func inverted() -> UIImage? {
