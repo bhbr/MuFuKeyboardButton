@@ -412,8 +412,8 @@ struct ScreenGeometry {
     override func prepareForInterfaceBuilder() {
         // dummy values
         titleLabel.text = "MuFuButton"
-        titleImage = UIImage(named:"sqrt2iPhone")
-        titleImageView.contentMode = .scaleAspectFit // .center
+        titleImage = UIImage(named:"placeholder")
+        titleImageView.contentMode = .center
     }
     
     init() {
@@ -595,7 +595,7 @@ struct ScreenGeometry {
         
         titleImageView.backgroundColor = .clear
         titleImageView.isUserInteractionEnabled = false
-        titleImageView.contentMode = .scaleAspectFit // .center
+        titleImageView.contentMode = .center
         
         self.addSubview(titleImageView)
         
@@ -820,6 +820,7 @@ struct ScreenGeometry {
         hideMagnifier()
     }
     
+    
 }
 
 
@@ -928,11 +929,6 @@ extension UIImage {
             }
         }
         
-//        print(lowX)
-//        print(highX)
-//        print(lowY)
-//        print(highY)
-        
         let padding: CGFloat = 5.0
         
         //return CGRect(x: 0, y: 0, width: CGFloat(widthInt), height: highY + lowY)
@@ -1014,33 +1010,7 @@ extension UIImage {
         let context = CIContext(options: nil)
         guard let outputImage = filter.outputImage else { return nil }
         guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
-        return UIImage(cgImage: outputImageCopy)
+        return UIImage(cgImage: outputImageCopy, scale: self.scale, orientation: self.imageOrientation)
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

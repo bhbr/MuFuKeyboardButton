@@ -172,7 +172,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             titleLabel.backgroundColor = .clear
             titleLabel.textAlignment = .center
             titleLabel.clipsToBounds = false
-            titleLabel.contentMode = .scaleAspectFit
+            titleLabel.contentMode = .center
             titleLabel.adjustsFontSizeToFitWidth = true
             
             if rootButton.position == .Left {
@@ -214,7 +214,8 @@ class MuFuKeyboardButtonDetailView: UIView {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let point = touches.first!.location(in: self)
-        updateHighlightedInputIndex(forPoint: point)    }
+        updateHighlightedInputIndex(forPoint: point)
+    }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         let point = touches.first!.location(in: self)
@@ -362,7 +363,7 @@ class MuFuKeyboardButtonDetailView: UIView {
     
     func drawMagnifiedInputView(_ rect: CGRect) {
         titleImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        titleImageView.contentMode = .center//scaleAspectFit
+        titleImageView.contentMode = .center
         // maybe use a larger image here, or enlarge the image by a function
         
         titleImageView.center = titleLabel.center
@@ -499,7 +500,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         newLabel.text = optionTitle
         newLabel.textColor = stringColor
         newLabel.font = rootButton.optionsFont
-        newLabel.contentMode = .scaleAspectFit
+        newLabel.contentMode = .center
         newLabel.clipsToBounds = false
         newLabel.textAlignment = .center
         newLabel.center = CGPoint(x: optionRect.midX, y: optionRect.midY)
@@ -516,7 +517,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         let newImageView = UIImageView(frame: optionRect)
         newImageView.image = rootButton.optionsImages[idx]
-        newImageView.contentMode = .scaleAspectFit
+        newImageView.contentMode = .center
         newImageView.clipsToBounds = false
         newImageView.center = CGPoint(x: optionRect.midX, y: optionRect.midY)
         newImageView.isOpaque = true
@@ -558,6 +559,7 @@ class MuFuKeyboardButtonDetailView: UIView {
                         imageView.backgroundColor = rootButton.color
                         imageView.image = rootButton.optionsImages[idx]
                     }
+                    imageView.contentMode = .center
                     
                 }
     
@@ -828,14 +830,14 @@ class MuFuKeyboardButtonDetailView: UIView {
         var rowLeadingOptionRect = CGRect.zero
         
         switch rootButton.sizeClass {
-        case .Phone:            offsetX = keyRect.width
+        case .Phone:
+            offsetX = keyRect.width
             optionRect = keyRect.insetBy(dx: OPTION_RECT_X_INSET, dy: OPTION_RECT_Y_INSET).offsetBy(dx: rootButton.optionsRowOffsets.first! * keyRect.width, dy: -(CGFloat(nbRows) * keyRect.height + OPTION_RECT_Y_OFFSET_PADDING))
             break
 
         case .Tablet:
             offsetX = keyRect.width
             optionRect = keyRect.insetBy(dx: OPTION_RECT_X_INSET, dy: OPTION_RECT_Y_INSET).offsetBy(dx: 0.0, dy: -(CGFloat(nbRows) * keyRect.height + OPTION_RECT_Y_OFFSET_PADDING))
-
             break
         }
     
