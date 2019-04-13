@@ -179,7 +179,8 @@ let DEFAULT_MAGNIFIER_FONT: UIFont = .systemFont(ofSize: 44.0)
 let DEFAULT_KEY_COLOR: UIColor = .white
 let DEFAULT_SHADOW_COLOR: UIColor = UIColor(red: 136.0/255.0, green: 138.0/255.0, blue: 142.0/255.0, alpha: 1.0)
 let DEFAULT_BORDER_COLOR: UIColor = .clear
-let DEFAULT_HIGHLIGHT_COLOR: UIColor = UIColor(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1.0)
+let DEFAULT_HIGHLIGHT_COLOR: UIColor = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 190.0/255.0, alpha: 1.0)
+let DEFAULT_OPTION_HIGHLIGHT_COLOR: UIColor = UIColor(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1.0)
 let DEFAULT_CORNER_RADIUS: CGFloat = 5.0
 
 let DEFAULT_SHADOW_X_OFFSET: CGFloat = 0.1
@@ -300,6 +301,7 @@ struct ScreenGeometry {
     var borderColor: UIColor = DEFAULT_BORDER_COLOR
     var shadowColor: UIColor? = DEFAULT_SHADOW_COLOR
     var highlightColor: UIColor? = DEFAULT_HIGHLIGHT_COLOR
+    var optionHighlightColor: UIColor? = DEFAULT_OPTION_HIGHLIGHT_COLOR
     
     var shadowXOffset: CGFloat = DEFAULT_SHADOW_X_OFFSET
     var shadowYOffset: CGFloat = DEFAULT_SHADOW_Y_OFFSET
@@ -354,9 +356,7 @@ struct ScreenGeometry {
             // automatically save inverted images
             highlightedOptionsImages = []
             for inputOptionImage: UIImage in optionsImages {
-                NSLog("adding inverted image...")
                 highlightedOptionsImages.append(inputOptionImage.inverted()!)
-                NSLog("...done.")
             }
         }
     }
@@ -412,12 +412,11 @@ struct ScreenGeometry {
     override func prepareForInterfaceBuilder() {
         // dummy values
         titleLabel.text = "MuFuButton"
-        titleImage = UIImage(named:"sqrt")
+        titleImage = UIImage(named:"sqrt2iPhone")
         titleImageView.contentMode = .scaleAspectFit // .center
     }
     
     init() {
-        //delegate?.log("MFKB.init()")
         let frame = CGRect(x:0.0, y:0.0, width: DEFAULT_BUTTON_WIDTH, height: DEFAULT_BUTTON_HEIGHT)
         sizeClass = .Phone
         titleType = .Label
@@ -428,7 +427,6 @@ struct ScreenGeometry {
     }
     
     override init(frame: CGRect) {
-        //delegate?.log("MFKB.init(frame:)")
         sizeClass = .Phone
         titleType = .Label
         position = .Inner
@@ -438,7 +436,6 @@ struct ScreenGeometry {
     }
     
     init(x: CGFloat, y: CGFloat, style: MuFuKeyboardButtonSizeClass) {
-        //delegate?.log("MFKB.init(x:y:style:)")
         sizeClass = style
         let newFrame = CGRect(x: x, y: y, width: DEFAULT_BUTTON_WIDTH, height: DEFAULT_BUTTON_HEIGHT)
         titleType = .Label
@@ -458,7 +455,6 @@ struct ScreenGeometry {
     }
     
     func setupAppearanceFromDevice() {
-        //delegate?.log("MuFuKeyboardButton.setupAppearanceFromDevice()")
         switch (screenGeometry.interfaceIdiom, screenGeometry.screenSize, screenGeometry.isPortrait) {
             
         case (.phone, 568.0,true): // iPhone 5,5C,5S,SE Portrait
@@ -564,38 +560,14 @@ struct ScreenGeometry {
             
             
         default:
-            //delegate?.log("screen size and orientation undetected!")
             break
         }
-        
-        
-        
-        //        switch style {
-        //        case .Phone:
-        //            keyCornerRadius = 4.0
-        //            frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: IPHONE_BUTTON_WIDTH, height: IPHONE_BUTTON_HEIGHT)
-        //            break
-        //        case .Tablet:
-        //            keyCornerRadius = 6.0
-        //            frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: IPAD_BUTTON_WIDTH, height: IPAD_BUTTON_HEIGHT)
-        //            break
-        //        }
-        
-        //setNeedsDisplay()
         
     }
     
     func commonInit() {
-        //delegate?.log("MFKB.commonInit()")
-        setupAppearanceFromDevice()
         
-        //        // Default appearance
-        //        titleFont = DEFAULT_FONT
-        //        optionsFont = .systemFont(ofSize: 24.0)
-        //        color = .white
-        //        titleColor = .black
-        //        shadowColor = UIColor(red: 136.0/255.0, green: 138.0/255.0, blue: 142.0/255.0, alpha: 1.0)
-        //        highlightColor = UIColor(red: 213.0/255.0, green: 214.0/255.0, blue: 216.0/255.0, alpha: 1.0)
+        setupAppearanceFromDevice()
         
         // Styling
         backgroundColor = .clear
@@ -657,10 +629,8 @@ struct ScreenGeometry {
     }
     
     override func layoutSubviews() {
-         //delegate?.log("MFKB.layoutSubviews")
         super.layoutSubviews()
         updateButtonPosition()
-        ////setNeedsDisplay()
         contentMode = .redraw
     }
     
@@ -676,14 +646,10 @@ struct ScreenGeometry {
     
     
     func showMagnifier() {
-         //delegate?.log("MFKB.showMagnifier()")
         if (sizeClass == .Phone) {
-            //hideMagnifier()
             magnifier = MuFuKeyboardButtonDetailView(keyboardButton: self, newType: .Magnifier)
             // this of course invalidates all previous setup of the magnifier!!!
             magnifier!.titleType = titleType
-            
-            //magnifier?.titleImageView.image = magnifierTitleImageView.image
             window?.addSubview(magnifier!)
         } else {
             //setNeedsDisplay()
@@ -696,7 +662,6 @@ struct ScreenGeometry {
         //hideMagnifier()
         
         if (recognizer.state == .began) {
-            //delegate?.log("MFKB.showOptions(), began\n")
             
             if (optionsView == nil) {
                 
@@ -724,28 +689,22 @@ struct ScreenGeometry {
     }
     
     func hideMagnifier() {
-         //delegate?.log("MFKB.hideMagnifier()")
         magnifier?.removeFromSuperview()
         magnifier = nil
-        //setNeedsDisplay()
     }
     
     func hideOptions() {
-        //delegate?.log("MFKB.hideOptions()")
         delegate?.optionsHidden(for: self)
         if optionsView?.type == .Options {
             NotificationCenter.default.post(name: .buttonDidHideInputOptions, object: self)
         }
-        
         optionsView?.removeFromSuperview()
         optionsView = nil
-        //setNeedsDisplay()
     }
     
     
     
     func updateButtonPosition() {
-         //delegate?.log("MFKB.updateButtonPosition() on button " + inputID)
         // Determine the button's position state based on the superview padding
         let leftPadding = frame.minX
         let rightPadding = (superview?.frame.maxX)! - frame.maxX
@@ -761,11 +720,9 @@ struct ScreenGeometry {
     }
     
     func setupOptionsConfiguration() {
-        delegate?.log("MFKB.setupOptionsConfiguration()")
         tearDownOptionsConfiguration()
         
         if (optionsInputIDs.count > 0) {
-            //delegate?.log("--- optionsInputIDs.count > 0")
             let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(showOptions(recognizer:)))
             longPressGestureRecognizer.minimumPressDuration = CFTimeInterval(optionsViewDelay)
             longPressGestureRecognizer.delegate = self
@@ -781,7 +738,6 @@ struct ScreenGeometry {
     }
     
     func tearDownOptionsConfiguration() {
-        //delegate?.log("MFKB.tearDownOptionsConfiguration()")
         removeGestureRecognizer(optionsViewRecognizer)
         removeGestureRecognizer(panGestureRecognizer)
     }
@@ -811,7 +767,6 @@ struct ScreenGeometry {
     }
     
     @objc func handlePanning(recognizer: UIPanGestureRecognizer) {
-        //delegate?.log("MFKB.handlePanning(recognizer:)")
         
         if (recognizer.state == .ended || recognizer.state == .cancelled) {
             backgroundColor = self.color
@@ -823,7 +778,6 @@ struct ScreenGeometry {
                         inputID = optionsInputIDs[idx]
                         title = optionsTitles[idx]
                         titleImageView.image? = optionsImages[idx]
-                        //magnifierTitleImageView.image? = optionsImages[idx]
                     }
                     
                     optionsView?.previouslyHighlightedInputIndex = (optionsView?.highlightedInputIndex)!
@@ -844,13 +798,11 @@ struct ScreenGeometry {
                 }
                 
                 optionsView?.highlightedInputIndex = NSNotFound
-                //optionsView?.setNeedsDisplay()
             }
             
             setNeedsDisplay()
             
         } else {
-            //delegate?.log("yes we're panning")
             let location = recognizer.location(in: superview)
             optionsView?.updateHighlightedInputIndex(forPoint: location)
             
@@ -867,30 +819,6 @@ struct ScreenGeometry {
         super.touchesCancelled(touches, with: event)
         hideMagnifier()
     }
-    
-    override func draw(_ rect: CGRect) { // draw the button alone (without magnifier or options, but maybe highlighted)
-        //delegate?.log("MFKB.draw(_)")
-//        let context = UIGraphicsGetCurrentContext()
-//        var fillColor = self.color
-//
-//        if (state == .highlighted) {
-//            fillColor = highlightColor
-//        }
-//
-//        let roundedRectanglePath = UIBezierPath(roundedRect: CGRect(x: 0.0, y: 0.0, width: frame.size.width, height: frame.size.height - shadowYOffset), cornerRadius: cornerRadius)
-//        context?.saveGState()
-//        //context?.setShadow(offset: shadowOffset, blur: shadowBlurRadius, color: shadowColor?.cgColor)
-////        layer.shadowOffset = shadowOffset
-////        layer.shadowOpacity = 1.0 // ?
-////        layer.shadowColor = shadowColor?.cgColor
-////        layer.shadowRadius = 0.0 //shadowBlurRadius
-//        fillColor?.setFill()
-//        roundedRectanglePath.fill()
-//        context?.restoreGState()
-        
-    }
-    
-    
     
 }
 
