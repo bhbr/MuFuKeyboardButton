@@ -175,7 +175,7 @@ class MuFuKeyboardButtonDetailView: UIView {
             titleLabel.backgroundColor = .clear
             titleLabel.textAlignment = .center
             titleLabel.clipsToBounds = false
-            titleLabel.contentMode = .scaleAspectFit
+            titleLabel.contentMode = .center
             titleLabel.adjustsFontSizeToFitWidth = true
             
             if rootButton.position == .Left {
@@ -389,7 +389,7 @@ class MuFuKeyboardButtonDetailView: UIView {
     func drawMagnifiedInputView(_ rect: CGRect) {
         //rootButton.//delegate?.log("MFKBDV.drawMagnifiedInputView(_)")
         titleImageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        titleImageView.contentMode = .center//scaleAspectFit
+        titleImageView.contentMode = .center
         // maybe use a larger image here, or enlarge the image by a function
         
         titleImageView.center = titleLabel.center
@@ -539,7 +539,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         newLabel.text = optionTitle
         newLabel.textColor = stringColor
         newLabel.font = rootButton.optionsFont
-        newLabel.contentMode = .scaleAspectFit
+        newLabel.contentMode = .center
         newLabel.clipsToBounds = false
         //newLabel.sizeToFit()
         newLabel.textAlignment = .center
@@ -559,7 +559,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         let newImageView = UIImageView(frame: optionRect)
         newImageView.image = rootButton.optionsImages[idx]
-        newImageView.contentMode = .scaleAspectFit
+        newImageView.contentMode = .center
         newImageView.clipsToBounds = false
         newImageView.center = CGPoint(x: optionRect.midX, y: optionRect.midY)
         newImageView.isOpaque = true
@@ -665,7 +665,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         //                    imageView.image = rootButton.optionsImages[idx]
         //                }
         //                imageView.isOpaque = true
-        //                imageView.contentMode = .scaleAspectFit
+        //                imageView.contentMode = .center
         //                addSubview(imageView)
         //
         //            }

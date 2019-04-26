@@ -413,7 +413,7 @@ struct ScreenGeometry {
         // dummy values
         titleLabel.text = "MuFuButton"
         titleImage = UIImage(named:"sqrt")
-        titleImageView.contentMode = .scaleAspectFit // .center
+        titleImageView.contentMode = .center
     }
     
     init() {
@@ -623,7 +623,7 @@ struct ScreenGeometry {
         
         titleImageView.backgroundColor = .clear
         titleImageView.isUserInteractionEnabled = false
-        titleImageView.contentMode = .scaleAspectFit // .center
+        titleImageView.contentMode = .center
         
         self.addSubview(titleImageView)
         
