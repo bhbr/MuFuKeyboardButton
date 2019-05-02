@@ -104,6 +104,27 @@ let IPHONEX_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
 
 
 
+let IPHONEXR_PORTRAIT_BUTTON_WIDTH: CGFloat = 28.0
+let IPHONEXR_PORTRAIT_BUTTON_HEIGHT: CGFloat = 42.0
+let IPHONEXR_PORTRAIT_OPTION_WIDTH: CGFloat = 28.0
+let IPHONEXR_PORTRAIT_OPTION_HEIGHT: CGFloat = 42.0
+let IPHONEXR_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
+let IPHONEXR_PORTRAIT_BUTTON_X_GAP: CGFloat = 6.0
+let IPHONEXR_PORTRAIT_BUTTON_Y_GAP: CGFloat = 12.0
+// set
+
+let IPHONEXR_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONEXR_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONEXR_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONEXR_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+let IPHONEXR_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
+let IPHONEXR_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
+let IPHONEXR_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
+
+
+
+
+
 
 let IPAD_AIR_PORTRAIT_BUTTON_WIDTH: CGFloat = 49.0
 let IPAD_AIR_PORTRAIT_BUTTON_HEIGHT: CGFloat = 57.0
@@ -507,6 +528,21 @@ struct ScreenGeometry {
             break
             
         case (.phone,812.0,false): // iPhone X Landscape
+            sizeClass = .Phone
+            self.frame.size.width = IPHONEX_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONEX_LANDSCAPE_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+            
+        case (.phone,896.0,true): // iPhone XR, XSMax Portrait
+            sizeClass = .Phone
+            self.frame.size.width = IPHONEX_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONEX_PORTRAIT_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,896.0,false): // iPhone XR, XSMax Landscape
             sizeClass = .Phone
             self.frame.size.width = IPHONEX_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONEX_LANDSCAPE_BUTTON_HEIGHT
