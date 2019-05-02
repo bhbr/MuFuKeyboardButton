@@ -787,7 +787,7 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpInside() {
-        delegate?.handleKeyboardEvent(inputID)
+        if (optionsView == nil) { delegate?.handleKeyboardEvent(inputID) }
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
         setNeedsDisplay()
