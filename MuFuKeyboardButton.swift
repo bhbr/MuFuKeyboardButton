@@ -370,6 +370,14 @@ struct ScreenGeometry {
         }
     }
     
+    var pressTimer: Timer?
+    
+    var fireRepeatedlyOnHold: Bool = false {
+        didSet {
+            setupLongPressConfiguration()
+        }
+    }
+    
     var optionsTitles: Array<String> = [] // will by default be set to the optionInputIDs
     
     var optionsImages: Array<UIImage> = [] {
@@ -415,6 +423,7 @@ struct ScreenGeometry {
     var optionsView: MuFuKeyboardButtonDetailView? // button options
     lazy var optionsViewRecognizer = UILongPressGestureRecognizer()
     lazy var panGestureRecognizer = UIPanGestureRecognizer()
+    lazy var longPressRecognizer = UILongPressGestureRecognizer()
     
     var optionsViewDelay = Float(DEFAULT_OPTIONS_VIEW_DELAY)
     var optionsRowLengths: [Int] = [0]
@@ -778,6 +787,33 @@ struct ScreenGeometry {
         removeGestureRecognizer(panGestureRecognizer)
     }
     
+    func setupLongPressConfiguration() {
+        tearDownLongPressConfiguration()
+        longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        longPressRecognizer.minimumPressDuration = CFTimeInterval(optionsViewDelay)
+        longPressRecognizer.delegate = self
+        addGestureRecognizer(longPressRecognizer)
+    }
+    
+    func tearDownLongPressConfiguration() {
+        removeGestureRecognizer(longPressRecognizer)
+    }
+    
+    
+    @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
+        if (recognizer.state == .began) {
+            pressTimer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(fireKey), userInfo: nil, repeats: true)
+        } else if (recognizer.state == .ended) {
+            pressTimer?.invalidate()
+            handleTouchUpInside()
+        }
+        
+    }
+    
+    @objc func fireKey() {
+        delegate?.handleKeyboardEvent(inputID)
+    }
+    
     @objc func handleTouchDown() {
         UIDevice.current.playInputClick()
         backgroundColor = highlightColor
@@ -892,7 +928,7 @@ extension UIImage {
     func trim() -> UIImage {
         let newRect = self.cropRect
         if let imageRef = self.cgImage!.cropping(to: newRect) {
-            return UIImage(cgImage: imageRef)
+            return UIImage(cgImage: imageRef, scale: self.scale, orientation: self.imageOrientation)
         }
         return self
     }
@@ -1047,6 +1083,13 @@ extension UIImage {
         guard let outputImage = filter.outputImage else { return nil }
         guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
         return UIImage(cgImage: outputImageCopy, scale: self.scale, orientation: self.imageOrientation)
+    }
+    
+    func resized(to size: CGSize) -> UIImage {
+        let image2 = UIGraphicsImageRenderer(size: size).image { _ in
+            draw(in: CGRect(origin: .zero, size: size))
+        }
+        return image2
     }
     
 }
