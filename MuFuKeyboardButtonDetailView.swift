@@ -247,6 +247,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         if let tappedInputID = optionalTappedInputID
         {
             rootButton.delegate?.handleKeyboardEvent(tappedInputID)
+            rootButton.updateTitle(tappedInputID)
         }
         
         

@@ -838,6 +838,17 @@ struct ScreenGeometry {
         hideOptions()
     }
     
+    func updateTitle(_ id: String) {
+        if titleIsPersistent { return }
+        inputID = id
+        if let idx = optionsInputIDs.index(of: id) {
+            if idx != NSNotFound {
+                title = optionsTitles[idx]
+                titleImageView.image? = optionsImages[idx]
+            }
+        }
+    }
+    
     @objc func handlePanning(recognizer: UIPanGestureRecognizer) {
         
         if (recognizer.state == .ended || recognizer.state == .cancelled) {
@@ -950,8 +961,8 @@ extension UIImage {
             return CGRect.zero
         }
         
-        var lowX = width
-        var lowY = height
+        var lowX = width * self.scale
+        var lowY = height * self.scale
         var highX: CGFloat = 0
         var highY: CGFloat = 0
         
@@ -1040,23 +1051,21 @@ extension UIImage {
         accessibilityIdentifier = imageName
     }
     
-    func imageByMakingWhiteBackgroundTransparent() -> UIImage? {
-        
-        let image = UIImage(data: self.jpegData(compressionQuality: 1.0)!)!
-        let rawImageRef: CGImage = image.cgImage!
-        
-        let colorMasking: [CGFloat] = [222, 255, 222, 255, 222, 255]
-        UIGraphicsBeginImageContext(image.size);
-        
-        let maskedImageRef = rawImageRef.copy(maskingColorComponents: colorMasking)
-        UIGraphicsGetCurrentContext()?.translateBy(x: 0.0,y: image.size.height)
-        UIGraphicsGetCurrentContext()?.scaleBy(x: 1.0, y: -1.0)
-        UIGraphicsGetCurrentContext()?.draw(maskedImageRef!, in: CGRect.init(x: 0, y: 0, width: image.size.width, height: image.size.height))
-        let result = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        return result
-        
+    
+    func whiteToTransparent() -> UIImage? {
+        let ctx = CIContext()
+        let ciImage = CIImage(cgImage: (self.inverted()?.cgImage!)!)
+        let filter = CIFilter(name: "CIMaskToAlpha")
+        filter?.setDefaults()
+        filter?.setValue(ciImage, forKey: "inputImage")
+        if let outputCIImage = filter?.outputImage {
+            let outputCGImage = ctx.createCGImage(outputCIImage, from: outputCIImage.extent)
+            let outputUIImage = UIImage(cgImage: outputCGImage!, scale: self.scale, orientation: self.imageOrientation)
+            return outputUIImage.inverted()
+        }
+        return nil
     }
+    
     
     func withBackground(color: UIColor, opaque: Bool = true) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
