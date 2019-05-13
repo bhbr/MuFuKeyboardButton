@@ -244,7 +244,7 @@ extension Notification.Name {
 
 
 protocol MFKBDelegate { // is the KeyboardViewController
-    func handleKeyboardEvent(_ id: String)
+    func handleKeyboardEvent(_ id: String, save: Bool)
     func log(_ string: String)
     func optionsShown(for: MuFuKeyboardButton)
     func optionsHidden(for: MuFuKeyboardButton)
@@ -811,7 +811,7 @@ struct ScreenGeometry {
     }
     
     @objc func fireKey() {
-        delegate?.handleKeyboardEvent(inputID)
+        delegate?.handleKeyboardEvent(inputID, save: true)
     }
     
     @objc func handleTouchDown() {
@@ -823,7 +823,7 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpInside() {
-        if (optionsView == nil) { delegate?.handleKeyboardEvent(inputID) }
+        if (optionsView == nil) { delegate?.handleKeyboardEvent(inputID, save: true) }
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
         setNeedsDisplay()
@@ -831,7 +831,7 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpOutside() {
-        delegate?.handleKeyboardEvent(inputID)
+        delegate?.handleKeyboardEvent(inputID, save: true)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
         setNeedsDisplay()
@@ -856,7 +856,7 @@ struct ScreenGeometry {
             if let idx = optionsView?.highlightedInputIndex {
                 if idx != NSNotFound {
                     let inputOptionID = optionsInputIDs[idx]
-                    delegate?.handleKeyboardEvent(inputOptionID)
+                    delegate?.handleKeyboardEvent(inputOptionID, save: true)
                     if !titleIsPersistent {
                         inputID = optionsInputIDs[idx]
                         title = optionsTitles[idx]
@@ -877,7 +877,7 @@ struct ScreenGeometry {
                 
                 if !(delegate?.isTypingText)! {
                     delegate?.isTypingText = true
-                    delegate?.handleKeyboardEvent("mathrm")
+                    delegate?.handleKeyboardEvent("mathrm", save: true)
                 }
                 
                 optionsView?.highlightedInputIndex = NSNotFound
