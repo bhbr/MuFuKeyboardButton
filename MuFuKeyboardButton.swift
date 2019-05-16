@@ -937,14 +937,16 @@ extension UIImage {
     }
     
     func trim() -> UIImage {
-        let newRect = self.cropRect
+        print("trimming")
+        let newRect = self.cropRectGray
         if let imageRef = self.cgImage!.cropping(to: newRect) {
             return UIImage(cgImage: imageRef, scale: self.scale, orientation: self.imageOrientation)
         }
         return self
     }
     
-    var cropRect: CGRect {
+    var cropRectARGB: CGRect {
+        print("cropping")
         let cgImage = self.cgImage
         let context = createARGBBitmapContextFromImage(inImage: cgImage!)
         if context == nil { return CGRect.zero }
@@ -968,15 +970,67 @@ extension UIImage {
         let widthInt = Int(width)
         
         //Filter through data and look for transparent or white pixels.
-        let samplingDensity = 2
+        let samplingDensity = 10
+        print("data:", data)
         for yy in (0 ..< heightInt/samplingDensity) {
             let y = CGFloat(yy*samplingDensity)
             for xx in (0 ..< widthInt/samplingDensity) {
                 let x = CGFloat(xx*samplingDensity)
                 let pixelIndex = (width * y + x) * 4 /* 4 for A, R, G, B */
-                
                 if data[Int(pixelIndex)] == 0  { continue } // crop transparent
                 if data[Int(pixelIndex+1)] > 0xE0 && data[Int(pixelIndex+2)] > 0xE0 && data[Int(pixelIndex+3)] > 0xE0 { continue } // crop white
+                
+                if (x < lowX) { lowX = x }
+                if (x > highX) { highX = x }
+                if (y < lowY) { lowY = y }
+                if (y > highY) { highY = y }
+            }
+        }
+        print(lowX, highX, lowY, highY)
+        
+        let padding: CGFloat = 10.0
+        
+        //return CGRect(x: 0, y: 0, width: CGFloat(widthInt), height: highY + lowY)
+        return CGRect(x: lowX - padding, y: lowY - padding, width: highX - lowX + 2.0 * padding, height: highY - lowY + 2.0 * padding)
+    }
+    
+    var cropRectGray: CGRect {
+        print("cropping")
+        let cgImage = self.cgImage
+        //let context = createARGBBitmapContextFromImage(inImage: cgImage!)
+        let context = createGrayBitmapContextFromImage(inImage: cgImage!)
+        if context == nil { return CGRect.zero }
+        
+        let height = CGFloat(cgImage!.height)
+        let width = CGFloat(cgImage!.width)
+        
+        let rect = CGRect(x: 0.0, y: 0.0, width: width, height: height)
+        context?.draw(cgImage!, in: rect)
+        
+        guard let data = context?.data?.assumingMemoryBound(to: UInt8.self) else {
+            return CGRect.zero
+        }
+        
+        var lowX = width * self.scale
+        var lowY = height * self.scale
+        var highX: CGFloat = 0.0
+        var highY: CGFloat = 0.0
+        
+        let heightInt = Int(height)
+        let widthInt = Int(width)
+        
+        //Filter through data and look for transparent or white pixels.
+        let samplingDensity = 10
+        print("data:", data)
+        for yy in (0 ..< heightInt/samplingDensity) {
+            let y = CGFloat(yy*samplingDensity)
+            for xx in (0 ..< widthInt/samplingDensity) {
+                let x = CGFloat(xx*samplingDensity)
+                let pixelIndex = (width * y + x) * 1 /* 1 for grayscale */
+                print(data[Int(pixelIndex)])
+                //                if data[Int(pixelIndex)] == 0  { continue } // crop transparent
+                //                if data[Int(pixelIndex+1)] > 0xE0 && data[Int(pixelIndex+2)] > 0xE0 && data[Int(pixelIndex+3)] > 0xE0 { continue } // crop white
+                if data[Int(pixelIndex)] > 0x00  { continue }
                 
                 if (x < lowX) { lowX = x }
                 if (x > highX) { highX = x }
@@ -1002,6 +1056,36 @@ extension UIImage {
         
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         
+        print("allocating \(bitmapByteCount) bytes")
+        let bitmapData = malloc(bitmapByteCount)
+        if bitmapData == nil {
+            return nil
+        }
+        
+        let context = CGContext(
+            data: bitmapData,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,      // bits per component
+            bytesPerRow: bitmapBytesPerRow,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
+        )
+        
+        return context
+    }
+    
+    func createGrayBitmapContextFromImage(inImage: CGImage) -> CGContext? {
+        
+        let width = inImage.width
+        let height = inImage.height
+        
+        let bitmapBytesPerRow = width * 1
+        let bitmapByteCount = bitmapBytesPerRow * height
+        
+        let colorSpace = CGColorSpaceCreateDeviceGray()
+        
+        print("allocating \(bitmapByteCount) bytes")
         let bitmapData = malloc(bitmapByteCount)
         if bitmapData == nil {
             return nil
