@@ -25,6 +25,7 @@
 
 
 import UIKit
+import WebKit
 
 let IPHONE5_PORTRAIT_BUTTON_WIDTH: CGFloat = 24.0
 let IPHONE5_PORTRAIT_BUTTON_HEIGHT: CGFloat = 38.0
@@ -244,7 +245,7 @@ extension Notification.Name {
 
 
 @objc protocol MFKBDelegate { // is the KeyboardViewController
-    func handleKeyboardEvent(_ id: String, save: Bool)
+    func handleKeyboardEvent(_ id: String, in: WKWebView?, save: Bool)
     func log(_ string: String)
     func optionsShown(for: MuFuKeyboardButton)
     func optionsHidden(for: MuFuKeyboardButton)
@@ -811,7 +812,7 @@ struct ScreenGeometry {
     }
     
     @objc func fireKey() {
-        delegate?.handleKeyboardEvent(inputID, save: true)
+        delegate?.handleKeyboardEvent(inputID, in: nil, save: true)
     }
     
     @objc func handleTouchDown() {
@@ -823,7 +824,7 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpInside() {
-        if (optionsView == nil) { delegate?.handleKeyboardEvent(inputID, save: true) }
+        if (optionsView == nil) { delegate?.handleKeyboardEvent(inputID, in: nil, save: true) }
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
         setNeedsDisplay()
@@ -831,7 +832,7 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpOutside() {
-        delegate?.handleKeyboardEvent(inputID, save: true)
+        delegate?.handleKeyboardEvent(inputID, in: nil, save: true)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
         setNeedsDisplay()
@@ -856,7 +857,7 @@ struct ScreenGeometry {
             if let idx = optionsView?.highlightedInputIndex {
                 if idx != NSNotFound {
                     let inputOptionID = optionsInputIDs[idx]
-                    delegate?.handleKeyboardEvent(inputOptionID, save: true)
+                    delegate?.handleKeyboardEvent(inputOptionID, in: nil, save: true)
                     if !titleIsPersistent {
                         inputID = optionsInputIDs[idx]
                         title = optionsTitles[idx]
@@ -877,7 +878,7 @@ struct ScreenGeometry {
                 
                 if !(delegate?.isTypingText)! {
                     delegate?.isTypingText = true
-                    delegate?.handleKeyboardEvent("mathrm", save: true)
+                    delegate?.handleKeyboardEvent("mathrm", in: nil, save: true)
                 }
                 
                 optionsView?.highlightedInputIndex = NSNotFound
