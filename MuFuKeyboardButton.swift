@@ -243,7 +243,7 @@ extension Notification.Name {
 }
 
 
-protocol MFKBDelegate { // is the KeyboardViewController
+@objc protocol MFKBDelegate { // is the KeyboardViewController
     func handleKeyboardEvent(_ id: String, save: Bool)
     func log(_ string: String)
     func optionsShown(for: MuFuKeyboardButton)
@@ -429,7 +429,7 @@ struct ScreenGeometry {
     var optionsRowLengths: [Int] = [0]
     var optionsRowOffsets: [CGFloat] = [0.0]
     
-    var delegate: MFKBDelegate?
+    weak var delegate: MFKBDelegate?
     // handles keyboard events by getting passed an input ID
     
     var optionWidth: CGFloat = 50.0
@@ -752,7 +752,7 @@ struct ScreenGeometry {
     func updateButtonPosition() {
         // Determine the button's position state based on the superview padding
         let leftPadding = frame.minX
-        let rightPadding = (superview?.frame.maxX)! - frame.maxX
+        let rightPadding: CGFloat = (superview?.frame.maxX ?? 0.0) - frame.maxX
         let minimumClearance = frame.width * 0.5 + POSITION_CLEARANCE_PADDING
         
         if (leftPadding >= minimumClearance && rightPadding >= minimumClearance) {
@@ -802,7 +802,7 @@ struct ScreenGeometry {
     
     @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
         if (recognizer.state == .began) {
-            pressTimer = Timer.scheduledTimer(timeInterval: 0.25, target: self, selector: #selector(fireKey), userInfo: nil, repeats: true)
+            pressTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fireKey), userInfo: nil, repeats: true)
         } else if (recognizer.state == .ended) {
             pressTimer?.invalidate()
             handleTouchUpInside()
@@ -947,14 +947,12 @@ extension UIImage {
     var cropRect: CGRect {
         let cgImage = self.cgImage
         let context = createARGBBitmapContextFromImage(inImage: cgImage!)
-        if context == nil {
-            return CGRect.zero
-        }
+        if context == nil { return CGRect.zero }
         
         let height = CGFloat(cgImage!.height)
         let width = CGFloat(cgImage!.width)
         
-        let rect = CGRect(x: 0, y: 0, width: width, height: height)
+        let rect = CGRect(x: 0.0, y: 0.0, width: width, height: height)
         context?.draw(cgImage!, in: rect)
         
         guard let data = context?.data?.assumingMemoryBound(to: UInt8.self) else {
@@ -963,56 +961,32 @@ extension UIImage {
         
         var lowX = width * self.scale
         var lowY = height * self.scale
-        var highX: CGFloat = 0
-        var highY: CGFloat = 0
+        var highX: CGFloat = 0.0
+        var highY: CGFloat = 0.0
         
         let heightInt = Int(height)
         let widthInt = Int(width)
-        print("height: \(height)")
-        print("width: \(width)")
         
         //Filter through data and look for transparent or white pixels.
-        for y in (0 ..< heightInt) {
-            let y = CGFloat(y)
-            for x in (0 ..< widthInt) {
-                let x = CGFloat(x)
+        let samplingDensity = 2
+        for yy in (0 ..< heightInt/samplingDensity) {
+            let y = CGFloat(yy*samplingDensity)
+            for xx in (0 ..< widthInt/samplingDensity) {
+                let x = CGFloat(xx*samplingDensity)
                 let pixelIndex = (width * y + x) * 4 /* 4 for A, R, G, B */
                 
-                let alpha =  data[Int(pixelIndex)]
-                let red =  data[Int(pixelIndex + 1)]
-                let green = data[Int(pixelIndex) + 2]
-                let blue =  data[Int(pixelIndex + 3)]
+                if data[Int(pixelIndex)] == 0  { continue } // crop transparent
+                if data[Int(pixelIndex+1)] > 0xE0 && data[Int(pixelIndex+2)] > 0xE0 && data[Int(pixelIndex+3)] > 0xE0 { continue } // crop white
                 
-                if (alpha != 255 && red != 255 && green != 255 && blue != 255) {
-                    //print("(\(x),\(y)) -> (\(alpha),\(red),\(green),\(blue))")
-                }
-                
-                if data[Int(pixelIndex)] == 0  {
-                    continue
-                } // crop transparent
-                
-                
-                if data[Int(pixelIndex+1)] > 0xE0 && data[Int(pixelIndex+2)] > 0xE0 && data[Int(pixelIndex+3)] > 0xE0 {
-                    continue
-                } // crop white
-                
-                
-                if (x < lowX) {
-                    lowX = x
-                }
-                if (x > highX) {
-                    highX = x
-                }
-                if (y < lowY) {
-                    lowY = y
-                }
-                if (y > highY) {
-                    highY = y
-                }
+                if (x < lowX) { lowX = x }
+                if (x > highX) { highX = x }
+                if (y < lowY) { lowY = y }
+                if (y > highY) { highY = y }
             }
         }
+        print(lowX, highX, lowY, highY)
         
-        let padding: CGFloat = 5.0
+        let padding: CGFloat = 10.0
         
         //return CGRect(x: 0, y: 0, width: CGFloat(widthInt), height: highY + lowY)
         return CGRect(x: lowX - padding, y: lowY - padding, width: highX - lowX + 2.0 * padding, height: highY - lowY + 2.0 * padding)
@@ -1083,6 +1057,7 @@ extension UIImage {
     }
     
     func inverted() -> UIImage? {
+        //return self
         guard let cgImage = self.cgImage else { return nil }
         let ciImage = CoreImage.CIImage(cgImage: cgImage)
         guard let filter = CIFilter(name: "CIColorInvert") else { return nil }
