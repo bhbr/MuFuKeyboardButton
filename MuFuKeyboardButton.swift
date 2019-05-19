@@ -938,7 +938,7 @@ extension UIImage {
     
     func trim() -> UIImage {
         print("trimming")
-        let newRect = self.cropRectGray
+        let newRect = self.cropRectARGB
         if let imageRef = self.cgImage!.cropping(to: newRect) {
             return UIImage(cgImage: imageRef, scale: self.scale, orientation: self.imageOrientation)
         }
@@ -970,7 +970,7 @@ extension UIImage {
         let widthInt = Int(width)
         
         //Filter through data and look for transparent or white pixels.
-        let samplingDensity = 10
+        let samplingDensity = 3
         print("data:", data)
         for yy in (0 ..< heightInt/samplingDensity) {
             let y = CGFloat(yy*samplingDensity)
@@ -978,7 +978,7 @@ extension UIImage {
                 let x = CGFloat(xx*samplingDensity)
                 let pixelIndex = (width * y + x) * 4 /* 4 for A, R, G, B */
                 if data[Int(pixelIndex)] == 0  { continue } // crop transparent
-                if data[Int(pixelIndex+1)] > 0xE0 && data[Int(pixelIndex+2)] > 0xE0 && data[Int(pixelIndex+3)] > 0xE0 { continue } // crop white
+                if data[Int(pixelIndex+1)] > 0x00 && data[Int(pixelIndex+2)] > 0x00 && data[Int(pixelIndex+3)] > 0x00 { continue } // crop white
                 
                 if (x < lowX) { lowX = x }
                 if (x > highX) { highX = x }
