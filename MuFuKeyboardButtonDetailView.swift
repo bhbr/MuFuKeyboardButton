@@ -226,8 +226,8 @@ class MuFuKeyboardButtonDetailView: UIView {
         let point = touches.first!.location(in: self)
         updateHighlightedInputIndex(forPoint: point)
         
-        if !optionsViewPath().contains(point) {
-            // tapped outside: dismiss popup
+        if (!optionsViewPath().contains(point) || rootButton.frame.contains(point)) {
+            // tapped outside or on root button (white): dismiss popup
             highlightedInputIndex = NSNotFound
             rootButton.hideOptions()
             return
@@ -236,9 +236,9 @@ class MuFuKeyboardButtonDetailView: UIView {
         if (optionsViewPath().contains(point) && (highlightedInputIndex >= rootButton.optionsInputIDs.count || highlightedInputIndex < 0)) {
             // tapped inside on whitespace
             highlightedInputIndex = NSNotFound
-            if !rootButton.optionsArePersistent {
-                rootButton.hideOptions()
-            }
+//            if !rootButton.optionsArePersistent {
+//                rootButton.hideOptions()
+//            }
             return
         }
         
@@ -461,13 +461,6 @@ class MuFuKeyboardButtonDetailView: UIView {
             context?.restoreGState()
         }
 
-        drawOptionsView()
-        
-    }
-    
-    func drawOptionsView() {
-        
-        let context = UIGraphicsGetCurrentContext()
         context?.saveGState()
         
         // remove all previous image views

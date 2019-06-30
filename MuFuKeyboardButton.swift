@@ -867,6 +867,9 @@ struct ScreenGeometry {
                     optionsView?.highlightedInputIndex = NSNotFound
                     optionsView?.drawInputOptionView(for: (optionsView?.previouslyHighlightedInputIndex)!)
                     optionsView?.drawInputOptionView(for: (optionsView?.highlightedInputIndex)!)
+                } else {
+                    // pan ended on whitespace: don't collapse the options view
+                    return
                 }
             }
             
@@ -875,7 +878,7 @@ struct ScreenGeometry {
                 hideOptions()
             } else { // typing text
                 
-                if !(delegate?.isTypingText)! {
+                if (optionsArePersistent && !(delegate?.isTypingText)!) {
                     delegate?.isTypingText = true
                     delegate?.handleKeyboardEvent("mathrm", save: true)
                 }
