@@ -197,11 +197,66 @@ let DEFAULT_OPTIONS_VIEW_DELAY = 0.2
 let DEFAULT_FONT: UIFont = .systemFont(ofSize: 22.0)
 let DEFAULT_OPTION_FONT: UIFont = .systemFont(ofSize: 24.0)
 let DEFAULT_MAGNIFIER_FONT: UIFont = .systemFont(ofSize: 44.0)
-let DEFAULT_KEY_COLOR: UIColor = .white
-let DEFAULT_SHADOW_COLOR: UIColor = UIColor(red: 136.0/255.0, green: 138.0/255.0, blue: 142.0/255.0, alpha: 1.0)
+
+let DEFAULT_KEY_COLOR_LIGHT: UIColor = .white
+let DEFAULT_KEY_COLOR_DARK: UIColor = UIColor(red: 100.0/255.0, green: 100.0/255.0, blue: 101.0/255.0, alpha: 1.0)
+@available(iOS 13.0, *)
+let DYNAMIC_DEFAULT_KEY_COLOR = UIColor { (traitCollection: UITraitCollection) -> UIColor in
+    if traitCollection.userInterfaceStyle == .dark {
+        return DEFAULT_KEY_COLOR_DARK
+    } else {
+        return DEFAULT_KEY_COLOR_LIGHT
+    }
+}
+
+let DEFAULT_FONT_COLOR_LIGHT: UIColor = .black
+let DEFAULT_FONT_COLOR_DARK: UIColor = .white
+@available(iOS 13.0, *)
+let DYNAMIC_DEFAULT_FONT_COLOR = UIColor { (traitCollection: UITraitCollection) -> UIColor in
+    if traitCollection.userInterfaceStyle == .dark {
+        return DEFAULT_FONT_COLOR_DARK
+    } else {
+        return DEFAULT_FONT_COLOR_LIGHT
+    }
+}
+
+
+
+let DEFAULT_SHADOW_COLOR_LIGHT: UIColor = UIColor.black.withAlphaComponent(0.5)
+let DEFAULT_SHADOW_COLOR_DARK: UIColor = .black
+@available(iOS 13.0, *)
+let DYNAMIC_DEFAULT_SHADOW_COLOR = UIColor { (traitCollection: UITraitCollection) -> UIColor in
+    if traitCollection.userInterfaceStyle == .dark {
+        return DEFAULT_SHADOW_COLOR_DARK
+    } else {
+        return DEFAULT_SHADOW_COLOR_LIGHT
+    }
+}
+
 let DEFAULT_BORDER_COLOR: UIColor = .clear
-let DEFAULT_HIGHLIGHT_COLOR: UIColor = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 190.0/255.0, alpha: 1.0)
-let DEFAULT_OPTION_HIGHLIGHT_COLOR: UIColor = UIColor(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1.0)
+
+let DEFAULT_HIGHLIGHT_COLOR_LIGHT: UIColor = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 190.0/255.0, alpha: 1.0)
+let DEFAULT_HIGHLIGHT_COLOR_DARK: UIColor = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 190.0/255.0, alpha: 1.0)
+@available(iOS 13.0, *)
+let DYNAMIC_HIGHLIGHT_COLOR = UIColor { (traitCollection: UITraitCollection) -> UIColor in
+    if traitCollection.userInterfaceStyle == .dark {
+        return DEFAULT_HIGHLIGHT_COLOR_DARK
+    } else {
+        return DEFAULT_HIGHLIGHT_COLOR_LIGHT
+    }
+}
+
+let DEFAULT_OPTION_HIGHLIGHT_COLOR_LIGHT: UIColor = UIColor(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1.0)
+let DEFAULT_OPTION_HIGHLIGHT_COLOR_DARK: UIColor = UIColor(red: 21.0/255.0, green: 126.0/255.0, blue: 251.0/255.0, alpha: 1.0)
+@available(iOS 13.0, *)
+let DYNAMIC_DEFAULT_OPTION_HIGHLIGHT_COLOR = UIColor { (traitCollection: UITraitCollection) -> UIColor in
+    if traitCollection.userInterfaceStyle == .dark {
+        return DEFAULT_OPTION_HIGHLIGHT_COLOR_DARK
+    } else {
+        return DEFAULT_OPTION_HIGHLIGHT_COLOR_LIGHT
+    }
+}
+
 let DEFAULT_CORNER_RADIUS: CGFloat = 5.0
 
 let DEFAULT_SHADOW_X_OFFSET: CGFloat = 0.1
@@ -283,8 +338,17 @@ struct ScreenGeometry {
     var titleImage: UIImage? {
         get { return titleImageView.image }
         set {
-            titleImageView.image = newValue
-            magnifierTitleImageView.image = newValue
+            if #available(iOS 13, *) {
+                if (titleType == .Image) {
+                    if (traitCollection.userInterfaceStyle == .dark) {
+                        titleImageView.image = newValue!.inverted()
+                        magnifierTitleImageView.image = newValue!.inverted()
+                    } else {
+                        titleImageView.image = newValue
+                        magnifierTitleImageView.image = newValue
+                    }
+                }
+            }
             magnifier?.titleImageView = magnifierTitleImageView
         }
     }
@@ -310,8 +374,8 @@ struct ScreenGeometry {
         set { titleLabel.textColor = newValue }
     }
     
-    var color: UIColor? = DEFAULT_KEY_COLOR { // the key's background color
-    //  the existing backgroundColor has to remain clear so we can have round corners
+    var color: UIColor? = DEFAULT_KEY_COLOR_LIGHT { // the key's background color
+    // the existing backgroundColor has to remain clear so we can have round corners
     // no it doesn't if we use the built-in corner rounding on the layer
         didSet {
             backgroundColor = self.color
@@ -320,9 +384,9 @@ struct ScreenGeometry {
         
         
     var borderColor: UIColor = DEFAULT_BORDER_COLOR
-    var shadowColor: UIColor? = DEFAULT_SHADOW_COLOR
-    var highlightColor: UIColor? = DEFAULT_HIGHLIGHT_COLOR
-    var optionHighlightColor: UIColor? = DEFAULT_OPTION_HIGHLIGHT_COLOR
+    var shadowColor: UIColor? = DEFAULT_SHADOW_COLOR_LIGHT
+    var highlightColor: UIColor? = DEFAULT_HIGHLIGHT_COLOR_LIGHT
+    var optionHighlightColor: UIColor? = DEFAULT_OPTION_HIGHLIGHT_COLOR_LIGHT
     
     var shadowXOffset: CGFloat = DEFAULT_SHADOW_X_OFFSET
     var shadowYOffset: CGFloat = DEFAULT_SHADOW_Y_OFFSET
@@ -382,10 +446,23 @@ struct ScreenGeometry {
     
     var optionsImages: Array<UIImage> = [] {
         didSet {
-            // automatically save inverted images
             highlightedOptionsImages = []
-            for inputOptionImage: UIImage in optionsImages {
-                highlightedOptionsImages.append(inputOptionImage.inverted()!)
+            if #available(iOS 13, *) {
+                if (traitCollection.userInterfaceStyle == .dark) {
+                    for inputOptionImage: UIImage in optionsImages {
+                        let idx = optionsImages.index(of: inputOptionImage)
+                        optionsImages[idx!] = inputOptionImage.inverted()!
+                        highlightedOptionsImages.append(optionsImages[idx!])
+                    }
+                } else {
+                    for inputOptionImage: UIImage in optionsImages {
+                        highlightedOptionsImages.append(inputOptionImage.inverted()!)
+                    }
+                }
+            } else {
+                for inputOptionImage: UIImage in optionsImages {
+                    highlightedOptionsImages.append(inputOptionImage.inverted()!)
+                }
             }
         }
     }
@@ -609,13 +686,38 @@ struct ScreenGeometry {
         }
         
     }
+
+    func updateColors() { // for dark mode
+        
+        if #available(iOS 13, *) {
+            color = DYNAMIC_DEFAULT_KEY_COLOR.resolvedColor(with: self.traitCollection)
+            titleColor = DYNAMIC_DEFAULT_FONT_COLOR.resolvedColor(with: self.traitCollection)
+            highlightColor = DYNAMIC_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
+            optionHighlightColor = DYNAMIC_DEFAULT_OPTION_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
+            shadowColor = DYNAMIC_DEFAULT_SHADOW_COLOR.resolvedColor(with: self.traitCollection)
+            layer.shadowColor = shadowColor?.cgColor
+            
+        } else {
+            color = DEFAULT_KEY_COLOR_LIGHT
+            backgroundColor = self.color
+            titleColor = DEFAULT_FONT_COLOR_LIGHT
+            highlightColor = DEFAULT_HIGHLIGHT_COLOR_LIGHT
+            optionHighlightColor = DEFAULT_OPTION_HIGHLIGHT_COLOR_LIGHT
+            shadowColor = DEFAULT_SHADOW_COLOR_LIGHT
+            layer.shadowColor = shadowColor?.cgColor
+            }
+        if (state == .highlighted) {
+            backgroundColor = highlightColor
+        } else {
+            backgroundColor = self.color
+        }
+    }
     
     func commonInit() {
-        
         setupAppearanceFromDevice()
+        updateColors()
         
-        // Styling
-        backgroundColor = .clear
+        
         clipsToBounds = false
         layer.masksToBounds = false
         contentHorizontalAlignment = .center
@@ -631,6 +733,7 @@ struct ScreenGeometry {
         titleLabel.textAlignment = .center
         titleLabel.isUserInteractionEnabled = false
         
+        
         self.addSubview(titleLabel)
         
         titleImageView.frame = self.bounds
@@ -642,6 +745,7 @@ struct ScreenGeometry {
         titleImageView.isUserInteractionEnabled = false
         titleImageView.contentMode = .center
         
+        
         self.addSubview(titleImageView)
         
         optionsRowLengths = [optionsInputIDs.count] // unless specified from outside
@@ -649,25 +753,29 @@ struct ScreenGeometry {
         
         optionWidth = frame.width
         
+        layer.cornerRadius = cornerRadius
+        layer.shadowOpacity = 1.0
+        layer.masksToBounds = false
+        isOpaque = true
         
-        backgroundColor = self.color
-        if (state == .highlighted) {
-            backgroundColor = highlightColor
+        switch UIDevice.current.userInterfaceIdiom {
+        case .phone:
+            layer.shadowRadius = DEFAULT_IPHONE_SHADOW_BLUR_RADIUS
+            layer.shadowOffset = DEFAULT_IPHONE_ROOT_SHADOW_OFFSET
+        case .pad:
+            layer.shadowRadius = DEFAULT_IPAD_SHADOW_BLUR_RADIUS
+            layer.shadowOffset = DEFAULT_IPAD_ROOT_SHADOW_OFFSET
+        default:
+            layer.shadowRadius = DEFAULT_IPHONE_SHADOW_BLUR_RADIUS
+            layer.shadowOffset = DEFAULT_IPHONE_ROOT_SHADOW_OFFSET
         }
         
-        let shadowOffset = CGSize(width: 0.1, height: 1.0)
-        
-        layer.cornerRadius = cornerRadius
-        layer.shadowOffset = shadowOffset
-        layer.shadowOpacity = 1.0 // ?
-        layer.shadowColor = shadowColor?.cgColor
-        layer.shadowRadius = 0.0 //shadowBlurRadius
-        layer.masksToBounds = true
-        
-        isOpaque = true
         
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        updateColors()
+    }
     
     override func didMoveToSuperview() {
         updateButtonPosition()
@@ -799,7 +907,6 @@ struct ScreenGeometry {
         removeGestureRecognizer(longPressRecognizer)
     }
     
-    
     @objc func handleLongPress(recognizer: UILongPressGestureRecognizer) {
         if (recognizer.state == .began) {
             pressTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fireKey), userInfo: nil, repeats: true)
@@ -807,7 +914,6 @@ struct ScreenGeometry {
             pressTimer?.invalidate()
             handleTouchUpInside()
         }
-        
     }
     
     @objc func fireKey() {
@@ -1128,6 +1234,22 @@ extension UIImage {
     }
     
     
+    func blackToTransparent() -> UIImage? {
+        return self.inverted()?.whiteToTransparent()?.inverted()
+//        let ctx = CIContext()
+//        let ciImage = CIImage(cgImage: self.cgImage!)
+//        let filter = CIFilter(name: "CIMaskToAlpha")
+//        filter?.setDefaults()
+//        filter?.setValue(ciImage, forKey: "inputImage")
+//        if let outputCIImage = filter?.outputImage {
+//            let outputCGImage = ctx.createCGImage(outputCIImage, from: outputCIImage.extent)
+//            let outputUIImage = UIImage(cgImage: outputCGImage!, scale: self.scale, orientation: self.imageOrientation)
+//            return outputUIImage
+//        }
+//        return nil
+    }
+    
+    
     func withBackground(color: UIColor, opaque: Bool = true) -> UIImage {
         UIGraphicsBeginImageContextWithOptions(size, opaque, scale)
         
@@ -1144,7 +1266,6 @@ extension UIImage {
     }
     
     func inverted() -> UIImage? {
-        //return self
         guard let cgImage = self.cgImage else { return nil }
         let ciImage = CoreImage.CIImage(cgImage: cgImage)
         guard let filter = CIFilter(name: "CIColorInvert") else { return nil }
