@@ -247,6 +247,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         if let tappedInputID = optionalTappedInputID
         {
             rootButton.delegate?.handleKeyboardEvent(tappedInputID, save: true)
+            rootButton.delegate?.log("touchesEnded")
             rootButton.updateTitle(tappedInputID)
         }
         
@@ -488,7 +489,7 @@ class MuFuKeyboardButtonDetailView: UIView {
     func setupLabel(for idx: NSInteger) {
         let optionTitle = rootButton.optionsTitles[idx]
         let optionRect: CGRect = inputOptionsRects[idx]
-        let stringColor = UIColor.black
+        let stringColor = rootButton.titleColor
         
         let newLabel = UILabel(frame: optionRect)
         newLabel.text = optionTitle
@@ -510,7 +511,18 @@ class MuFuKeyboardButtonDetailView: UIView {
         let optionRect: CGRect = inputOptionsRects[idx]
         
         let newImageView = UIImageView(frame: optionRect)
-        newImageView.image = rootButton.optionsImages[idx]
+        
+        if #available(iOS 13, *) {
+            if (traitCollection.userInterfaceStyle == .dark && !rootButton.inputID.starts(with: "copy")) {
+                rootButton.delegate?.log("should use highlighted image")
+                newImageView.image = rootButton.optionsImages[idx].inverted()!
+            } else {
+                newImageView.image = rootButton.optionsImages[idx]
+            }
+        } else {
+            newImageView.image = rootButton.optionsImages[idx]
+        }
+        
         newImageView.contentMode = .center
         newImageView.clipsToBounds = false
         newImageView.center = CGPoint(x: optionRect.midX, y: optionRect.midY)
@@ -530,24 +542,25 @@ class MuFuKeyboardButtonDetailView: UIView {
         let optionTitle = rootButton.optionsTitles[idx]
         let highlighted = (idx == self.highlightedInputIndex)
         let previouslyHighlighted = (idx == self.previouslyHighlightedInputIndex)
+        rootButton.delegate?.log("we are here")
         
         for subview: UIView in subviews {
             if let label = subview as? UILabel {
                 if label.text == optionTitle {
                     if highlighted {
-                        label.backgroundColor = rootButton.tintColor
+                        label.backgroundColor = rootButton.optionHighlightColor // .tintColor
                         label.textColor = .white
                     } else if previouslyHighlighted {
-                        label.backgroundColor = .white
-                        label.textColor = .black
+                        label.backgroundColor = rootButton.color
+                        label.textColor = rootButton.titleLabel.textColor
                     }
                 }
             } else if let imageView = subview as? UIImageView {
                 
                 if (imageView.image == rootButton.optionsImages[idx] || imageView.image == rootButton.highlightedOptionsImages[idx]) {
-                
+                    rootButton.delegate?.log("we are here")
                     if highlighted {
-                        imageView.backgroundColor = rootButton.optionHighlightColor
+                        imageView.backgroundColor = UIColor.red // rootButton.optionHighlightColor
                         imageView.image = rootButton.highlightedOptionsImages[idx]
                     } else if previouslyHighlighted {
                         imageView.backgroundColor = rootButton.color

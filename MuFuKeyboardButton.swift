@@ -339,16 +339,15 @@ struct ScreenGeometry {
         get { return titleImageView.image }
         set {
             if #available(iOS 13, *) {
-                if (titleType == .Image) {
-                    if (traitCollection.userInterfaceStyle == .dark) {
-                        titleImageView.image = newValue!.inverted()
-                        magnifierTitleImageView.image = newValue!.inverted()
-                    } else {
-                        titleImageView.image = newValue
-                        magnifierTitleImageView.image = newValue
-                    }
+                if (traitCollection.userInterfaceStyle == .dark) {
+                    titleImageView.image = newValue!.inverted()
+                    magnifierTitleImageView.image = newValue!.inverted()
+                } else {
+                    titleImageView.image = newValue
+                    magnifierTitleImageView.image = newValue
                 }
             }
+            titleImageView.image = newValue
             magnifier?.titleImageView = magnifierTitleImageView
         }
     }
@@ -688,7 +687,6 @@ struct ScreenGeometry {
     }
 
     func updateColors() { // for dark mode
-        
         if #available(iOS 13, *) {
             color = DYNAMIC_DEFAULT_KEY_COLOR.resolvedColor(with: self.traitCollection)
             titleColor = DYNAMIC_DEFAULT_FONT_COLOR.resolvedColor(with: self.traitCollection)
@@ -918,17 +916,17 @@ struct ScreenGeometry {
     
     @objc func fireKey() {
         delegate?.handleKeyboardEvent(inputID, save: true)
+        delegate?.log("fireKey")
     }
     
     @objc func handleTouchDown() {
         UIDevice.current.playInputClick()
         backgroundColor = highlightColor
         if shouldShowMagnifier { showMagnifier() }
-        
-        setNeedsDisplay()
     }
     
     @objc func handleTouchUpInside() {
+        delegate?.log("handleTouchUpInside")
         if (optionsView == nil) { delegate?.handleKeyboardEvent(inputID, save: true) }
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
@@ -937,6 +935,7 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpOutside() {
+        delegate?.log("handleTouchUpOutside")
         delegate?.handleKeyboardEvent(inputID, save: true)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
@@ -945,12 +944,21 @@ struct ScreenGeometry {
     }
     
     func updateTitle(_ id: String) {
+        delegate?.log("updating title")
         if titleIsPersistent { return }
         inputID = id
         if let idx = optionsInputIDs.index(of: id) {
             if idx != NSNotFound {
                 title = optionsTitles[idx]
-                titleImageView.image? = optionsImages[idx]
+                if #available(iOS 13, *) {
+                    if (traitCollection.userInterfaceStyle == .dark && !self.inputID.starts(with: "copy")) {
+                        titleImage = optionsImages[idx].inverted()!
+                    } else {
+                        titleImage = optionsImages[idx]
+                    }
+                } else {
+                    titleImage = optionsImages[idx]
+                }
             }
         }
     }
@@ -963,10 +971,21 @@ struct ScreenGeometry {
                 if idx != NSNotFound {
                     let inputOptionID = optionsInputIDs[idx]
                     delegate?.handleKeyboardEvent(inputOptionID, save: true)
+                    delegate?.log("handlePanning")
                     if !titleIsPersistent {
                         inputID = optionsInputIDs[idx]
-                        title = optionsTitles[idx]
-                        titleImageView.image? = optionsImages[idx]
+                        //title = optionsTitles[idx]
+                        updateTitle(optionsTitles[idx])
+                        if #available(iOS 13, *) {
+                            if (traitCollection.userInterfaceStyle == .dark && !inputID.starts(with: "copy")) {
+                                titleImage = optionsImages[idx].inverted()
+                            } else {
+                                titleImage = optionsImages[idx]
+                            }
+                        } else {
+                            titleImage = optionsImages[idx]
+                        }
+                        
                     }
                     
                     optionsView?.previouslyHighlightedInputIndex = (optionsView?.highlightedInputIndex)!
@@ -1236,17 +1255,6 @@ extension UIImage {
     
     func blackToTransparent() -> UIImage? {
         return self.inverted()?.whiteToTransparent()?.inverted()
-//        let ctx = CIContext()
-//        let ciImage = CIImage(cgImage: self.cgImage!)
-//        let filter = CIFilter(name: "CIMaskToAlpha")
-//        filter?.setDefaults()
-//        filter?.setValue(ciImage, forKey: "inputImage")
-//        if let outputCIImage = filter?.outputImage {
-//            let outputCGImage = ctx.createCGImage(outputCIImage, from: outputCIImage.extent)
-//            let outputUIImage = UIImage(cgImage: outputCGImage!, scale: self.scale, orientation: self.imageOrientation)
-//            return outputUIImage
-//        }
-//        return nil
     }
     
     
@@ -1285,3 +1293,4 @@ extension UIImage {
     }
     
 }
+
