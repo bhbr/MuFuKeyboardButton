@@ -560,7 +560,7 @@ class MuFuKeyboardButtonDetailView: UIView {
                 if (imageView.image == rootButton.optionsImages[idx] || imageView.image == rootButton.highlightedOptionsImages[idx]) {
                     rootButton.delegate?.log("we are here")
                     if highlighted {
-                        imageView.backgroundColor = UIColor.red // rootButton.optionHighlightColor
+                        imageView.backgroundColor = rootButton.optionHighlightColor
                         imageView.image = rootButton.highlightedOptionsImages[idx]
                     } else if previouslyHighlighted {
                         imageView.backgroundColor = rootButton.color

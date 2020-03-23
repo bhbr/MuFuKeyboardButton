@@ -950,14 +950,16 @@ struct ScreenGeometry {
         if let idx = optionsInputIDs.index(of: id) {
             if idx != NSNotFound {
                 title = optionsTitles[idx]
-                if #available(iOS 13, *) {
-                    if (traitCollection.userInterfaceStyle == .dark && !self.inputID.starts(with: "copy")) {
-                        titleImage = optionsImages[idx].inverted()!
+                if (optionsImages.count != 0) {
+                    if #available(iOS 13, *) {
+                        if (traitCollection.userInterfaceStyle == .dark && !self.inputID.starts(with: "copy")) {
+                            titleImage = optionsImages[idx].inverted()!
+                        } else {
+                            titleImage = optionsImages[idx]
+                        }
                     } else {
                         titleImage = optionsImages[idx]
                     }
-                } else {
-                    titleImage = optionsImages[idx]
                 }
             }
         }
@@ -974,20 +976,11 @@ struct ScreenGeometry {
                     delegate?.log("handlePanning")
                     if !titleIsPersistent {
                         inputID = optionsInputIDs[idx]
-                        //title = optionsTitles[idx]
-                        updateTitle(optionsTitles[idx])
-                        if #available(iOS 13, *) {
-                            if (traitCollection.userInterfaceStyle == .dark && !inputID.starts(with: "copy")) {
-                                titleImage = optionsImages[idx].inverted()
-                            } else {
-                                titleImage = optionsImages[idx]
-                            }
-                        } else {
-                            titleImage = optionsImages[idx]
-                        }
-                        
+                        let idx2: Int = idx
+                        updateTitle(optionsTitles[idx2]) // crashes
+
                     }
-                    
+
                     optionsView?.previouslyHighlightedInputIndex = (optionsView?.highlightedInputIndex)!
                     optionsView?.highlightedInputIndex = NSNotFound
                     optionsView?.drawInputOptionView(for: (optionsView?.previouslyHighlightedInputIndex)!)
