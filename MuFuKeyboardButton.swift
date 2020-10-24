@@ -33,13 +33,13 @@ let IPHONE5_PORTRAIT_OPTION_HEIGHT: CGFloat = 38.0
 let IPHONE5_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
 let IPHONE5_PORTRAIT_BUTTON_X_GAP: CGFloat = 5.0
 let IPHONE5_PORTRAIT_BUTTON_Y_GAP: CGFloat = 16.0
-// set
+
 
 let IPHONE5_LANDSCAPE_BUTTON_WIDTH: CGFloat = 47.0
 let IPHONE5_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 32.0
 let IPHONE5_LANDSCAPE_OPTION_WIDTH: CGFloat = 47.0
 let IPHONE5_LANDSCAPE_OPTION_HEIGHT: CGFloat = 32.0
-// set
+
 let IPHONE5_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
 let IPHONE5_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
 let IPHONE5_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
@@ -53,7 +53,7 @@ let IPHONE6_PORTRAIT_OPTION_HEIGHT: CGFloat = 42.0
 let IPHONE6_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
 let IPHONE6_PORTRAIT_BUTTON_X_GAP: CGFloat = 6.0
 let IPHONE6_PORTRAIT_BUTTON_Y_GAP: CGFloat = 12.0
-// set
+
 
 let IPHONE6_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
 let IPHONE6_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
@@ -72,7 +72,7 @@ let IPHONE6P_PORTRAIT_BUTTON_WIDTH: CGFloat = 31.0
 let IPHONE6P_PORTRAIT_BUTTON_HEIGHT: CGFloat = 45.0
 let IPHONE6P_PORTRAIT_OPTION_WIDTH: CGFloat = 31.0
 let IPHONE6P_PORTRAIT_OPTION_HEIGHT: CGFloat = 45.0
-// set
+
 
 let IPHONE6P_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
 let IPHONE6P_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
@@ -91,7 +91,7 @@ let IPHONEX_PORTRAIT_OPTION_HEIGHT: CGFloat = 42.0
 let IPHONEX_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
 let IPHONEX_PORTRAIT_BUTTON_X_GAP: CGFloat = 6.0
 let IPHONEX_PORTRAIT_BUTTON_Y_GAP: CGFloat = 12.0
-// set
+
 
 let IPHONEX_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
 let IPHONEX_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
@@ -103,7 +103,6 @@ let IPHONEX_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
 
 
 
-
 let IPHONEXR_PORTRAIT_BUTTON_WIDTH: CGFloat = 28.0
 let IPHONEXR_PORTRAIT_BUTTON_HEIGHT: CGFloat = 42.0
 let IPHONEXR_PORTRAIT_OPTION_WIDTH: CGFloat = 28.0
@@ -111,7 +110,7 @@ let IPHONEXR_PORTRAIT_OPTION_HEIGHT: CGFloat = 42.0
 let IPHONEXR_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
 let IPHONEXR_PORTRAIT_BUTTON_X_GAP: CGFloat = 6.0
 let IPHONEXR_PORTRAIT_BUTTON_Y_GAP: CGFloat = 12.0
-// set
+
 
 let IPHONEXR_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
 let IPHONEXR_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
@@ -120,6 +119,63 @@ let IPHONEXR_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
 let IPHONEXR_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
 let IPHONEXR_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
 let IPHONEXR_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
+
+
+
+let IPHONE12_PORTRAIT_BUTTON_WIDTH: CGFloat = 28.0
+let IPHONE12_PORTRAIT_BUTTON_HEIGHT: CGFloat = 42.0
+let IPHONE12_PORTRAIT_OPTION_WIDTH: CGFloat = 28.0
+let IPHONE12_PORTRAIT_OPTION_HEIGHT: CGFloat = 42.0
+let IPHONE12_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
+let IPHONE12_PORTRAIT_BUTTON_X_GAP: CGFloat = 6.0
+let IPHONE12_PORTRAIT_BUTTON_Y_GAP: CGFloat = 12.0
+
+
+let IPHONE12_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE12_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE12_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE12_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+let IPHONE12_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
+let IPHONE12_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
+let IPHONE12_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
+
+
+
+let IPHONE12MINI_PORTRAIT_BUTTON_WIDTH: CGFloat = 28.0
+let IPHONE12MINI_PORTRAIT_BUTTON_HEIGHT: CGFloat = 42.0
+let IPHONE12MINI_PORTRAIT_OPTION_WIDTH: CGFloat = 28.0
+let IPHONE12MINI_PORTRAIT_OPTION_HEIGHT: CGFloat = 42.0
+let IPHONE12MINI_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
+let IPHONE12MINI_PORTRAIT_BUTTON_X_GAP: CGFloat = 6.0
+let IPHONE12MINI_PORTRAIT_BUTTON_Y_GAP: CGFloat = 12.0
+
+
+let IPHONE12MINI_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE12MINI_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE12MINI_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE12MINI_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+let IPHONE12MINI_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
+let IPHONE12MINI_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
+let IPHONE12MINI_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
+
+
+
+let IPHONE12PROMAX_PORTRAIT_BUTTON_WIDTH: CGFloat = 34.0
+let IPHONE12PROMAX_PORTRAIT_BUTTON_HEIGHT: CGFloat = 45.0
+let IPHONE12PROMAX_PORTRAIT_OPTION_WIDTH: CGFloat = 34.0
+let IPHONE12PROMAX_PORTRAIT_OPTION_HEIGHT: CGFloat = 45.0
+let IPHONE12PROMAX_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 3.0
+let IPHONE12PROMAX_PORTRAIT_BUTTON_X_GAP: CGFloat = 6.0
+let IPHONE12PROMAX_PORTRAIT_BUTTON_Y_GAP: CGFloat = 11.0
+
+
+let IPHONE12PROMAX_LANDSCAPE_BUTTON_WIDTH: CGFloat = 30.0
+let IPHONE12PROMAX_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 39.0
+let IPHONE12PROMAX_LANDSCAPE_OPTION_WIDTH: CGFloat = 20.0
+let IPHONE12PROMAX_LANDSCAPE_OPTION_HEIGHT: CGFloat = 20.0
+let IPHONE12PROMAX_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
+let IPHONE12PROMAX_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
+let IPHONE12PROMAX_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
 
 
 
@@ -133,7 +189,7 @@ let IPAD_AIR_PORTRAIT_OPTION_HEIGHT: CGFloat = 57.0
 let IPAD_AIR_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 6.0
 let IPAD_AIR_PORTRAIT_BUTTON_X_GAP: CGFloat = 12.0
 let IPAD_AIR_PORTRAIT_BUTTON_Y_GAP: CGFloat = 9.0
-// set
+
 
 let IPAD_AIR_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
 let IPAD_AIR_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
@@ -145,6 +201,25 @@ let IPAD_AIR_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
 
 
 
+let IPAD7_PORTRAIT_BUTTON_WIDTH: CGFloat = 49.0
+let IPAD7_PORTRAIT_BUTTON_HEIGHT: CGFloat = 57.0
+let IPAD7_PORTRAIT_OPTION_WIDTH: CGFloat = 49.0
+let IPAD7_PORTRAIT_OPTION_HEIGHT: CGFloat = 57.0
+let IPAD7_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 6.0
+let IPAD7_PORTRAIT_BUTTON_X_GAP: CGFloat = 12.0
+let IPAD7_PORTRAIT_BUTTON_Y_GAP: CGFloat = 9.0
+
+
+let IPAD7_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD7_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD7_LANDSCAPE_OPTION_WIDTH: CGFloat = 50.0
+let IPAD7_LANDSCAPE_OPTION_HEIGHT: CGFloat = 50.0
+let IPAD7_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
+let IPAD7_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
+let IPAD7_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
+
+
+
 let IPAD_PRO10_PORTRAIT_BUTTON_WIDTH: CGFloat = 53.5
 let IPAD_PRO10_PORTRAIT_BUTTON_HEIGHT: CGFloat = 57.0
 let IPAD_PRO10_PORTRAIT_OPTION_WIDTH: CGFloat = 53.5
@@ -152,7 +227,7 @@ let IPAD_PRO10_PORTRAIT_OPTION_HEIGHT: CGFloat = 57.0
 let IPAD_PRO10_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 6.5
 let IPAD_PRO10_PORTRAIT_BUTTON_X_GAP: CGFloat = 12.5
 let IPAD_PRO10_PORTRAIT_BUTTON_Y_GAP: CGFloat = 9.0
-// set
+
 
 let IPAD_PRO10_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
 let IPAD_PRO10_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
@@ -164,6 +239,25 @@ let IPAD_PRO10_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
 
 
 
+let IPAD_PRO11_PORTRAIT_BUTTON_WIDTH: CGFloat = 56.0
+let IPAD_PRO11_PORTRAIT_BUTTON_HEIGHT: CGFloat = 60.0
+let IPAD_PRO11_PORTRAIT_OPTION_WIDTH: CGFloat = 56.0
+let IPAD_PRO11_PORTRAIT_OPTION_HEIGHT: CGFloat = 60.0
+let IPAD_PRO11_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 4.0
+let IPAD_PRO11_PORTRAIT_BUTTON_X_GAP: CGFloat = 10.0
+let IPAD_PRO11_PORTRAIT_BUTTON_Y_GAP: CGFloat = 8.0
+
+
+let IPAD_PRO11_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
+let IPAD_PRO11_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
+let IPAD_PRO11_LANDSCAPE_OPTION_WIDTH: CGFloat = 50.0
+let IPAD_PRO11_LANDSCAPE_OPTION_HEIGHT: CGFloat = 50.0
+let IPAD_PRO11_LANDSCAPE_BUTTON_X_OFFSET: CGFloat = 10.0
+let IPAD_PRO11_LANDSCAPE_BUTTON_X_GAP: CGFloat = 3.0
+let IPAD_PRO11_LANDSCAPE_BUTTON_Y_GAP: CGFloat = 3.0
+
+
+
 let IPAD_PRO12_PORTRAIT_BUTTON_WIDTH: CGFloat = 58.0
 let IPAD_PRO12_PORTRAIT_BUTTON_HEIGHT: CGFloat = 63.0
 let IPAD_PRO12_PORTRAIT_OPTION_WIDTH: CGFloat = 58.0
@@ -171,7 +265,7 @@ let IPAD_PRO12_PORTRAIT_OPTION_HEIGHT: CGFloat = 63.0
 let IPAD_PRO12_PORTRAIT_BUTTON_X_OFFSET: CGFloat = 4.0
 let IPAD_PRO12_PORTRAIT_BUTTON_X_GAP: CGFloat = 7.0
 let IPAD_PRO12_PORTRAIT_BUTTON_Y_GAP: CGFloat = 7.0
-// set
+
 
 let IPAD_PRO12_LANDSCAPE_BUTTON_WIDTH: CGFloat = 57.0
 let IPAD_PRO12_LANDSCAPE_BUTTON_HEIGHT: CGFloat = 55.0
@@ -238,7 +332,7 @@ let DEFAULT_BORDER_COLOR: UIColor = .clear
 let DEFAULT_HIGHLIGHT_COLOR_LIGHT: UIColor = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 190.0/255.0, alpha: 1.0)
 let DEFAULT_HIGHLIGHT_COLOR_DARK: UIColor = UIColor(red: 174.0/255.0, green: 179.0/255.0, blue: 190.0/255.0, alpha: 1.0)
 @available(iOS 13.0, *)
-let DYNAMIC_HIGHLIGHT_COLOR = UIColor { (traitCollection: UITraitCollection) -> UIColor in
+let DYNAMIC_DEFAULT_HIGHLIGHT_COLOR = UIColor { (traitCollection: UITraitCollection) -> UIColor in
     if traitCollection.userInterfaceStyle == .dark {
         return DEFAULT_HIGHLIGHT_COLOR_DARK
     } else {
@@ -338,19 +432,23 @@ struct ScreenGeometry {
     var titleImage: UIImage? {
         get { return titleImageView.image }
         set {
-            if #available(iOS 13, *) {
-                if (traitCollection.userInterfaceStyle == .dark) {
-                    titleImageView.image = newValue!.inverted()
-                    magnifierTitleImageView.image = newValue!.inverted()
-                } else {
-                    titleImageView.image = newValue
-                    magnifierTitleImageView.image = newValue
-                }
-            }
-            titleImageView.image = newValue
-            magnifier?.titleImageView = magnifierTitleImageView
+//            if #available(iOS 13, *) {
+//                if (traitCollection.userInterfaceStyle == .dark && invertImageInDarkMode) {
+//                    delegate?.log("inverting title image for " + inputID )
+//                    titleImageView.image = newValue!.inverted()
+//                    magnifierTitleImageView.image = newValue!.inverted()
+//                } else {
+//                    titleImageView.image = newValue
+//                    magnifierTitleImageView.image = newValue
+//                }
+//            } else {
+                titleImageView.image = newValue
+                magnifier?.titleImageView = magnifierTitleImageView
+            //}
         }
     }
+    
+    var invertImageInDarkMode: Bool = false
     
     var titleIsPersistent: Bool = true // false means: displayed label/image changes to last selected option
     
@@ -378,9 +476,13 @@ struct ScreenGeometry {
     // no it doesn't if we use the built-in corner rounding on the layer
         didSet {
             backgroundColor = self.color
+//            if (inputID == "Shift") {
+//                delegate?.log("color was set to")
+//                delegate?.log(backgroundColor.debugDescription)
+//            }
         }
     }
-        
+    
         
     var borderColor: UIColor = DEFAULT_BORDER_COLOR
     var shadowColor: UIColor? = DEFAULT_SHADOW_COLOR_LIGHT
@@ -445,25 +547,37 @@ struct ScreenGeometry {
     
     var optionsImages: Array<UIImage> = [] {
         didSet {
-            highlightedOptionsImages = []
-            if #available(iOS 13, *) {
-                if (traitCollection.userInterfaceStyle == .dark) {
-                    for inputOptionImage: UIImage in optionsImages {
-                        let idx = optionsImages.index(of: inputOptionImage)
-                        optionsImages[idx!] = inputOptionImage.inverted()!
-                        highlightedOptionsImages.append(optionsImages[idx!])
-                    }
-                } else {
-                    for inputOptionImage: UIImage in optionsImages {
+            updateHighlightedOptionImages()
+        }
+    }
+    
+    func updateHighlightedOptionImages() {
+        highlightedOptionsImages = []
+//            if #available(iOS 13, *) {
+//                if (traitCollection.userInterfaceStyle == .dark) {
+//                    for inputOptionImage: UIImage in optionsImages {
+//                        let idx = optionsImages.firstIndex(of: inputOptionImage)
+//                        optionsImages[idx!] = inputOptionImage.inverted()!
+//                        highlightedOptionsImages.append(optionsImages[idx!])
+//                    }
+//                } else {
+//                    for inputOptionImage: UIImage in optionsImages {
+//                        highlightedOptionsImages.append(inputOptionImage.inverted()!)
+//                    }
+//                }
+//            } else {
+            for inputOptionImage: UIImage in optionsImages {
+                if #available(iOS 13, *) {
+                    if (traitCollection.userInterfaceStyle == .dark) {
+                        highlightedOptionsImages.append(inputOptionImage)
+                    } else {
                         highlightedOptionsImages.append(inputOptionImage.inverted()!)
                     }
-                }
-            } else {
-                for inputOptionImage: UIImage in optionsImages {
+                } else {
                     highlightedOptionsImages.append(inputOptionImage.inverted()!)
                 }
             }
-        }
+        //}
     }
     
     var highlightedOptionsImages: Array<UIImage> = []
@@ -563,28 +677,28 @@ struct ScreenGeometry {
     func setupAppearanceFromDevice() {
         switch (screenGeometry.interfaceIdiom, screenGeometry.screenSize, screenGeometry.isPortrait) {
             
-        case (.phone, 568.0,true): // iPhone 5,5C,5S,SE Portrait
+        case (.phone, 568.0,true): // iPhone 5,5C,5S,SE1 Portrait
             sizeClass = .Phone
             self.frame.size.width = IPHONE5_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONE5_PORTRAIT_BUTTON_HEIGHT
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
-        case (.phone, 568.0,false): // iPhone 5,5C,5S,SE Landscape
+        case (.phone, 568.0,false): // iPhone 5,5C,5S,SE1 Landscape
             sizeClass = .Phone
             self.frame.size.width = IPHONE5_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONE5_LANDSCAPE_BUTTON_HEIGHT
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
-        case (.phone, 667.0, true): // iPhone 6,6S,7,8 Portrait
+        case (.phone, 667.0, true): // iPhone 6,6S,7,8, SE2 Portrait
             sizeClass = .Phone
             self.frame.size.width = IPHONE6_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONE6_PORTRAIT_BUTTON_HEIGHT
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
-        case (.phone, 667.0, false): // iPhone 6,6S,7,8 Landscape
+        case (.phone, 667.0, false): // iPhone 6,6S,,SE2 Landscape
             sizeClass = .Phone
             self.frame.size.width = IPHONE6_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONE6_LANDSCAPE_BUTTON_HEIGHT
@@ -605,14 +719,14 @@ struct ScreenGeometry {
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
-        case (.phone,812.0,true): // iPhone X Portrait
+        case (.phone,812.0,true): // iPhone X, XS, 11 Pro Portrait
             sizeClass = .Phone
             self.frame.size.width = IPHONEX_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONEX_PORTRAIT_BUTTON_HEIGHT
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
-        case (.phone,812.0,false): // iPhone X Landscape
+        case (.phone,812.0,false): // iPhone X, XS, 11 Pro Landscape
             sizeClass = .Phone
             self.frame.size.width = IPHONEX_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONEX_LANDSCAPE_BUTTON_HEIGHT
@@ -620,19 +734,62 @@ struct ScreenGeometry {
             break
             
             
-        case (.phone,896.0,true): // iPhone XR, XSMax Portrait
+        case (.phone,896.0,true): // iPhone XR, XSMax, 11, Pro Max Portrait
             sizeClass = .Phone
             self.frame.size.width = IPHONEX_PORTRAIT_BUTTON_WIDTH
             self.frame.size.height = IPHONEX_PORTRAIT_BUTTON_HEIGHT
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
-        case (.phone,896.0,false): // iPhone XR, XSMax Landscape
+        case (.phone,896.0,false): // iPhone XR, XSMax, 11, Pro Max Landscape
             sizeClass = .Phone
             self.frame.size.width = IPHONEX_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONEX_LANDSCAPE_BUTTON_HEIGHT
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
+            
+        case (.phone,844.0,true): // iPhone 12, 12 Pro Portrait
+            sizeClass = .Phone
+            self.frame.size.width = IPHONE12_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONE12_PORTRAIT_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,844.0,false): // iPhone 12, 12 Pro Landscape
+            sizeClass = .Phone
+            self.frame.size.width = IPHONE12_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONE12_LANDSCAPE_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,780.0,true): // iPhone 12 mini Portrait
+            sizeClass = .Phone
+            self.frame.size.width = IPHONE12MINI_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONE12MINI_PORTRAIT_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,780.0,false): // iPhone 12mini Landscape
+            sizeClass = .Phone
+            self.frame.size.width = IPHONE12MINI_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONE12MINI_LANDSCAPE_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,926.0,true): // iPhone 12 Pro Max Portrait
+            sizeClass = .Phone
+            self.frame.size.width = IPHONE12PROMAX_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPHONE12PROMAX_PORTRAIT_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
+        case (.phone,926.0,false): // iPhone 12 Pro Max Landscape
+            sizeClass = .Phone
+            self.frame.size.width = IPHONE12PROMAX_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPHONE12PROMAX_LANDSCAPE_BUTTON_HEIGHT
+            cornerRadius = IPHONE_KEY_CORNER_RADIUS
+            break
+            
             
             
             
@@ -679,31 +836,63 @@ struct ScreenGeometry {
             cornerRadius = IPAD_KEY_CORNER_RADIUS
             break
             
+        case (.pad,1194.0,true): // iPad Pro 11" Portrait
+            sizeClass = .Tablet
+            self.frame.size.width = IPAD_PRO11_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPAD_PRO11_PORTRAIT_BUTTON_HEIGHT
+            cornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1194.0,false): // iPad Pro 11" Landscape
+            sizeClass = .Tablet
+            self.frame.size.width = IPAD_PRO11_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPAD_PRO11_LANDSCAPE_BUTTON_HEIGHT
+            cornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1080.0,true): // iPad 7th gen Portrait
+            sizeClass = .Tablet
+            self.frame.size.width = IPAD7_PORTRAIT_BUTTON_WIDTH
+            self.frame.size.height = IPAD7_PORTRAIT_BUTTON_HEIGHT
+            cornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
+        case (.pad,1080.0,false): // iPad 7th gen Landscape
+            sizeClass = .Tablet
+            self.frame.size.width = IPAD7_LANDSCAPE_BUTTON_WIDTH
+            self.frame.size.height = IPAD7_LANDSCAPE_BUTTON_HEIGHT
+            cornerRadius = IPAD_KEY_CORNER_RADIUS
+            break
+            
             
         default:
+            delegate?.log("failed to identify screen geometry")
             break
         }
         
     }
 
     func updateColors() { // for dark mode
-        if #available(iOS 13, *) {
-            color = DYNAMIC_DEFAULT_KEY_COLOR.resolvedColor(with: self.traitCollection)
-            titleColor = DYNAMIC_DEFAULT_FONT_COLOR.resolvedColor(with: self.traitCollection)
-            highlightColor = DYNAMIC_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
-            optionHighlightColor = DYNAMIC_DEFAULT_OPTION_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
-            shadowColor = DYNAMIC_DEFAULT_SHADOW_COLOR.resolvedColor(with: self.traitCollection)
-            layer.shadowColor = shadowColor?.cgColor
-            
-        } else {
-            color = DEFAULT_KEY_COLOR_LIGHT
-            backgroundColor = self.color
-            titleColor = DEFAULT_FONT_COLOR_LIGHT
-            highlightColor = DEFAULT_HIGHLIGHT_COLOR_LIGHT
-            optionHighlightColor = DEFAULT_OPTION_HIGHLIGHT_COLOR_LIGHT
-            shadowColor = DEFAULT_SHADOW_COLOR_LIGHT
-            layer.shadowColor = shadowColor?.cgColor
-            }
+        
+//        if #available(iOS 13, *) {
+//            color = DYNAMIC_DEFAULT_KEY_COLOR.resolvedColor(with: self.traitCollection)
+//            titleColor = DYNAMIC_DEFAULT_FONT_COLOR.resolvedColor(with: self.traitCollection)
+//            highlightColor = DYNAMIC_DEFAULT_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
+//            optionHighlightColor = DYNAMIC_DEFAULT_OPTION_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
+//            shadowColor = DYNAMIC_DEFAULT_SHADOW_COLOR.resolvedColor(with: self.traitCollection)
+//            layer.shadowColor = shadowColor?.cgColor
+//
+//        } else {
+//            color = DEFAULT_KEY_COLOR_LIGHT
+//            backgroundColor = self.color
+//            titleColor = DEFAULT_FONT_COLOR_LIGHT
+//            highlightColor = DEFAULT_HIGHLIGHT_COLOR_LIGHT
+//            optionHighlightColor = DEFAULT_OPTION_HIGHLIGHT_COLOR_LIGHT
+//            shadowColor = DEFAULT_SHADOW_COLOR_LIGHT
+//            layer.shadowColor = shadowColor?.cgColor
+//            }
+        
+        
         if (state == .highlighted) {
             backgroundColor = highlightColor
         } else {
@@ -713,8 +902,6 @@ struct ScreenGeometry {
     
     func commonInit() {
         setupAppearanceFromDevice()
-        updateColors()
-        
         
         clipsToBounds = false
         layer.masksToBounds = false
@@ -725,12 +912,22 @@ struct ScreenGeometry {
         addTarget(self, action: #selector(MuFuKeyboardButton.handleTouchUpInside), for: .touchUpInside)
         addTarget(self, action: #selector(MuFuKeyboardButton.handleTouchUpOutside), for: .touchUpOutside)
         
-        
         titleLabel.frame = self.bounds
         titleLabel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         titleLabel.textAlignment = .center
         titleLabel.isUserInteractionEnabled = false
         
+        
+        if #available(iOS 13, *) {
+            titleColor = DYNAMIC_DEFAULT_FONT_COLOR
+            self.color = DYNAMIC_DEFAULT_KEY_COLOR
+            highlightColor = DYNAMIC_DEFAULT_HIGHLIGHT_COLOR
+        } else {
+            titleColor = DEFAULT_FONT_COLOR_LIGHT
+            self.color = DEFAULT_KEY_COLOR_LIGHT
+            highlightColor = DEFAULT_HIGHLIGHT_COLOR_LIGHT
+        }
+        layer.shadowColor = shadowColor?.cgColor
         
         self.addSubview(titleLabel)
         
@@ -768,14 +965,24 @@ struct ScreenGeometry {
             layer.shadowOffset = DEFAULT_IPHONE_ROOT_SHADOW_OFFSET
         }
         
+        if (state == .highlighted) {
+            backgroundColor = highlightColor
+        } else {
+            backgroundColor = self.color
+        }
+
         
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
         updateColors()
+        updateTitle(inputID)
+        updateHighlightedOptionImages()
     }
     
     override func didMoveToSuperview() {
+        super.didMoveToSuperview()
         updateButtonPosition()
     }
     
@@ -947,16 +1154,10 @@ struct ScreenGeometry {
         delegate?.log("updating title")
         if titleIsPersistent { return }
         inputID = id
-        if let idx = optionsInputIDs.index(of: id) {
+        if let idx = optionsInputIDs.firstIndex(of: id) {
             if idx != NSNotFound {
                 title = optionsTitles[idx]
-                if #available(iOS 13, *) {
-                    if (traitCollection.userInterfaceStyle == .dark && !self.inputID.starts(with: "copy")) {
-                        titleImage = optionsImages[idx].inverted()!
-                    } else {
-                        titleImage = optionsImages[idx]
-                    }
-                } else {
+                if optionsImages.count > 0 {
                     titleImage = optionsImages[idx]
                 }
             }
@@ -966,28 +1167,22 @@ struct ScreenGeometry {
     @objc func handlePanning(recognizer: UIPanGestureRecognizer) {
         
         if (recognizer.state == .ended || recognizer.state == .cancelled) {
+            delegate?.log("handlePanning")
+            delegate?.log(optionsImages.debugDescription)
             backgroundColor = self.color
             if let idx = optionsView?.highlightedInputIndex {
                 if idx != NSNotFound {
                     let inputOptionID = optionsInputIDs[idx]
                     delegate?.handleKeyboardEvent(inputOptionID, save: true)
-                    delegate?.log("handlePanning")
+                    delegate?.log("handlePanning ended")
                     if !titleIsPersistent {
                         inputID = optionsInputIDs[idx]
-                        //title = optionsTitles[idx]
                         updateTitle(optionsTitles[idx])
-                        if #available(iOS 13, *) {
-                            if (traitCollection.userInterfaceStyle == .dark && !inputID.starts(with: "copy")) {
-                                titleImage = optionsImages[idx].inverted()
-                            } else {
-                                titleImage = optionsImages[idx]
-                            }
-                        } else {
+                        if optionsImages.count > 0 {
                             titleImage = optionsImages[idx]
                         }
-                        
                     }
-                    
+
                     optionsView?.previouslyHighlightedInputIndex = (optionsView?.highlightedInputIndex)!
                     optionsView?.highlightedInputIndex = NSNotFound
                     optionsView?.drawInputOptionView(for: (optionsView?.previouslyHighlightedInputIndex)!)
@@ -997,20 +1192,20 @@ struct ScreenGeometry {
                     return
                 }
             }
-            
-            
+
+
             if !optionsArePersistent {
                 hideOptions()
             } else { // typing text
-                
+
                 if (optionsArePersistent && !(delegate?.isTypingText)!) {
                     delegate?.isTypingText = true
                     delegate?.handleKeyboardEvent("mathrm", save: true)
                 }
-                
+
                 optionsView?.highlightedInputIndex = NSNotFound
             }
-            
+
             setNeedsDisplay()
             
         } else {

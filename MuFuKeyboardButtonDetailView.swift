@@ -225,14 +225,14 @@ class MuFuKeyboardButtonDetailView: UIView {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         let point = touches.first!.location(in: self)
         updateHighlightedInputIndex(forPoint: point)
-        
+
         if (!optionsViewPath().contains(point) || rootButton.frame.contains(point)) {
             // tapped outside or on root button (white): dismiss popup
             highlightedInputIndex = NSNotFound
             rootButton.hideOptions()
             return
         }
-        
+
         if (optionsViewPath().contains(point) && (highlightedInputIndex >= rootButton.optionsInputIDs.count || highlightedInputIndex < 0)) {
             // tapped inside on whitespace
             highlightedInputIndex = NSNotFound
@@ -241,7 +241,7 @@ class MuFuKeyboardButtonDetailView: UIView {
 //            }
             return
         }
-        
+
         // tapped on an option
         let optionalTappedInputID: String? = rootButton.optionsInputIDs[highlightedInputIndex]
         if let tappedInputID = optionalTappedInputID
@@ -250,8 +250,8 @@ class MuFuKeyboardButtonDetailView: UIView {
             rootButton.delegate?.log("touchesEnded")
             rootButton.updateTitle(tappedInputID)
         }
-        
-        
+
+
         for subview in subviews {
             if let label = subview as? UILabel {
                 label.backgroundColor = rootButton.color
@@ -259,7 +259,7 @@ class MuFuKeyboardButtonDetailView: UIView {
                 imageView.backgroundColor = rootButton.color
             }
         }
-        
+
         previouslyHighlightedInputIndex = highlightedInputIndex
         highlightedInputIndex = NSNotFound
         drawInputOptionView(for: previouslyHighlightedInputIndex)
@@ -295,7 +295,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         for optionRect in inputOptionsRects {
             if optionRect.contains(point) {
-                let index = inputOptionsRects.index(of: optionRect)
+                let index = inputOptionsRects.firstIndex(of: optionRect)
                 if index == nil {
                 } else if index == NSNotFound {
                 } else {
@@ -474,7 +474,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         for optionInputID: String in rootButton.optionsInputIDs {
             // position rect has already been computed, let's retrieve it
-            let idx = rootButton.optionsInputIDs.index(of: optionInputID)!
+            let idx = rootButton.optionsInputIDs.firstIndex(of: optionInputID)!
             if rootButton.titleType == .Label {
                 setupLabel(for: idx)
             } else if titleType == .Image {
@@ -512,16 +512,16 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         let newImageView = UIImageView(frame: optionRect)
         
-        if #available(iOS 13, *) {
-            if (traitCollection.userInterfaceStyle == .dark && !rootButton.inputID.starts(with: "copy")) {
-                rootButton.delegate?.log("should use highlighted image")
-                newImageView.image = rootButton.optionsImages[idx].inverted()!
-            } else {
-                newImageView.image = rootButton.optionsImages[idx]
-            }
-        } else {
+//        if #available(iOS 13, *) {
+//            if (traitCollection.userInterfaceStyle == .dark && !rootButton.inputID.starts(with: "copy")) {
+//                rootButton.delegate?.log("should use highlighted image")
+//                newImageView.image = rootButton.optionsImages[idx].inverted()!
+//            } else {
+//                newImageView.image = rootButton.optionsImages[idx]
+//            }
+//        } else {
             newImageView.image = rootButton.optionsImages[idx]
-        }
+        //}
         
         newImageView.contentMode = .center
         newImageView.clipsToBounds = false
@@ -560,7 +560,7 @@ class MuFuKeyboardButtonDetailView: UIView {
                 if (imageView.image == rootButton.optionsImages[idx] || imageView.image == rootButton.highlightedOptionsImages[idx]) {
                     rootButton.delegate?.log("we are here")
                     if highlighted {
-                        imageView.backgroundColor = UIColor.red // rootButton.optionHighlightColor
+                        imageView.backgroundColor = rootButton.optionHighlightColor
                         imageView.image = rootButton.highlightedOptionsImages[idx]
                     } else if previouslyHighlighted {
                         imageView.backgroundColor = rootButton.color
