@@ -1159,10 +1159,7 @@ struct ScreenGeometry {
                 title = optionsTitles[idx]
                 if optionsImages.count > 0 {
                     titleImage = optionsImages[idx]
-                }
-            }
-        }
-    }
+
     
     @objc func handlePanning(recognizer: UIPanGestureRecognizer) {
         
@@ -1181,6 +1178,7 @@ struct ScreenGeometry {
                         if optionsImages.count > 0 {
                             titleImage = optionsImages[idx]
                         }
+
                     }
 
                     optionsView?.previouslyHighlightedInputIndex = (optionsView?.highlightedInputIndex)!
