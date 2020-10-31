@@ -181,6 +181,8 @@ class MuFuKeyboardButtonDetailView: UIView {
                 titleLabel.frame.origin.x -= magnifierTitleXInset
             }
             
+            titleLabel.frame.size.height *= 1.5
+            
             self.addSubview(titleLabel)
             
             // Image
@@ -247,7 +249,6 @@ class MuFuKeyboardButtonDetailView: UIView {
         if let tappedInputID = optionalTappedInputID
         {
             rootButton.delegate?.handleKeyboardEvent(tappedInputID, save: true)
-            rootButton.delegate?.log("touchesEnded")
             rootButton.updateTitle(tappedInputID)
         }
 
@@ -339,7 +340,7 @@ class MuFuKeyboardButtonDetailView: UIView {
         // layout label
         titleLabel.center.x = rootButton.center.x
         newFrame = titleLabel.frame
-        titleLabel.frame = CGRect(x: newFrame.origin.x, y: newFrame.origin.y + cornerRadius, width: rootButton.frame.width, height: rootButton.frame.height)
+        titleLabel.frame = CGRect(x: newFrame.origin.x, y: newFrame.origin.y + cornerRadius, width: rootButton.frame.width, height: rootButton.frame.height * 1.5)
         titleLabel.center.x = rootButton.center.x
         
         // adjust position if magnifying next to a screen edge
@@ -376,7 +377,6 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         // ok so we're on an iPhone as we should
         
-            
         // Generate the overlay
         let bezierPath = magnifiedInputViewPath() // includes root button
         
@@ -542,7 +542,6 @@ class MuFuKeyboardButtonDetailView: UIView {
         let optionTitle = rootButton.optionsTitles[idx]
         let highlighted = (idx == self.highlightedInputIndex)
         let previouslyHighlighted = (idx == self.previouslyHighlightedInputIndex)
-        rootButton.delegate?.log("we are here")
         
         for subview: UIView in subviews {
             if let label = subview as? UILabel {
@@ -555,10 +554,11 @@ class MuFuKeyboardButtonDetailView: UIView {
                         label.textColor = rootButton.titleLabel.textColor
                     }
                 }
+                //label.clipsToBounds = false
+                
             } else if let imageView = subview as? UIImageView {
                 
                 if (imageView.image == rootButton.optionsImages[idx] || imageView.image == rootButton.highlightedOptionsImages[idx]) {
-                    rootButton.delegate?.log("we are here")
                     if highlighted {
                         imageView.backgroundColor = rootButton.optionHighlightColor
                         imageView.image = rootButton.highlightedOptionsImages[idx]

@@ -551,6 +551,8 @@ struct ScreenGeometry {
         }
     }
     
+    var invertImagesOnHighlighting: Bool = true
+    
     func updateHighlightedOptionImages() {
         highlightedOptionsImages = []
 //            if #available(iOS 13, *) {
@@ -568,13 +570,17 @@ struct ScreenGeometry {
 //            } else {
             for inputOptionImage: UIImage in optionsImages {
                 if #available(iOS 13, *) {
-                    if (traitCollection.userInterfaceStyle == .dark) {
+                    if (traitCollection.userInterfaceStyle == .dark  || !invertImagesOnHighlighting) {
                         highlightedOptionsImages.append(inputOptionImage)
                     } else {
                         highlightedOptionsImages.append(inputOptionImage.inverted()!)
                     }
                 } else {
-                    highlightedOptionsImages.append(inputOptionImage.inverted()!)
+                    if (invertImagesOnHighlighting) {
+                        highlightedOptionsImages.append(inputOptionImage.inverted()!)
+                    } else {
+                        highlightedOptionsImages.append(inputOptionImage)
+                    }
                 }
             }
         //}
@@ -769,7 +775,7 @@ struct ScreenGeometry {
             cornerRadius = IPHONE_KEY_CORNER_RADIUS
             break
             
-        case (.phone,780.0,false): // iPhone 12mini Landscape
+        case (.phone,780.0,false): // iPhone 12 mini Landscape
             sizeClass = .Phone
             self.frame.size.width = IPHONE12MINI_LANDSCAPE_BUTTON_WIDTH
             self.frame.size.height = IPHONE12MINI_LANDSCAPE_BUTTON_HEIGHT
@@ -1123,7 +1129,6 @@ struct ScreenGeometry {
     
     @objc func fireKey() {
         delegate?.handleKeyboardEvent(inputID, save: true)
-        delegate?.log("fireKey")
     }
     
     @objc func handleTouchDown() {
@@ -1133,7 +1138,6 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpInside() {
-        delegate?.log("handleTouchUpInside")
         if (optionsView == nil) { delegate?.handleKeyboardEvent(inputID, save: true) }
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
@@ -1142,7 +1146,6 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchUpOutside() {
-        delegate?.log("handleTouchUpOutside")
         delegate?.handleKeyboardEvent(inputID, save: true)
         if shouldShowMagnifier { hideMagnifier() } // since the touch ended
         backgroundColor = self.color
@@ -1151,7 +1154,6 @@ struct ScreenGeometry {
     }
     
     func updateTitle(_ id: String) {
-        delegate?.log("updating title")
         if titleIsPersistent { return }
         inputID = id
         if let idx = optionsInputIDs.firstIndex(of: id) {
@@ -1168,14 +1170,12 @@ struct ScreenGeometry {
     @objc func handlePanning(recognizer: UIPanGestureRecognizer) {
         
         if (recognizer.state == .ended || recognizer.state == .cancelled) {
-            delegate?.log("handlePanning")
             delegate?.log(optionsImages.debugDescription)
             backgroundColor = self.color
             if let idx = optionsView?.highlightedInputIndex {
                 if idx != NSNotFound {
                     let inputOptionID = optionsInputIDs[idx]
                     delegate?.handleKeyboardEvent(inputOptionID, save: true)
-                    delegate?.log("handlePanning ended")
                     if !titleIsPersistent {
                         inputID = optionsInputIDs[idx]
                         updateTitle(optionsTitles[idx])
