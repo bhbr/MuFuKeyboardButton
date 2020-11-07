@@ -1260,16 +1260,16 @@ extension UIImage {
         
     }
     
-    func trim() -> UIImage {
+    func trim(bgColor: CGColor) -> UIImage {
         print("trimming")
-        let newRect = self.cropRectARGB
+        let newRect: CGRect = self.cropRectARGB(bgColor: bgColor)
         if let imageRef = self.cgImage!.cropping(to: newRect) {
             return UIImage(cgImage: imageRef, scale: self.scale, orientation: self.imageOrientation)
         }
         return self
     }
     
-    var cropRectARGB: CGRect {
+    func cropRectARGB(bgColor: CGColor) -> CGRect {
         print("cropping")
         let cgImage = self.cgImage
         let context = createARGBBitmapContextFromImage(inImage: cgImage!)
@@ -1293,17 +1293,23 @@ extension UIImage {
         let heightInt = Int(height)
         let widthInt = Int(width)
         
-        //Filter through data and look for transparent or white pixels.
+        //Filter through data and look for transparent or bgColored pixels.
         let samplingDensity = 3
+        let bgColorAsRGB: CGColor = bgColor.converted(to: CGColorSpaceCreateDeviceRGB(), intent: .defaultIntent, options: nil)!
+        let bgRed = Int(255 * bgColorAsRGB.components![0])
+        let bgGreen = Int(255 * bgColorAsRGB.components![1])
+        let bgBlue = Int(255 * bgColorAsRGB.components![2])
+
         print("data:", data)
-        for yy in (0 ..< heightInt/samplingDensity) {
-            let y = CGFloat(yy*samplingDensity)
-            for xx in (0 ..< widthInt/samplingDensity) {
-                let x = CGFloat(xx*samplingDensity)
-                let pixelIndex = (width * y + x) * 4 /* 4 for A, R, G, B */
-                if data[Int(pixelIndex)] == 0  { continue } // crop transparent
-                if data[Int(pixelIndex+1)] > 0x00 && data[Int(pixelIndex+2)] > 0x00 && data[Int(pixelIndex+3)] > 0x00 { continue } // crop white
-                
+        for yy in (0 ..< heightInt / samplingDensity) {
+            let y = CGFloat(yy * samplingDensity)
+            for xx in (0 ..< widthInt / samplingDensity) {
+                let x = CGFloat(xx * samplingDensity)
+                let i = Int(width * y + x) * 4 /* 4 for A, R, G, B */
+                if data[i] == 0  { continue } // crop transparent
+                let flag: Bool = (data[i + 1] == bgRed) && (data[i + 2] == bgGreen) && (data[i + 3] == bgBlue)
+                if flag { continue } // crop white
+
                 if (x < lowX) { lowX = x }
                 if (x > highX) { highX = x }
                 if (y < lowY) { lowY = y }
@@ -1346,10 +1352,10 @@ extension UIImage {
         //Filter through data and look for transparent or white pixels.
         let samplingDensity = 10
         print("data:", data)
-        for yy in (0 ..< heightInt/samplingDensity) {
-            let y = CGFloat(yy*samplingDensity)
-            for xx in (0 ..< widthInt/samplingDensity) {
-                let x = CGFloat(xx*samplingDensity)
+        for yy in (0 ..< heightInt / samplingDensity) {
+            let y = CGFloat(yy * samplingDensity)
+            for xx in (0 ..< widthInt / samplingDensity) {
+                let x = CGFloat(xx * samplingDensity)
                 let pixelIndex = (width * y + x) * 1 /* 1 for grayscale */
                 print(data[Int(pixelIndex)])
                 //                if data[Int(pixelIndex)] == 0  { continue } // crop transparent
@@ -1470,10 +1476,21 @@ extension UIImage {
     }
     
     func inverted() -> UIImage? {
+        
+        let cgImage = self.cgImage!
+        
+        let decodeArray: [CGFloat] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+        
+        let newImage = CGImage(width: cgImage.width, height: cgImage.height, bitsPerComponent: cgImage.bitsPerComponent, bitsPerPixel: cgImage.bitsPerPixel, bytesPerRow: cgImage.bytesPerRow, space: cgImage.colorSpace!, bitmapInfo: cgImage.bitmapInfo, provider: cgImage.dataProvider!, decode: decodeArray, shouldInterpolate: cgImage.shouldInterpolate, intent: cgImage.renderingIntent)
+        
+        return UIImage(cgImage: newImage!, scale: scale, orientation: imageOrientation)
+
+    }
+    
+    func brighten(_ brightness: CGFloat) -> UIImage? {
         guard let cgImage = self.cgImage else { return nil }
         let ciImage = CoreImage.CIImage(cgImage: cgImage)
-        guard let filter = CIFilter(name: "CIColorInvert") else { return nil }
-        filter.setDefaults()
+        guard let filter = CIFilter(name: "CIColorControls", parameters: ["inputBrightness": brightness]) else { return nil }
         filter.setValue(ciImage, forKey: kCIInputImageKey)
         let context = CIContext(options: nil)
         guard let outputImage = filter.outputImage else { return nil }
