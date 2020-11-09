@@ -23,8 +23,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 import UIKit
+import AudioToolbox
 
 let IPHONE5_PORTRAIT_BUTTON_WIDTH: CGFloat = 24.0
 let IPHONE5_PORTRAIT_BUTTON_HEIGHT: CGFloat = 38.0
@@ -432,19 +432,8 @@ struct ScreenGeometry {
     var titleImage: UIImage? {
         get { return titleImageView.image }
         set {
-//            if #available(iOS 13, *) {
-//                if (traitCollection.userInterfaceStyle == .dark && invertImageInDarkMode) {
-//                    delegate?.log("inverting title image for " + inputID )
-//                    titleImageView.image = newValue!.inverted()
-//                    magnifierTitleImageView.image = newValue!.inverted()
-//                } else {
-//                    titleImageView.image = newValue
-//                    magnifierTitleImageView.image = newValue
-//                }
-//            } else {
-                titleImageView.image = newValue
-                magnifier?.titleImageView = magnifierTitleImageView
-            //}
+            titleImageView.image = newValue
+            magnifier?.titleImageView = magnifierTitleImageView
         }
     }
     
@@ -453,6 +442,9 @@ struct ScreenGeometry {
     var titleIsPersistent: Bool = true // false means: displayed label/image changes to last selected option
     
     var optionsArePersistent: Bool = false // for the roman letter key
+    
+    var shouldPlaySound: Bool = true
+    var soundID: SystemSoundID = 1123 // standard keyboard click sound
     
     // shortcuts for the label's properties
     
@@ -555,35 +547,21 @@ struct ScreenGeometry {
     
     func updateHighlightedOptionImages() {
         highlightedOptionsImages = []
-//            if #available(iOS 13, *) {
-//                if (traitCollection.userInterfaceStyle == .dark) {
-//                    for inputOptionImage: UIImage in optionsImages {
-//                        let idx = optionsImages.firstIndex(of: inputOptionImage)
-//                        optionsImages[idx!] = inputOptionImage.inverted()!
-//                        highlightedOptionsImages.append(optionsImages[idx!])
-//                    }
-//                } else {
-//                    for inputOptionImage: UIImage in optionsImages {
-//                        highlightedOptionsImages.append(inputOptionImage.inverted()!)
-//                    }
-//                }
-//            } else {
-            for inputOptionImage: UIImage in optionsImages {
-                if #available(iOS 13, *) {
-                    if (traitCollection.userInterfaceStyle == .dark  || !invertImagesOnHighlighting) {
-                        highlightedOptionsImages.append(inputOptionImage)
-                    } else {
-                        highlightedOptionsImages.append(inputOptionImage.inverted()!)
-                    }
+        for inputOptionImage: UIImage in optionsImages {
+            if #available(iOS 13, *) {
+                if (traitCollection.userInterfaceStyle == .dark  || !invertImagesOnHighlighting) {
+                    highlightedOptionsImages.append(inputOptionImage)
                 } else {
-                    if (invertImagesOnHighlighting) {
-                        highlightedOptionsImages.append(inputOptionImage.inverted()!)
-                    } else {
-                        highlightedOptionsImages.append(inputOptionImage)
-                    }
+                    highlightedOptionsImages.append(inputOptionImage.inverted()!)
+                }
+            } else {
+                if (invertImagesOnHighlighting) {
+                    highlightedOptionsImages.append(inputOptionImage.inverted()!)
+                } else {
+                    highlightedOptionsImages.append(inputOptionImage)
                 }
             }
-        //}
+        }
     }
     
     var highlightedOptionsImages: Array<UIImage> = []
@@ -879,26 +857,6 @@ struct ScreenGeometry {
     }
 
     func updateColors() { // for dark mode
-        
-//        if #available(iOS 13, *) {
-//            color = DYNAMIC_DEFAULT_KEY_COLOR.resolvedColor(with: self.traitCollection)
-//            titleColor = DYNAMIC_DEFAULT_FONT_COLOR.resolvedColor(with: self.traitCollection)
-//            highlightColor = DYNAMIC_DEFAULT_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
-//            optionHighlightColor = DYNAMIC_DEFAULT_OPTION_HIGHLIGHT_COLOR.resolvedColor(with: self.traitCollection)
-//            shadowColor = DYNAMIC_DEFAULT_SHADOW_COLOR.resolvedColor(with: self.traitCollection)
-//            layer.shadowColor = shadowColor?.cgColor
-//
-//        } else {
-//            color = DEFAULT_KEY_COLOR_LIGHT
-//            backgroundColor = self.color
-//            titleColor = DEFAULT_FONT_COLOR_LIGHT
-//            highlightColor = DEFAULT_HIGHLIGHT_COLOR_LIGHT
-//            optionHighlightColor = DEFAULT_OPTION_HIGHLIGHT_COLOR_LIGHT
-//            shadowColor = DEFAULT_SHADOW_COLOR_LIGHT
-//            layer.shadowColor = shadowColor?.cgColor
-//            }
-        
-        
         if (state == .highlighted) {
             backgroundColor = highlightColor
         } else {
@@ -923,7 +881,6 @@ struct ScreenGeometry {
         titleLabel.textAlignment = .center
         titleLabel.isUserInteractionEnabled = false
         
-        
         if #available(iOS 13, *) {
             titleColor = DYNAMIC_DEFAULT_FONT_COLOR
             self.color = DYNAMIC_DEFAULT_KEY_COLOR
@@ -941,11 +898,9 @@ struct ScreenGeometry {
         
         titleImageView.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin, .flexibleBottomMargin]
         
-        
         titleImageView.backgroundColor = .clear
         titleImageView.isUserInteractionEnabled = false
         titleImageView.contentMode = .center
-        
         
         self.addSubview(titleImageView)
         
@@ -976,8 +931,20 @@ struct ScreenGeometry {
         } else {
             backgroundColor = self.color
         }
-
         
+        if (soundID == 1123) {
+            if #available(iOS 10.0, *) { } else {
+                soundID = 1104
+            }
+        }
+    }
+    
+    func playSound() {
+        if (shouldPlaySound) {
+            DispatchQueue.global().async {
+                AudioServicesPlaySystemSound(self.soundID)
+            }
+        }
     }
     
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -1023,8 +990,6 @@ struct ScreenGeometry {
     
     @objc func showOptions(recognizer: UILongPressGestureRecognizer) {
         
-        //hideMagnifier()
-        
         if (recognizer.state == .began) {
             
             if (optionsView == nil) {
@@ -1049,7 +1014,6 @@ struct ScreenGeometry {
             
         }
     
-        
     }
     
     func hideMagnifier() {
@@ -1065,8 +1029,6 @@ struct ScreenGeometry {
         optionsView?.removeFromSuperview()
         optionsView = nil
     }
-    
-    
     
     func updateButtonPosition() {
         // Determine the button's position state based on the superview padding
@@ -1132,8 +1094,10 @@ struct ScreenGeometry {
     }
     
     @objc func handleTouchDown() {
-        UIDevice.current.playInputClick()
-        backgroundColor = highlightColor
+        // UIDevice.current.playInputClick() // can't get it to work, so we roll our own
+        if (!optionsArePersistent) {
+            playSound()
+        }
         if shouldShowMagnifier { showMagnifier() }
     }
     
@@ -1176,6 +1140,9 @@ struct ScreenGeometry {
                 if idx != NSNotFound {
                     let inputOptionID = optionsInputIDs[idx]
                     delegate?.handleKeyboardEvent(inputOptionID, save: true)
+                    if (optionsArePersistent) {
+                        playSound()
+                    }
                     if !titleIsPersistent {
                         inputID = optionsInputIDs[idx]
                         updateTitle(optionsTitles[idx])
@@ -1226,7 +1193,6 @@ struct ScreenGeometry {
         super.touchesCancelled(touches, with: event)
         hideMagnifier()
     }
-    
     
 }
 

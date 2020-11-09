@@ -91,7 +91,6 @@ class MuFuKeyboardButtonDetailView: UIView {
     var highlightedInputIndex: NSInteger
     var previouslyHighlightedInputIndex: NSInteger = NSNotFound
     
-    
     var rootButton: MuFuKeyboardButton
     var inputOptionsRects: Array<CGRect> = []
     
@@ -150,7 +149,6 @@ class MuFuKeyboardButtonDetailView: UIView {
         
         cornerRadius = rootButton.cornerRadius
         rootShadowColor = rootButton.color!
-        
         
         super.init(frame: frame)
         
@@ -249,6 +247,9 @@ class MuFuKeyboardButtonDetailView: UIView {
         if let tappedInputID = optionalTappedInputID
         {
             rootButton.delegate?.handleKeyboardEvent(tappedInputID, save: true)
+            if (rootButton.optionsArePersistent) {
+                rootButton.playSound()
+            }
             rootButton.updateTitle(tappedInputID)
         }
 
