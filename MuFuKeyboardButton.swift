@@ -25,6 +25,7 @@
 
 import UIKit
 import AudioToolbox
+import CoreGraphics
 
 let IPHONE5_PORTRAIT_BUTTON_WIDTH: CGFloat = 24.0
 let IPHONE5_PORTRAIT_BUTTON_HEIGHT: CGFloat = 38.0
@@ -1405,10 +1406,33 @@ extension UIImage {
         accessibilityIdentifier = imageName
     }
     
+    func numberOfColorChannels() -> Int {
+        return self.cgImage!.colorSpace!.numberOfComponents
+    }
+    
+    func hasAlphaChannel() -> Bool {
+        return (self.numberOfColorChannels() == 4) // assuming RGB, not grayscale
+    }
+    
+    func imageByAddingAlphaComponent(_ alpha: CGFloat) -> UIImage? {
+        return UIGraphicsImageRenderer(size: size).image { _ in
+            draw(at: .zero, blendMode: .normal, alpha: alpha)
+        }
+    }
+    
+    func asGrayScale() -> UIImage? {
+        let imageRect = CGRect(x: 0.0, y: 0.0, width: self.size.width, height: self.size.height)
+        let grayColorSpace: CGColorSpace = CGColorSpaceCreateDeviceGray()
+        let ctx = CGContext(data: nil, width: Int(self.size.width), height: Int(self.size.height), bitsPerComponent: 8, bytesPerRow: 0, space: grayColorSpace, bitmapInfo: CGImageAlphaInfo.none.rawValue)!
+        ctx.draw(self.cgImage!, in: imageRect)
+        let newCGImage: CGImage = ctx.makeImage()!
+        return UIImage(cgImage: newCGImage)
+    }
+    
     
     func whiteToTransparent() -> UIImage? {
         let ctx = CIContext()
-        let ciImage = CIImage(cgImage: (self.inverted()?.cgImage!)!)
+        let ciImage = CIImage(cgImage: (self.imageByAddingAlphaComponent(1.0)!.inverted()?.cgImage!)!)
         let filter = CIFilter(name: "CIMaskToAlpha")
         filter?.setDefaults()
         filter?.setValue(ciImage, forKey: "inputImage")
@@ -1419,8 +1443,6 @@ extension UIImage {
         }
         return nil
     }
-    
-    
     func blackToTransparent() -> UIImage? {
         return self.inverted()?.whiteToTransparent()?.inverted()
     }
@@ -1441,11 +1463,12 @@ extension UIImage {
         return UIGraphicsGetImageFromCurrentImageContext() ?? self
     }
     
+    
     func inverted() -> UIImage? {
         
         let cgImage = self.cgImage!
         
-        let decodeArray: [CGFloat] = [1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
+        let decodeArray: [CGFloat] = [0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0]
         
         let newImage = CGImage(width: cgImage.width, height: cgImage.height, bitsPerComponent: cgImage.bitsPerComponent, bitsPerPixel: cgImage.bitsPerPixel, bytesPerRow: cgImage.bytesPerRow, space: cgImage.colorSpace!, bitmapInfo: cgImage.bitmapInfo, provider: cgImage.dataProvider!, decode: decodeArray, shouldInterpolate: cgImage.shouldInterpolate, intent: cgImage.renderingIntent)
         
@@ -1457,6 +1480,26 @@ extension UIImage {
         guard let cgImage = self.cgImage else { return nil }
         let ciImage = CoreImage.CIImage(cgImage: cgImage)
         guard let filter = CIFilter(name: "CIColorControls", parameters: ["inputBrightness": brightness]) else { return nil }
+        filter.setValue(ciImage, forKey: kCIInputImageKey)
+        let context = CIContext(options: nil)
+        guard let outputImage = filter.outputImage else { return nil }
+        guard let outputImageCopy = context.createCGImage(outputImage, from: outputImage.extent) else { return nil }
+        return UIImage(cgImage: outputImageCopy, scale: self.scale, orientation: self.imageOrientation)
+    }
+    
+    func darken(_ brightness: CGFloat) -> UIImage? {
+        guard let cgImage = self.cgImage else { return nil }
+        let ciImage = CoreImage.CIImage(cgImage: cgImage)
+
+        let filterParams: [String: CIVector] = [
+            "inputRVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: 0.0),
+            "inputGVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: 0.0),
+            "inputBVector": CIVector(x: 0.0, y: 0.0, z: 0.0, w: 0.0),
+            "inputAVector": CIVector(x: 1.0, y: 0.0, z: 0.0, w: 0.0),
+            "inputBiasVector": CIVector(x: brightness, y: brightness, z: brightness, w: 0.0)
+        ]
+
+        guard let filter = CIFilter(name: "CIColorMatrix", parameters: filterParams) else { return nil }
         filter.setValue(ciImage, forKey: kCIInputImageKey)
         let context = CIContext(options: nil)
         guard let outputImage = filter.outputImage else { return nil }
